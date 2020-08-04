@@ -1,0 +1,191 @@
+
+body, html, * {
+    box-sizing: padding-box;
+    font-family: Verdana,Arial,sans-serif;
+    font-size: 16px;
+    line-height: 1.2;
+}
+.printing {
+    background-color: #cbc8c9;
+    border: medium none;
+    border-radius: 0;
+    display: inline;
+    font-size: 12px;
+    padding: 5px;
+    position: relative;
+}
+#toggler {
+    background-color: #efe5d2;
+    color: #ffa500;
+    cursor: pointer;
+    padding: 3px 8px;
+    position: relative;
+    right: 1em;
+    top: -20px;
+    width: 28px;
+}
+#toggler:hover {
+    background-color: #e4e1e2;
+    color: #b0afa5;
+}
+#inputs {
+    background-color: #f3e2b7;
+    box-sizing: content-box;
+    margin: 0 auto;
+    padding: 2%;
+    text-align: center;
+    width: 80%;
+}
+#intro {
+    left: 10em;
+    margin: 2em;
+    position: relative;
+    width: 20em;
+}
+.trigger:hover:not(#total):not(#current) {
+    background-color: #e4e1e2;
+    font-size: 80%;
+}
+.trigger {
+    background-color: #efe5d2;
+    color: #b0afa5;
+    cursor: default;
+    display: inline;
+    font-size: 100%;
+    padding: 3px 8px;
+    position: relative;
+}
+#item, #amount {
+    font-family: Times New Roman,tahoma;
+    font-size: small;
+}
+.cell, #total, #submit, #reset {
+    border-radius: 5px;
+    color: #778899;
+    font-size: 100%;
+    font-size-adjust: 1;
+    font-weight: 600;
+    text-align: right;
+}
+#reset, #total, #submit {
+    font-size: 80%;
+}
+#total, #current {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+}
+#reset {
+    left: -30%;
+}
+#submit {
+    right: -30%;
+}
+body {
+    background-color: #ebebeb;
+    width: 100%;
+}
+#resultsPane > table {
+    margin: 0 auto;
+}
+header {
+    background-color: #ffffdf;
+    font-size: 120%;
+    padding: 0.5em;
+    text-align: center;
+    width: 100%;
+}
+header {
+    background-color: #ffffdf;
+    box-sizing: content-box;
+    font-size: 120%;
+    margin: 0 auto;
+    padding: 2em;
+    text-align: center;
+    width: 80%;
+}
+nav {
+    background-color: #e8e8e8;
+    border-bottom: 1px solid #000000;
+    font-family: Arial;
+    margin: 0 auto;
+    padding: 1em;
+    text-align: center;
+    width: 80%;
+}
+nav ul li {
+    display: inline;
+    font-style: oblique;
+}
+nav ul li a {
+    border: medium none;
+    border-radius: 50%;
+    color: #0000ff;
+    padding: 0.5em 1em;
+    text-decoration: none;
+}
+nav ul li a:visited {
+    color: #b30000;
+    text-decoration: overline dotted #ffff00;
+}
+nav ul li a:hover {
+    color: #228080;
+    text-decoration: overline dotted #0000ff;
+}
+nav ul li a:link {
+    color: #808000;
+}
+#resultsPane {
+    width: 101%;
+}
+#row {
+    width: 70%;
+}
+#trigger {
+    margin: 1em;
+}
+#input {
+    margin: 2em;
+}
+.input {
+    font-family: Verdana,Arial,sans-serif;
+    font-stretch: extra-expanded;
+}
+#cell0 {
+    text-align: left;
+}
+.RASTERS {
+    width: 85%;
+}
+#manage {
+    background-color: #4c4c4c;
+    border-radius: 4px;
+    color: #cccccc;
+    left: 116px;
+    overflow-x: hidden;
+    padding-top: 60px;
+    position: absolute;
+    top: 25em;
+    transition: all 0.3s ease 0s;
+    width: 0;
+    z-index: 1;
+    padding-bottom: 60px;
+}
+#manage > .managed {
+    cursor: pointer;
+    display: block;
+    font-size: 25px;
+    left: 10px;
+    padding: 8px 8px 8px 32px;
+    position: relative;
+    transition: all 0.3s ease 0s;
+    width: 90%;
+    font-family: Helvetica, serif;
+}
+.managed:hover {
+    border-radius: 7px;
+    color: #ffffff;
+    cursor: pointer;
+    background-color: #989898;
+}
+.toggle {
+    width: 250px;
+}
