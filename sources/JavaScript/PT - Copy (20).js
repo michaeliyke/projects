@@ -17,7 +17,7 @@ if (   !(machineInfo && machineInfo.noIssues)   ) {
 throw new TypeError("Sorry, some issus were encountered while loading core files.");
 }
 global.Techie = global.pt = factory.call( stub, global, machineInfo, factor, global.document, factory ); 
-// console.clear();
+console.clear();
 console.info("Techie JavaScript API working perfectly");
 } 
 }
@@ -671,9 +671,6 @@ if (node && (datum.nodeType == 1)) {
   }
 return false;
 }, 
-hidden: function(){
-  alert(this)
-},
 dom: function isDom(d){
 if (typeof d === "object") {
 var html = d.ownerDocument == document || d == document || d instanceof HTMLElement;
@@ -1035,7 +1032,7 @@ function delta(ds, fn /*optional. Default is techie*/, type){
 return type ? stub.alpha(ds, type, fn) :
 (ds && is.techie(ds) && is.list(ds) ? fn.apply(ds, ds): fn.apply( (ds = Techie.emptyPT(ds)) , ds));
 }
-function alpha(x, typ, fn){//.alpha(div, "array", function(d){a(d)})
+function alpha(x, typ, fn){//.alpha(div, "array", functiion(d){a(d)})
 typ = type.data[stub.capA(typ).toLowerCase()]; if (!is.list(x)) {x = [x];}
 return fn.call( (x = typ.apply(null, x)),   x );
 }
@@ -1243,13 +1240,12 @@ getWheelDelta: function(event) {
         return -event.detail * 40;
     }
 },
-getCharCode: function(event) { 
-    if (Object.prototype.toString.call(event.charCode) == "[object Number]") {
+getCharCode: function(event) {
+    if (typeof event.charCode == "number") {
         return event.charCode;
-    } else if (event.keyCode) { 
+    } else {
         return event.keyCode;
     }
-    return null;
 },
 //used to get mouse click right, left, midle wheel
 getMouseButton: function(event) {
@@ -1271,10 +1267,10 @@ getMouseButton: function(event) {
         }
     }
 },
-on: function on(event, fn, object) {//window.on("scroll", function(){});
+on: function(event, fn, object) {//window.on("scroll", function(){});;;
     enclose(cast(this, object)).forEach(function( object, index) {
-        Events.addHandler(object, event, fn.bind(this));
-    }, null, this); 
+        Events.addHandler(object, event, fn.bind(object));
+    }); 
     return this;
 },
 
@@ -1299,111 +1295,16 @@ return this;
 //TECHIE METHODS
 
 //TECHIE METHODS
-
-
-dispatch: function dispatch(type, details){
-details = details || {};
-    function isFn(d){
-    return Object.prototype.toString.call(d) == "[object Function]";
-}
-
-if (is.string(type) == false) { 
-    throw new Error("A String expect but found " + type);
-}
-var type = type.toLowerCase(), group, e, bubbles = true, cancelable = true, detail = {
-  trigger: details.trigger, EVENTGROUP: null
-};
-if (type == "change") {
-    bubbles = false;
-}
-switch(type){
-    case "click": case "mousedown": case "mouseup": case "mousemove":case "mouseleave": 
-    case "dblclick": case "mouseenter": case "mouseout": case "mouseover": 
-        group = "MouseEvents"; break
-    default: group = "HTMLEvents";
-}
-
-var Event = document.createEvent = "";
-
-this.each(function(element){
-
-if (typeof Event != "undefined" && isFn(Event)) { 
-    e = new Event(group);
-    e.EVENTGROUP = e.type;
-    e.synthetic = true;
-    e.initEvent(type, bubbles, cancelable);
-    // dispatch
-} else if ('createEvent' in document && isFn(document.createEvent)) {
-    try{
-        e = document.createEvent(group); 
-        e.synthetic = true;
-        e.EVENTGROUP = e.type;
-        e.initEvent(type, bubbles, cancelable);
-    } catch(error){ 
-    e = document.createEvent("CustomEvent");
-    e.synthetic = true;
-    e.EVENTGROUP = e.type;
-    e.initCustomEvent(type, bubbles, cancelable, detail );
-    // dispatch
-    }
-    // dispatchEvent
-} else if (typeof CustomEvent !== "undefined" && isFn(CustomEvent)) { 
-    e = new CustomEvent("CustomEvent", {detail: detail, bubbles: bubbles, cancelable: cancelable});
-    e.synthetic = true; 
-    e.EVENTGROUP = e.type;
-    e.initCustomEvent(type, bubbles, cancelable, detail);
-    // dispatch
-} else if ("createEventObject" in document && isFn(document.createEventObject)) {
-    e = document.createEventObject();
-    e.synthetic = true;
-    e.type = type;
-    e.bubbles = bubbles;
-    e.cancelable = cancelable;
-    e.detail = detail;
-    e.button = 1;
-    e.EVENTGROUP = e.type;
-    // fireEvent
-}
-
-if ("dispatchEvent" in element) {
-    result = element.dispatchEvent(e, type);
-} else if ("fireEvent" in element) {
-    result = element.fireEvent("on" + type, e);
-}
-if (result == false) {
-    console.dir( type + "Event default behaviour was prevented.");
-        // event was cancelled
-        // Animation issues could be solved here in terms of managing qeues. If it ran successfully, run the next thing that follows otherwise
-        //  it was cancelled and a different tyhing could be done instead
-    } else{
-        // event ran successfully
-        console.dir(type + "Event successfully dispatched on " + element + " with full bubbles" );
-    }
-    });
-    return this;
-},
-
-
-enter: function enter(fn) {
-  this.once(function(){  
-    var This = this;
-    this.addHandler(document, "keydown", function(event){
-      if (( event || window.event ).keyCode == 13) {
-         fn.call(This, event);
-  }
-    });
-  });
-    return this;
-},
-
-escape: function escape(fn) {
-  this.once(function(){
-    this.addHandler(document, "keydown", function(event){
-      if (( event || window.event ).keyCode == 27) {
-         fn.call(this, event);
-  }
-    });
-  });
+enter: function enter(fn, e) {
+    delta( cast(this, e), function(element){
+        this.addHandler(document, "keydown", function ( event ) {
+             if (( event || window.event ).keyCode == 13) {
+                    fn.call( element[0], event, element[0] );
+                }
+                    });
+                    
+    }.bind(this));
+   
     return this;
 },
 
@@ -1460,15 +1361,12 @@ this.each(function(element){
 return this;
 },
 
-hover: function hover(fn, func) {
-  switch(true){
-    case Object.prototype.toString.call(fn) != "[object Function]":
-    case Object.prototype.toString.call(func) != "[object Function]" && Object.prototype.toString.call(func) != "[object Undefined]":
-      throw new TypeError(".hover expects a function and an optional second argument which must also be a function if provided.");
-  }
-  this.each(function(element){
-    this.addHandler("mouseenter", (fn || function(){}).bind(this)).addHandler("mouseleave", (func || function(){}).bind(element));
-  });
+hover: function hover(fn, func,  e) {
+delta(cast(this, e), function(){
+this.each(function(element){
+    this.addHandler("mouseenter", fn.bind(element)).addHandler("mouseleave", func.bind(element));
+});
+});
 return this;
 },
 
@@ -1555,9 +1453,9 @@ preventDefault: function(event) {
     }
 },
 prevent: function(event) {
-    if (event && event.preventDefault) {
+    if (event.preventDefault) {
         event.preventDefault();
-    } else if(event) {
+    } else {
         event.returnValue = false;
     }
 },
@@ -1626,9 +1524,7 @@ it by the time the machine has internet access*/
 });
 }
 };
-
 Events.strew();
-
 var client = function client() { //client machine information
 
 function istouch(){
@@ -2407,37 +2303,110 @@ var Reg = {
 };
 
 
-var FX = function(){
-  return {
-    slow: 600,
-  xslow: 800,
-  vslow: 1000,
-  normal: 400,
-  fast: 200,
-  xfast: 100,
+var POP = {
+    obj: null,
+    minimal: function minimal(message, title, styleObject) {
+   this.originalBackround = Techie.PT.computedStyle(sapi.body)["background-color"];   
+        message = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui  officia deserunt mollit anim id est laborum.";
+        title = title || 'Prize Techie';
+        var cover = sapi.createElement('div');
+        cover.textContent = "I love crazy boys";
+            //focus on it and blur the body of the document                 
+            //pt.css(cover, {opacity:1, "background-color": "blue", "z-index": 2, width: body.width, height: body.height});
+        Blob = "<div id=pop >" +
+                    "<h3 id=header class=header > Dummy Text </h3> <hr />" +
+                    "<p id=message class=message body> Dummy Text  </p>" +
+                    "<footer id=footer> <hr />" +
+                     "<span id=Cancel class=action>Nope!</span> <span id=Ok class=action>Sure!</span>"+
+                   " </footer>" +
 
-  settings: {
-    options: ["slow", "fast", "xslow", "xfast", "normal"],
-    slow: function(n){
-      this.setting("slow", n);
-      return this;
+            "</div>",
+            div = pt.createFrag(Blob);
+        if (styleObject) {
+            if (toSting.call(styleObject) != '[object Object]') {
+                throw new TypeError('Only a plain object is required to extend the popup styles. Array or string is not supported');
+            }
+            pt.mixin( this.css,styleObject);
+        }
+
+        var header, body, footer,  Ok, Cancel; div.Children = div.children;
+          ( header = div.Children[0]).innerHTML = title;
+            body = div.Children[2].innerHTML = message;
+            footer = div.Children[3]; 
+sapi.body.appendChild(div);Ok = pt("#Ok", footer)[0]; Cancel = pt("#Cancel", footer)[0];
+
+        //data-dissabled
+sapi.body.style["pointer-events"] = "none";
+// sapi.body.style["position"] = "fixed";
+
+        pt.css( div,this.css); //styles the div
+        /*EventUtil.addHandler(Cancel, 'click', function() {
+            pt.pop.hide(Cancel);
+        });*/
+        pt(Ok).click(pt.FX.POP.hide.bind(Ok, div));
+        pt(Cancel).click(pt.FX.POP.hide.bind(Cancel, div));
+        
     },
-    fast: function(n){
-      this.setting("fast", n);
-      return this;
+    display: function display() {
+        pt.css(this.obj,"display:block");
     },
-    xslow: function(n){
-      this.setting("xslow", n);
-      return this;
+
+    hide: function hide(object, parent) {
+        pt.FX.fadeOut(object || this.obj, {
+            duration: 400,
+            complete: function complete(e) {
+        // sapi.body.style["position"] = "relative";
+        sapi.body.style["pointer-events"] = "auto";
+        sapi.body.style["backgroundColor"] = pt.FX.POP.originalBackround;
+        var obj = parent || object;
+        obj.parentNode.removeChild(obj);
+            }
+        });
+
+pt.css(sapi.body, {
+
+});
+
+    //(object || this.obj).style.display = 'none';
     },
-    xfast: function(n){
-      this.setting("xfast", n);
-      return this;
+      show: function show(object) {
+        sapi.body.style["pointer-events"] = "auto";
+        pt.FX.fadeIn(object || this.obj, {
+            duration: 500,
+            complete: function complete(e) {
+                // a(this.textContent)
+            }
+        });
+
+pt.css(sapi.body, {
+"position": "relative",opacity: 1  
+});
+
+    //(object || this.obj).style.display = 'none';
     },
-    setting: function(speed, degree){
-      FX[speed] = degree;
+    small: function small(msg) {
+        var div = sapi.createElement('div'),
+            def1 = {
+display: 'block',position: 'absolute',left: "12%",width: '35%',
+top: '2em',color: 'cyan',padding: '1em',background: '#444',
+'font-size': '1em','z-index': 1,'text-align': 'center'
+},
+def2 = {display: 'none'};
+        div.id = 'test';
+        var ed = "<p><small>Yet, they are real fun!!</small></p>";
+        div.innerHTML = msg || "I love to use a popup, but they drive me crazy." + ed;
+        sapi.body.appendChild(div);
+        Techie.PT.css( div, def1);
+        Events.addHandler(sapi, 'click', function() {
+            pt.pop.hide(div)
+        });
+
     }
-  },
+}
+
+!(function() {
+var FX = {
+  POP: POP,
 easing: {
     linear: function(progress) {
         return progress;
@@ -2465,49 +2434,23 @@ easing: {
         return Math.pow(2, 10 * (progress - 1)) * Math.cos(20 * Math.PI * x / 3 * progress);
     }
 },
-
-fadeIn: function(element, options) {
-    var to = 0;
-    this.animate({
-        duration: options.duration,
-        delta: function(progress) { 
-            progress = this.progress;
-            return FX.easing.swing(progress);
-        },
-        complete: function complete(){
-          if (options.complete) {
-            options.complete();
-          }
-        },
-step: function(delta) {
-            if (element && element.style) {
-              var display, timer = setTimeout(function(){
-                clearTimeout(timer);
-              if ((display = FX.displays.search(element))) {
-                element.style.display = display;
-                FX.displays.unregister(element);
-              } else{
-                element.style.display = "block";
-              }
-              element.style.opacity = to + delta;
-              }, 0);
-            }
+animate: function(options) {
+    var start = new Date;
+    var id = setInterval(function() {
+        var timePassed = new Date - start;
+        var progress = timePassed / options.duration;
+        if (progress > 1) {
+            progress = 1;
         }
-    });
+        options.progress = progress;
+        var delta = options.delta(progress);
+        options.step(delta);
+        if (progress == 1) {
+            clearInterval(id);
+            options.complete();
+        }
+    }, options.delay || 10);
 },
-
-fadeStyle: function fade (node) { // fade(document.body);
-var level = 1;    
-var step = function () {
-var hex = level.toString(16);
-node.style.backgroundColor = '#FFFF' + hex + hex; 
-if (level < 15) {
-level += 1;  
-setTimeout(step, 100);  
-}};       
-setTimeout(step, 100); 
-},
-
 fadeOut: function(element, options) {
     var to = 1;
     this.animate({
@@ -2518,69 +2461,45 @@ fadeOut: function(element, options) {
         },
         complete: function(){
             if (options.complete) {options.complete.call(element, element)}
-              FX.displays.register(element);
-                // element.style.display = 'none';
+                element.style.display = 'none';
         },
-        step: function(delta) {        
-            element.style.opacity = to - delta; 
+        step: function(delta) {
+            element.style.opacity = to - delta;
         }
     });
 },
 
-animate: function(options) {
-    var start = new Date;
-    var id = setInterval(function() {
-        var timePassed = new Date - start;
-        var progress = timePassed / options.duration; 
-        if (progress > 1) {
-            progress = 1;
-        }
-        options.progress = progress; 
-        var delta = options.delta(progress);
-        options.step(delta);
-        if (progress == 1) {
-            clearInterval(id);
-            options.complete();
-        }
-    }, options.delay || 10);
+fade: function fade (node) { // fade(document.body);
+var level = 1;    
+var step = function () {
+var hex = level.toString(16);
+node.style.backgroundColor = '#FFFF' + hex + hex; 
+if (level < 15) {
+level += 1;  
+setTimeout(step, 100);  
+}};     
+setTimeout(step, 100); 
 },
 
-  displays: {
-    // "inline-block": [elementOne, elementTwo, elementThree, elementFour]
-    register: function register(node){
-      var display = Techie.computedStyle(node)["display"];
-      if (this[display] == null) {
-        this[display] = [];
-      }
-      this[display].push(node);
-    },
-    unregister: function unregister(node){
-      var display = Techie.computedStyle(node)["display"], array;
-      if (!(array = this[display])) {
-        return null
-      }
-      this[display].splice(this[display].indexOf(node), 1);
-    },
-    search: function search(node){
-      var bool = null, jot, display;
-      for(jot in this){
-        if (this.hasOwnProperty(jot)) {
-          display = this[jot];
-          if (is.array(display) && display.indexOf(node) > -1) {
-          console.log(display)
-            bool = jot;
-            break
-          }
+
+
+fadeIn: function(element, options) {
+    var to = 0;
+    this.animate({
+        duration: options.duration,
+        delta: function(progress) {
+            progress = this.progress;
+            return FX.easing.swing(progress);
+        },
+        complete: options.complete,
+        step: function(delta) {
+            element.style.opacity = to + delta;
         }
-      }
-
-      return bool;
-    }
-  },
-
-  
-  };
-}();
+    });
+}
+};
+Techie.FX  = FX;
+})();
 
 function Animation (){ 
 //jQuery(selector).animate({css},speed,easing,callback)
@@ -2607,8 +2526,7 @@ Techie.PT = Techie.pt = Techie.prototype = _techie = {
 
 constructor: Techie,
 
-FX: FX,
-Animation: Animation,
+
 Techie: function PT(selector, context) { 
  var funcs, string, object, others, index = 0, str = ({}).toString.call(selector), 
 prevObject, nextObject, nodes = [], length, toString, wrapper, leng = 0;
@@ -2758,7 +2676,7 @@ concat: function(array){
   });
   return this;
 },
-push: function(item){
+push: function(item) { 
   this[this.length++] = item;
   return this;
 },
@@ -2791,106 +2709,6 @@ chop: function(){ //remove one item at the begining of this
   this.splice(0, 1);
   return this;
 },
-minimalFX: function minimal(message, title, styleObject) {
-   this.originalBackround = Techie.PT.computedStyle(sapi.body)["background-color"];   
-        message = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui  officia deserunt mollit anim id est laborum.";
-        title = title || 'Prize Techie';
-        var cover = sapi.createElement('div');
-        cover.textContent = "I love crazy boys";
-            //focus on it and blur the body of the document                 
-            //pt.css(cover, {opacity:1, "background-color": "blue", "z-index": 2, width: body.width, height: body.height});
-        Blob = "<div id=pop >" +
-                    "<h3 id=header class=header > Dummy Text </h3> <hr />" +
-                    "<p id=message class=message body> Dummy Text  </p>" +
-                    "<footer id=footer> <hr />" +
-                     "<span id=Cancel class=action>Nope!</span> <span id=Ok class=action>Sure!</span>"+
-                   " </footer>" +
-
-            "</div>",
-            div = pt.createFrag(Blob);
-        if (styleObject) {
-            if (toSting.call(styleObject) != '[object Object]') {
-                throw new TypeError('Only a plain object is required to extend the popup styles. Array or string is not supported');
-            }
-            pt.mixin( this.css,styleObject);
-        }
-
-        var header, body, footer,  Ok, Cancel; div.Children = div.children;
-          ( header = div.Children[0]).innerHTML = title;
-            body = div.Children[2].innerHTML = message;
-            footer = div.Children[3]; 
-sapi.body.appendChild(div);Ok = pt("#Ok", footer)[0]; Cancel = pt("#Cancel", footer)[0];
-
-        //data-dissabled
-sapi.body.style["pointer-events"] = "none";
-// sapi.body.style["position"] = "fixed";
-
-        pt.css( div,this.css); //styles the div
-        /*EventUtil.addHandler(Cancel, 'click', function() {
-            pt.pop.hide(Cancel);
-        });*/
-        pt(Ok).click(pt.FX.POP.hide.bind(Ok, div));
-        pt(Cancel).click(pt.FX.POP.hide.bind(Cancel, div));
-        
-    },
-    displayFX: function display() {
-        pt.css(this.obj,"display:block");
-    },
-
-        // sapi.body.style["position"] = "relative";
-        // sapi.body.style["pointer-events"] = "auto";
-    //(object || this.obj).style.display = 'none';
-    hideFX: function hideFX() {
-      this.each(function(element){
-        FX.fadeOut(element, {
-          duration: 800, 
-          complete: function(node){
-            // alert(node);
-          }
-        });
-      });
-      return this;
-    },
-     showFX: function showFX() {
-      this.each(function(element){
-        FX.fadeIn(element, {
-          duration: 800, 
-          complete: function(node){
-            // alert(node);
-          }
-        });
-      });
-      return this;
-    },
-      showFXs: function show(object) { 
-        // sapi.body.style["pointer-events"] = "auto";
-        object = object || this;
-        pt.FX.fadeIn(object[0], {
-            duration: 500,
-            complete: function complete(e) {
-                // a(this.textContent)
-            }
-        });
-    //(object || this.obj).style.display = 'none';
-    },
-    smallFX: function small(msg) {
-        var div = sapi.createElement('div'),
-            def1 = {
-display: 'block',position: 'absolute',left: "12%",width: '35%',
-top: '2em',color: 'cyan',padding: '1em',background: '#444',
-'font-size': '1em','z-index': 1,'text-align': 'center'
-},
-def2 = {display: 'none'};
-        div.id = 'test';
-        var ed = "<p><small>Yet, they are real fun!!</small></p>";
-        div.innerHTML = msg || "I love to use a popup, but they drive me crazy." + ed;
-        sapi.body.appendChild(div);
-        Techie.PT.css( div, def1);
-        Events.addHandler(sapi, 'click', function() {
-            pt.pop.hide(div)
-        });
-
-},
 computeWin: function computeWin(){ 
 if(document.body.clientWidth) { 
     this.X = document.body.clientWidth; 
@@ -2901,24 +2719,7 @@ if(document.body.clientWidth) {
 } 
 return this; 
 } ,
-getStyle: function getStyle(style, element) {
-  if (!element) {
-    element = this[0];
-  }
-  if (typeof element === "object" && typeof style === "string") {
-  switch(true) {
-    case !!element.style[style]: return element.style[style];
-    case !!window.getComputedStyle: return window.getComputedStyle(element, null).getPropertyValue(style);
-    break;
-    case !!element.currentStyle: return element.currentStyle[style];
-    break;
-    case !!element.runtimeStyle: return element.runtimeStyle[style];
-  }
-}
-return null;
-},
-
-getStyleOld: function getStyleOld(prop, element){//.getStyle("height");
+getStyle: function getStyle(prop, element){//.getStyle("height");
   if (toString.call(prop) != "[object String]") {return null;}
   try{
     return this.computedStyle(element || this[0])[prop];
@@ -3051,8 +2852,6 @@ if (value) {
 }
 });         
 },
-
-
 removeDuplicates:  function removeDuplicates(string){
    string = string.replace(/(_|\W)/ig, "");
   var reserve = [];
@@ -3093,61 +2892,40 @@ forEach.call(o.attributes, function(attribute){
 });
 return this;
 },
-hide: function hide () {
-this.each(function(node){
-  node.style.cssText += "display: none;";
-});
-return this;
-},
-cleanStyling: function(arr){//.cleanStyling("color").cleanStyling(["background-color", "color", "opacity"]);
-  if (toString.call(arr) == "[object String]") {
-    arr = [arr];
-  }
-  this.each(function(node){
-  arr.forEach(function(prop){
-    if (node.style.removeProperty) {
-    node.style.removeProperty(prop);
-  } else if (node.style.removeAttribute) {
-    node.style.removeAttribute(prop);
-  }
-  });
-})
-  return this;
-},
 
-show: function show(duration) {//.show()
-  this.each(function(node){
-    var style = this.getComputedStyle(node), text;
-    if (style["display"] == "none") {
-      node.style.cssText += "display: block;";
-    } 
-    if(style["visibility"] != "visible"){
-      node.style.cssText += "visibility: visible;";
+show: function show(rg, o) {
+var stk = [],
+    j, i, t = pt.type;
+if (!o) {
+    o = (this !== window) ? this : pt;
+}
+if (typeof rg === 'boolean') {
+    //style display to block;
+    this.style.display = 'block';
+    return this;
+}
+if (rg.search('prop') != -1) {
+    pt.props(o);
+    return;
+}
+if (rg.search('meth') != -1) {
+    pt.methods(o);
+    return;
+}
+if (index(type.types, rg)) {
+    var j, msg;
+    for (i in o) {
+        j = o[i];
+        if(o.hasOwnProperty(i)){
+            if (type(j, rg)) {
+                stk.push(h4 + type(j) + ': ' + i);
+            }
+        }
     }
-    if (style["opacity"] < 1) {
-      node.style.cssText += "opacity: 1;";
-    }
-  }, null, this);
-  return this;
+}
+pt.Log(stk, false);
+return stk;
 },
-display: function display (state){//.display().display("inline-block").display("flex").display("list-item")
-  var text = "display: " + state + "; opacity: 1; visibility: visible;";
- return  state == null || state == "block" ? this.show(): (function(){
-  if (typeof state === "string") {
-    this.each(function(node){
-  node.style.cssText += text;
-  });
-  } else{
-    console.error("argument passed to dispay() must be a string");
-  }
-  return this;
- }.call(this));
- 
-},
-toggleView: function(state, duration){// Used to toggle show/hide
-  return this.isHidden() ? this.showFX(state): this.hideFX();
-},
-
 Attr: function Attr(element, attr, value){//element = element/nodeList
 /*Attr(ele,"title", " ")--empty; elem.Attr("id", 'clicked') --remove/add if found/not found
 Attr(div, 'data-cardboard', "Shelf_One")--remove/add if found/not found
@@ -3254,19 +3032,26 @@ console.log("Class "+classname+" was not found in "+ element);
 return this;
 },
 
-hasClass: function hasClass (name){
-  var length = this.length, i = 0, classNames, element, hasclass = false;
-  for (i; i < length; i++){
-    element = this[i];
-    if (element && element.nodeType == 1) {
-      classNames = element.className.split(/\s+/);
-      if (classNames.indexOf(name) > -1) {
-        hasclass = true;
-        break;
-      }
+hasClass: function hasClass (name, element){
+var crank = false, classes, name = name? name.trim(): null, names;
+delta(cast(this, element), function(){
+this.each(function(){
+classes = this.className.trim().split(/\s+/);
+if (name) {
+    names = (names =  name.split(/\s+/).length > 1) ? names: null;
+    if (names) {
+        names.forEach(function(name){
+            crank = classes.indexOf(name) > -1;
+        });
+    } else{
+        crank = classes.indexOf(name) > -1;
     }
-  }
-return hasclass;
+} else{
+    crank = !!classes[0];
+}
+})
+});
+return crank;
 },
 
 toggleClass: function toggleClass(name1, name2){//.toggleClass(display, hide) .toggleClass("hide")
@@ -3333,29 +3118,6 @@ this.each(function(element){
 });
 });
 return this;
-},
-
-isHidden: function isHidden(element){
-  element = element || this;
-      
-  if (is.list(element)) {
-    element = element[0];
-  }
-    var ret, style = this.computedStyle(element),
-    rect = element.getBoundingClientRect();
-  if (element.nodeType && element.nodeName) {
-    switch(true){
-     case (element.offsetWidth + element.offsetHeight + rect.height + rect.width) < 1:
-     case element.nodeName.toLowerCase() == "form" && this.getAttr(element, "type") == "hidden":
-     case this.hasAttr(element, "hidden"):
-     case style["display"] == "none" || style["visibility"] != "visible" || style["opacity"] < 1:
-     ret = true; break
-     default: ret = false;
-  }
-    } else{
-      return console.error("No HTMLElement object found in the search.");
-    }
-  return ret;
 },
 
 css: function css ( element, style, options )    {
@@ -3736,13 +3498,8 @@ var parts = [],field = null,i,len, j, optLen, option, optValue;
     return parts.join("&");
 },
 
-removeClass: function removeClass(className) {
-  var names;
-  this.each(function(element){
-    names = element.className.split(/\s+/);
-    names.splice(names.indexOf(className), 1);
-    element.className = names.join(" ")
-  });
+removeClass: function removeClass(element, className) {
+    removeClass(element, className);
     return this;
 },
 eachChild: function eachChild(fn, element, Thisarg) {
@@ -3799,6 +3556,26 @@ var nodes = slice.call(e.childNodes);
 nodes.forEach(function(node){
 if(e.hasChildNodes){ e.removeChild(e.firstChild); }
 });
+});
+return this;
+},
+
+hide: function hide (e) {
+if (typeof e === "string") {e = Techie.PT.grab(e);}
+!e ? e = this : isHTML(e) ? e = [e] :  error("html", isCollection(e), ln());
+e.forEach(function(node){
+isCollection (node) ? pt.PT.hide(node) : error("html", isHTML(node), ln());
+node.style.display = "none";
+});
+return this;
+},
+
+display: function display (e){
+if (typeof e === "string") {e = Techie.PT.grab(e);}
+!e ? e = this : isHTML(e) ? e = [e] :  error("html", isCollection(e), ln());
+e.forEach(function(node){
+isCollection (node) ? pt.display(node) : error("html", isHTML(node), ln());
+node.style.display = "block";
 });
 return this;
 },
@@ -3905,20 +3682,8 @@ this.e = this.e.nextSibling; this.siblings(this.e, fn);
 }
 return  this.stack;
 },
-removeAttr: function removeAttr(attr){
-  this.each(function(node){
-    node.removeAttribute(attr);
-  });
-  return this;
-},
-getAttr: function getAttr(attribute) {
-  var val;
-  this.once(function(element){
-   if (element && element.getAttribute) {
-     val = element.getAttribute(attribute) || null;
-   }
-  });
-    return val;
+getAttr: function getAttr(element, attribute) {
+    return Attr(element, attribute)
 },
 parent: function parent( e ) {
     return (e || this[0]).parentNode;
@@ -4048,54 +3813,19 @@ offset: function(){
 offset: function(cordinates){
   //sets cordinates for each of this   var cordinates = {left: 3, top: 9};
 },
-cordinates:  function cordinates(elem){ //.cordinates()["topRight|top-right"]
+offset: function(fn){
   //Reaturns cordinates to use and work. this is each of the element
-  elem = elem || this;
-  if(is.list(elem)){
-    elem = elem[0];
-  }
-  var camelCased, elementPoints = {
-        'center': {
-            x: elem.getBoundingClientRect().left + elem.offsetWidth / 2,
-            y: elem.getBoundingClientRect().top + elem.offsetHeight / 2
-        },
-        'top-left': {
-            x: elem.getBoundingClientRect().left,
-            y: elem.getBoundingClientRect().top
-        },
-        'top-right': {
-            x: elem.getBoundingClientRect().right,
-            y: elem.getBoundingClientRect().top
-        },
-        'bottom-left': {
-            x: elem.getBoundingClientRect().left,
-            y: elem.getBoundingClientRect().bottom
-        },
-        'bottom-right': {
-            x: elem.getBoundingClientRect().right,
-            y: elem.getBoundingClientRect().bottom
-        }
-    };
-  forEach.call(elementPoints, function(prop, value){
-    camelCased = prop.replace(/\-[a-z]/gi, function(s){
- return s.replace("-", "").toUpperCase();
-});
-    elementPoints[camelCased] = elementPoints[prop];
-  });
-  
-    return elementPoints;
 },
-
 offset: function offset(cord, target, node){//.offset({top:0, left:2}) .offset({}, null, div) .offset(null, window, div)
     // use cordinates to set change the position of this
     // if cord is an fn, it will return cord object upon internal evaluation
     // if cord is null, reuturn the cord of this[0]
+    
     // if target is null, we make use of window as reference 
     var node = node || this[0], _cord = {}, parent = node.offsetParent;
     target = target || window;
     _cord["top"] = node.offsetTop;
     _cord["left"] = node.offsetLeft;
-
     while(parent && parent != target){
         _cord.left += parent.offsetLeft;
         _cord.top += parent.offsetTop;
@@ -4165,30 +3895,8 @@ prevUntil: function(selector){
   //Get all preceding siblings of each element up to but not including the element matched by 
 //the selector, DOM node, or jQuery object.
 },
-val: function(value_or_fn){//Get the current value of the first element in the set of matched elements
-  var val = value_or_fn, fn;
-  if (val) {
-    if (is.functions(val)) {
-      fn = val;
-    } else if (is.string(val) == false) {
-      throw new Error(val + " Must be a string");
-    }  else { //val is string, so do your worst!
-    this.each(function(element){
-    if ((element && "value" in element && element.nodeType == 1)) {
-      element.value = val;
-    } 
-    });
-  }
-    if (fn == null) {
-      return this;
-    }
-  } 
-  this.once(function(element){
-    if ((element && "value" in element && is.string(element.value))) {
-      val = (fn || function(it){return it;}).call(Techie.PT.emptyPT(element), element.value);
-    }
-  });
-  return val;
+val: function(value_or_fn){
+  //Get the current value of the first element in the set of matched elements
 },
 prevAll: function(selector){
   //Get all preceding siblings of each element in the set filtered
@@ -4322,16 +4030,12 @@ getFirstChild: function getFirstChild( element) {
     return nodes[1] ? Techie.PT._(nodes) : nodes[0];
 },
 
-hasAttr: function hasAttr(attribute) {
-  var has = false;
-  this.each(function(element){
-    if ( element && element.hasAttribute) {
-        (has = element.hasAttribute(attribute));
+hasAttr: function hasAttr(element, attribute) {
+    if ( element && element.hasAttrbiute) { 
+       return element.hasAttribute(attribute);
     } else if ( element && element.attributes && element.attributes[attribute]){ 
-        return ( has = element.attributes[attribute].specified ); 
+        return element.attributes[attribute].specified ; 
     }
-  });
-  return has;
 },
 setAttr: function setAttr(element, attribute, value) {
  this.Attr(element, attribute, value);
@@ -4734,28 +4438,20 @@ delta(parent, function(){
     return this;
 },
 
-qs: function qs(selector, context, entechie) {//Equivalent of querySelecor
-    context = context || this; //Always remember that the default context is this
-  context = is.dom(context) ? context: document;
-  var all, element;
-    context = context.nodeType && context.nodeName ? context: context[0];
-    error("html", (context && context.nodeType), ln());
-    if (entechie == true) {
-      return new emptyPT(context.querySelector(selector));
-    }
-     return context.querySelector(selector);
-},
-queryAll: function(selector, context){
-  context = context || document;
-  var matched = [];
-  delta(context, function(context){
-    this.each(function(context){
-    if (context && context.nodeType) {
-      matched = matched.concat(matched.slice.call(context.querySelectorAll(selector)));
-    }
+qs: function qs(selector, context) {
+    context = context || this;
+    a(this[0])
+  context = curry(document, !is.dom(context) ? context: null); var all;
+    // alert(context)
+    return
+    delta(context, function(){
+      all = this;
+        this.each(function(context){
+            error("html", is.node(context), ln()); 
+            all = all.concat(sapi.querySelectorAll(selector));
+        });
     });
-  });
-  return matched;
+  return all;
 },
 all: function all(selector, context) {
     context = context || this; 
@@ -4843,12 +4539,11 @@ classes: function classes (clss, context){
     return Techie.PT._().push(arr);
 },
 
-getClass: function getClass() { //all the class names 
-    var names = "";
-    this.each(function(element){
-      names = names.concat(element.className + " ");
-    });
-    return names;
+getClass: function getClass(context) { //all the class names 
+    // pt("body").getClass()//"case container book"
+    context = context || this; context = isCollection(context) ? 
+    context [0] : error("html", isHTML(context), ln()); 
+    return string(context.className);
 },
 
 classname: function classname (clas, context){ //gets only the first occurence
@@ -5057,136 +4752,7 @@ return e;
 };
 
 // EXTEND Techie
-Techie.prototype.getComputedStyle = Techie.prototype.computedStyle;
-
 extend(Techie.PT, {
-  ajaxHook: function makeHttpObject(object){
-  switch(true){
-    case typeof XMLHttpRequest === "function": object = new XMLHttpRequest(); break
-    case typeof ActiveXObject === "function": 
-    try{object = new ActiveXObject("Msxml2.XMLHTTP");}catch(error){try{object = new ActiveXObject("Microsoft.XMLHTTP");}catch(error){}}; break
-    default: throw new TypeError("AJAX is not supported in " + Techie.PT.machine.browser);
-  }
-  return object;
-},
-  createAjaxRequest: function createAjaxRequest(handler, options){
-  var xhr = null;
-  options = options || handler;
-  if (options == handler) {
-    handler = options.success;
-  }
-  if (typeof(options) !== "object") {
-    throw new Error("arguments supplied");
-  }
-
- try{
-  xhr = new XMLHttpRequest();
- } catch(err){
- try{
-   xhr = new ActiveXObject("Msxml2.XMLHTTP");
- } catch(err){
-  try{
-    xhr = new ActiveXObject("Microsoft.XMLHTTP");
-  } catch(err){
-    throw new Error("AJAX is not supported in " + Techie.PT.machine.browser);
-  }
- }
- }
- xhr.onreadystatechange = function(){
-if (xhr.readyState == 4){
-if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304){
-  try{
-  xhr.json = JSON.parse(xhr.responseText);
-  } catch(err){}
-handler.call(xhr, xhr.responseText, xhr);
-} else {
-options.error("Request was unsuccessful: " + xhr.status);
-}
-}
-};
- xhr.onerror = options.error || function(){};
- xhr.onload = options.load || function(){};
- xhr.load = options.load || function(){};
-return xhr;
-},
-
- encode: function encode(url, name, value){
-  var data = {}, aggr = "";
-  if (is.string(name) && is.string(value)) {
-    data[name] = value;
-  } else if (is.object(name)) {
-    data = name;
-  }
-  if (is.isEmptyObject(data) || is.string(url) == false) {
-    throw new Error("encode called on incompatible type")
-  }
-  for(prop in data){
-    if (data.hasOwnProperty(prop)) {
-      if (typeof data[prop] === "string") {
-        aggr = aggr.concat(encode(url, prop, data[prop]));
-      }
-    }
-  }
-  },
-  
-
-  getJSON: function getJSON(url, fn){
-
-  var Res, call = this.createAjaxRequest({
-    URL: url,
-    error: function(err){
-      throw new Error("Request Failed: " + err);
-    },
-    success: (fn || function(){})
-  });
-  call.open("GET", url);
-  if (typeof call.overrideMimeType === "function") {
-  call.overrideMimeType("application/json");
-}
-  call.send(null);
-  return this;
-},
- createCORSRequest: function createCORSRequest(method, url){
-var xhr = new XMLHttpRequest();
-if ("withCredentials" in xhr){
-xhr.open(method, url, true);
-} else if (typeof XDomainRequest != "undefined"){
-xhr = new XDomainRequest();
-xhr.open(method, url);
-} else {
-xhr = null;
-}
-return xhr;
-/*
-
-
-var request = createCORSRequest("get", "http://www.somewhere-else.com/page/");
-if (request){
-request.onload = function(){
-//do something with request.responseText
-};
-request.send();
-}
-
- */
-},
-
-  GET: function GET(endpoint, handler, option){
-  var call = this.createAjaxRequest(handler, options);
-  call.open("GET", endpoint);
-  call.send(null);
-  return this;
-},
-
-  POST: function(endpoint, handler, options){
-  var call = this.createAjaxRequest(handler);
-  call.open("POST", endpoint);
-  call.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-  call.setRequestHeader("Content-length", options.data.length);
-  call.send(this.serialize(options.data)); //data can be an already serialized string or just a raw form data like $("form") or sapi.forms[0] 
-  return this;
-},
-
 methods: function methods(o, boo) {
     var stk = [],
         j, i;
@@ -5321,16 +4887,22 @@ Log: function Log(text, bool, element) {
     }
     if (plain.type( bool, "boolean")) {
         _techie.hideErrors();
-    }   
-    var log = Techie.PT.createFrag(  "<h3 role='message body'>" + text + "</h3>" );
+    } else if (!element) {
+      element = bool;
+    }
+    if (is.dom(this)) {
+      element = this;
+    } 
+    var log = Techie.PT.createFrag(  "<h3>" + text + "</h3> <hr />" );
     log.id = "err";
     if (!is.dom(element)) {element = sapi.body;}
+     SAPI(element).prependChild( "<div></div>" ).first().first(log).css({
+        width: "100%", margin: "auto auto", position: "relative"
+    });
 
-     SAPI(element).prependChild( "<div role=Log></div>" ).first().first(log);
-
-    Techie.PT.css(log, { 
-      "background-color": "#a9a965", 'padding': '2em', "margin-left": "25%", "margin-right": "25%", 'color': 'cyan','border-radius': '10px', 
-      "text-align": "center"
+    Techie.PT.css(log, { background: "#a9a965",  "right": "0",
+'padding': '2em','box-sizing': 'border-box',display: "inline-block", "position": "relative", 
+'word-wrap': 'break-word','color': 'cyan','border-radius': '30px', "text-align": "center"
         } );
     return text;
 },
@@ -5686,7 +5258,6 @@ extend: extend
 
 // END OF TECHIE EXTEND
 }).extend(Techie.PT).extend(Events).extend(this).extend( Techie, Techie.PT );
-
 /////////================================///////////
 /////////================================///////////
 /////////================================///////////
@@ -5742,18 +5313,18 @@ dissolve(this.type(selector, "string") ? sapi.querySelectorAll(selector):(is.lis
 }
 grab.prototype = Techie.PT;
 
-function emptyPT(object){//var o = new empty(); new emptyPT(sapi.querySelector(".menu"));
-    function empty(object){
+function emptyPT(s){//var o = new empty();
+    function empty(s){
         this.length = 0;
         this.isTechie = true;
         this.techie = "[object Techie]";
         this.techieString = this.techie;
-        if(object){
-            dissolve(object, this, true);
+        if(s){
+            dissolve(s, this, true);
         }
     }
     empty.prototype = Techie.PT;
-   return this instanceof emptyPT ? emptyPT(object): new empty(object);
+   return this instanceof emptyPT ? emptyPT(s): new empty(s);
 }
 
 function SAPI( selector, context ) {
@@ -6353,83 +5924,6 @@ return forEach;
 forEach(fn, this)
 });
 
-var promise = Async;
- function Async(fn, fn2){
-    var prom = {
-      delay: function(millisecond){//Async.delay(3000).then(function(){ Do something important })
-
-      },
-      qeue: {
-        stack: [],
-        add: function(cb){
-          this.stack.push(cb);
-          return this;
-        },
-        pop: function(){},
-        chop: function(){},
-        remove: function(cb){
-          this.stack.forEach(function(_cb, index){
-            if (cb == _cb || cb.name == _cb.name) {
-              this.stack.splice(index, 1);
-            }
-          }, this);
-          return this;
-        },
-        triggerAll: function(){
-          while(this.stack.length > 0){
-            this.trigger();
-          }
-        },
-        trigger: function(){
-          var nextCb ;
-          if (!(nextCb = this.stack.shift())) {
-            return null;
-          }
-            nextCb.call(this);
-        }
-      },
-      then: function(success, failed){
-        // You can make for inifite thening by working up the cb and using it to constitute another promise.resolve that can be chained
-        // How: work up current task and call resolve with the result or reject with the failure
-        prom.successful ? function(){
-          success(prom.successStory);
-          // Prevent .then being fired the second time prom.resolved = prom.fulfilled = true
-        }: function(){
-          if(typeof failed === "function"){
-            failed(prom.failureStory);
-            // Prevent .catch fireing if failed was called prom.cought = true;
-          }
-        }; 
-        return this;
-      },
-      catch: function(fn){
-        if (prom.cought == false) {
-          fn(prom.catched); //Run only if it has not been yet cought
-        }
-        return prom;
-      },
-      finally: function(fn){
-        return fn(prom.value);
-      },
-      resolve: function(value){
-        try{
-          prom.value = value;
-        } catch(error){
-          
-        }
-      },
-      reject: function(fn){
-        fn.call(prom, prom.catched);
-      }
-    };
-
-    try{
-    fn.call(prom, fn, fn2);
-    }catch(error){
-      prom.catched = error;
-    }
-    return prom;
-  }
 
 //PURGE
 (function wash_the_global_env(params){
@@ -6437,7 +5931,6 @@ var promise = Async;
    if (param) { delete window[param];}
   });
 }([]));
-
 
 /*"error", "each", "walk", "errors", "count", "EventUtil", "run_the_DOM", "run"*/
 return Techie;
