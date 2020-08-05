@@ -27,7 +27,7 @@ or if you do or do not want links on the page followed.
  -->
 
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
-<link rel="stylesheet" type="text/css" href="Styles/index.css" />
+<link rel="stylesheet" type="text/css" href="sources/Styles/index.css" />
 
 
 <!-- SCRIPTS BEGIN -->
