@@ -39,8 +39,7 @@ or if you do or do not want links on the page followed.
 <script>
 	(function($){
 		$(document).ready(function($, body, head, sapi, _, w, Log, stringify, stringifyAll, a){
-        var t = this.qs(".first-toggle", null, true)
-        t.addHandler("click", init);
+        this.qs(".first-toggle", null, true).addHandler("click", init);
         $("#first-toggle").click(init);
         
         function toggleClass(object) { //toggle({"div": ["red", "blue"]})
