@@ -33,9 +33,9 @@ or if you do or do not want links on the page followed.
 <!-- SCRIPTS BEGIN -->
 <!-- <script type="text/javascript" src="https://github.com/PTNigeria/CDN/blob/master/Techie.js"></script> -->
 <!-- <script type="text/javascript" src="https://cdn.rawgit.com/PTNigeria/CDN/master/Techie.js"></script> -->
-<script type="text/javascript" src="JavaScript/PT.js"></script>
-<script type="text/javascript" src="JavaScript/jsPDF.min.js"></script>
-<script type="text/javascript" src="JavaScript/index.js"></script>
+<script type="text/javascript" src="sources/JavaScript/PT.js"></script>
+<script type="text/javascript" src="sources/JavaScript/jsPDF.min.js"></script>
+<script type="text/javascript" src="sources/JavaScript/index.js"></script>
 <script>
 	(function($){
 		$(document).ready(function($, body, head, sapi, _, w, Log, stringify, stringifyAll, a){
@@ -228,7 +228,7 @@ We have a simple budget calculation tool ready for use and its free.
 To use, start by typing an item of your budget and hit enter. That's it! The result is shown in real time and it is free and easy to use. Once you're done listing your budget items, you can print it or just grab the pdf version of your work already prepared for you. </p>
 				</div>
 				<div class="covered comfirm">This budget calculator is for you &nbsp;
-						<img alt="we've got you covered img" src="images/tick.png" />
+						<img alt="we've got you covered img" src="sources/images/tick.png" />
 				 </div>
 			</ul>
 			</div>
