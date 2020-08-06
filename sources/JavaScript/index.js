@@ -85,11 +85,11 @@ function del(e, btn){
     new Promise(function(resolve, reject) {
       row = $(btn.parentNode)
       value_cell = row[0].querySelector(".cell ~ .cell");
-      // updateCount(value_cell.textContent.replace(/[^\d]+/g, ""))
-      console.log(value_cell.textContent.replace(/[^\d]+/g, ""))
+      num = "-" + value_cell.textContent.replace(/[^\d]+/g) ;
+      updateUI(parseFloat(num, 10));
       row.hideFX();
        setTimeout(function(){
-        // row.remove()
+        row.remove()
       }, 1000);
       resolve(row);
     }).then(function(row) {
@@ -99,6 +99,10 @@ function del(e, btn){
       console.error(error);
     });
   } 
+    }
+
+    function updateCount(number) {
+      $("#total").text(`Total: ${number}`)
     }
 
     
@@ -210,22 +214,40 @@ function added() {
 
     
   function Foo(tem, item, amount){ 
-      var test = /^((\w*|\W*)*[\w\s-]*)+$/.test(item.value);
-    if (!(test && amount.value)) {
-        return console.warn("Warning::   Make sure you are inputing the right values.")
+    if (!validate(item, amount)) {
+      return;
     }
-  function extractNumbers(value){
-    return parseFloat( String(amount.value).replace(/[^\d]/g, ""), 10);
+
+   _techie.grab("table tbody").prependChild( createRow(item.value, amount.value) );
+    updateUI( extractNumbers(amount.value) );
   }
-Total += extractNumbers(amount.value); //The elusive counter engine 
- _techie.grab("table tbody").prependChild( createRow(item.value, amount.value) );
-    total.textContent = "Total: " + Total; 
+
+  function updateUI(num){
     item.value = amount.value = "";
     item.placeholder = "New item";
     amount.placeholder = "New value";
     currentItem.text(v1); currentV.text(v2);
     item.focus(); 
+    Total += num; //The elusive counter engine
+    if(Total != +Total) {
+      return //reset();
+    }
+    $("#total").text(`Total: ${Total}`);
 }
+
+
+function validate(item, amount) {
+  var test = /^((\w*|\W*)*[\w\s-]*)+$/.test(item.value);
+  if (!(test && amount.value)) {
+    console.warn("Warning::   Make sure you are inputing the right values.");
+    return false; 
+  }
+  return true
+}
+
+function extractNumbers(string){
+    return parseFloat( String(string).replace(/[^\d]/g, ""), 10);
+  }
 
 
 function createRow( item, value){
