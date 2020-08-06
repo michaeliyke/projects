@@ -2310,7 +2310,16 @@ online: function(){
     *_pt is factory, sapi is document, machine is machineInfo
     */
 
-function a(msg){try {return confirm(msg) ?  a = null : false;}catch(e){ }}
+function a(msg){
+  try {
+    if (confirm(msg)) {
+      a = null
+      return true;
+    }
+    return false;
+  } catch(e){ }
+}
+
 function EventTarget() {}
 var Events = EventUtil =  this.EventUtil = EventTarget.prototype = this.Events, contains = this.contains,
 getSelectionString = this.getSelectionString , extend = this.extend, ln = this.ln,

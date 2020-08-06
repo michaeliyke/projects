@@ -69,14 +69,20 @@ or if you do or do not want links on the page followed.
         		init();
         	}
         });
-		});
 
+        PT.showAllEvents = function showAllEvents() {
+        	[].forEach.call(arguments, function(arg){
+        		stringify(arg, null, null)
+        		
+        	})
+        }
+		});
 	}(Techie));
 </script>
 	<!-- END -->
 	<title>Budget Calculation Tool - Makes Calculations easy | Michael C Iyke</title>
 </head>
-<body>
+<body class="root-body">
  <!-- nav>ul>(li(a{Same})*6) -->
  <!-- But this is not the only comment here. -->
  <!-- There are stil other ones arround. -->

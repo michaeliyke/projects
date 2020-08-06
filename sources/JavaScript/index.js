@@ -28,6 +28,41 @@
  */
 
 Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
+
+    $(body).click(Subscription);
+
+    function Subscription(event, obj, filter) {
+
+      subscriptions = { //Subscription is purely by criterion -: id, class, name, data-set etc
+        "resultsPane": [a],
+        "del": [del],
+        "subscriber": event.target,
+        "subscribers": ["resultsPane", "del"],
+        "activate": function activator(event, subscriberString) {
+          actions = this[subscriberString];
+          actions.forEach(function actionsHandler(action) {
+            action.call(obj, event, subscriptions.subscriber);
+          })
+        }
+      };
+
+      filter = filter || subscribeHandler
+      subscriptions.subscribers.forEach(filter)
+
+      function subscribeHandler(subscriberString){
+        if (subscriptions.subscriber.classList.contains(subscriberString)) {
+          actions = subscriptions[subscriberString]
+          subscriptions.activate(event, subscriberString);
+        }
+      }
+
+    }
+
+    // {
+    //   "click": ["#click"]
+    // }
+
+
     // Settings
 
     // $(document).click(function(e) {
@@ -44,19 +79,27 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
     //  //
     //////
     ///
-   $("table").click(del)
-function del(e){
-      var target = this.getTarget(e);
-      if (target.classList.contains("del")) {
-        var tic = `
-          <div id="warning-popup">
-  <div class="pop popup-head">Warning!</div>
-  <div class="pop popup-body">Are you sure you want to delete this row?</div>
-  <div class="pop popup-foot"><span id="popup-no">No</span><span id="popup-ok">Ok</span></div>
-</div>
-        `;
-      }
-    };
+   // $("table").click(del)
+function del(e, btn){
+  if (a("Do you want to delete this row?")) {
+    new Promise(function(resolve, reject) {
+      row = $(btn.parentNode)
+      value_cell = row[0].querySelector(".cell ~ .cell");
+      // updateCount(value_cell.textContent.replace(/[^\d]+/g, ""))
+      console.log(value_cell.textContent.replace(/[^\d]+/g, ""))
+      row.hideFX();
+       setTimeout(function(){
+        // row.remove()
+      }, 1000);
+      resolve(row);
+    }).then(function(row) {
+    console.log("Row deleted");
+    return row
+    }).catch(function(error){
+      console.error(error);
+    });
+  } 
+    }
 
     
     //Hooks an event on the document
@@ -90,7 +133,7 @@ function del(e){
     }
     });
 
-// item.focus();
+item.focus();
 /*#2876a8*/
 function added() {
     var ret = false;
