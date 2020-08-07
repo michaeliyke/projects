@@ -68,11 +68,11 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
     // $(document).click(function(e) {
     //   a(this.computedStyle(this.getTarget(e))["font-size"]);
     // });
-    var d = document, getId = this.Id, Total = 0,v1 = "Next item",v2 = '0.00',amount = getId("amount"), Results = getId("Results"),
-    total = getId("total"), resultPane = getId("resultsPane"), submit = getId("submit"), item = inputItem = getId("item"),
+    var d = document, getId = this.Id, Total = 0,v1 = "Next item",v2 = '0.00',amount = getId("amount"),
+    total = getId("total"), submit = getId("submit"), item = inputItem = getId("item"),
     reset = getId("reset"),  currentV = $("#current > #current"), currentItem =  $("#current > #currentItem"),
     manage = getId("managing"), printing = getId("printing"), saving = getId("saving"), _techie = this,
-     table = getId("table");
+    table = getId("table");
 
     // Initial calls 
     //////
@@ -107,7 +107,8 @@ function del(e, btn){
 
     
     //Hooks an event on the document
-    this.text("Total: 0", total).addHandler(submit, "click", Foo.bind(null, null, item, amount)
+    this.text("Total: 0", total)
+    .addHandler(submit, "click", Foo.bind(null, null, item, amount)
       ).addHandler(reset, "click", function Clean(){ 
         //reset all fields here
         item.value = amount.value = "";
