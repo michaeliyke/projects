@@ -29,30 +29,55 @@
 
 Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
 
-    $(body).click(Subscription);
+    $(body).click(Subscription); 
 
     function Subscription(event, obj, filter) {
 
       subscriptions = { //Subscription is purely by criterion -: id, class, name, data-set etc
         "resultsPane": [a],
         "del": [del],
+        "submit": [Foo],
+        "reset": [Clean], // subscriber: handlers
+        "converting": [ConvertToPDF],
+        "default_handlers": [CloseHandler], //Default handlers will always execute
+        "grouped_subscribers": [{"names": ["toggler", "equiv"], "handlers": [ActionsMenuToggle]}],
         "subscriber": event.target,
-        "subscribers": ["resultsPane", "del"],
-        "activate": function activator(event, subscriberString) {
-          actions = this[subscriberString];
-          actions.forEach(function actionsHandler(action) {
-            action.call(obj, event, subscriptions.subscriber);
-          })
+        "subscribers": ["resultsPane", "del", "submit", "reset", "converting"], 
+        //subscribers -> classes or ids subscribing to the click (event) bubble
+        "activate": function activator(event, subscriberString, actions) {
+          if (actions.length < 1) {
+            console.warn("You have not specified any actions for subscriber:", subscriberString);
+          }
+          actions.forEach(function launch(action) {
+            action.call(obj, event, subscriptions.subscriber, obj);
+          });
         }
       };
 
-      filter = filter || subscribeHandler
-      subscriptions.subscribers.forEach(filter)
+      filter = filter || ActivationHandler
+      subscriptions.default_handlers.forEach(function(handle) {
+        handle.call(obj, event, subscriptions.subscriber, obj);
+      });
+      subscriptions.subscribers.forEach(filter);
+      HandlerGroup();
+      
+      function HandlerGroup(){
+           subscriptions.grouped_subscribers.forEach(function handleSubscription(group) {
+             group.names.forEach(function subscriber(subscriberString,) {
+                 filter(subscriberString, group);           
+             });
+           });
+      }
 
-      function subscribeHandler(subscriberString){
+      function ActivationHandler(subscriberString, group){
         if (subscriptions.subscriber.classList.contains(subscriberString)) {
-          actions = subscriptions[subscriberString]
-          subscriptions.activate(event, subscriberString);
+        if (Object.prototype.toString.call(group) == "[object Object]") {
+          actions = group.handlers;
+        } else {
+            actions = subscriptions[subscriberString];
+        }
+        // console.log(subscriberString, actions)
+          subscriptions.activate(event, subscriberString, actions);
         }
       }
 
@@ -105,11 +130,7 @@ function del(e, btn){
       $("#total").text(`Total: ${number}`)
     }
 
-    
-    //Hooks an event on the document
-    this.text("Total: 0", total)
-    .addHandler(submit, "click", Foo.bind(null, null, item, amount)
-      ).addHandler(reset, "click", function Clean(){ 
+    function Clean(){ 
         //reset all fields here
         item.value = amount.value = "";
             item.placeholder = "New item";
@@ -118,7 +139,10 @@ function del(e, btn){
              total.textContent = "Total: 0";
             $("table tbody").empty(); 
     }
-).keydown(function(e){
+
+    
+    //Hooks an event on the document
+    this.text("Total: 0", total).keydown(function(e){
          var evnt = e || global.event;
          if(evnt.keyCode == 13){
             Foo.call(null, null, item, amount);
@@ -132,13 +156,13 @@ function del(e, btn){
       }
     }, body);
     // PDF plug
-   $("#converting").click(function(){
+    function ConvertToPDF(){
     if (added()) {
       printsBlob();
     }
-    });
+    }
 
-item.focus();
+// item.focus();
 /*#2876a8*/
 function added() {
     var ret = false;
@@ -150,10 +174,12 @@ function added() {
           return ret;
         }
 
-  $("#toggler").click(function handler(event, dom, techie) {
-    var pane, width, type;
+
+  function ActionsMenuToggle(event, dom, techie) {
+    var width, pane;
       $("#manage").toggleClass(function(){
         pane = this;
+        this.pane = this;
         width = this.computedStyle()["width"].replace(/[A-z]+/i, "");
         if (width == 0) {
           this.css({
@@ -163,27 +189,26 @@ function added() {
           $("#equiv").html("&#120169;");
           width = 250;
         }else{
-          closePane.call(this, this, handler);
+          closePane.call(this, event, ActionsMenuToggle, this);
         }
       });
-       function closePane(pane, handler){
-          pane.css({
-            "width": "0px", opacity: 0
-          });
-          $("#equiv").html("&#9776;"/*"&#9776;"*/);
-          width = 0;
-          
-            if (type == "click") {
-              $(body).removeHandler("click", handler);
-            } else if (type == "keypress") {
-              $(body).removeHandler("keypress", handler)
-            }
-            
-        }
-        
+      this.pane = pane;
+    }
+      _techie.grab("body").addHandler("keypress", EscapeKeyHandler);
+
+      function EscapeKeyHandler(event){
+      if(event.keyCode == 27){ //escape key
+        this.type_ = "keypress";
+      if (width > 0) {
+        closePane(event, EscapeKeyHandler); 
+
+      }
+    }
+    }
 
 
-         $(body).addHandler("click", function handler(event){
+
+     function CloseHandler(event, dom, techie){
       var target = this.getTarget(event);
       if ((target.id == "equiv" || target.id == "manage") || (target.id == "equiv" || target.parentNode.id == "manage")) {
         return false;
@@ -196,25 +221,34 @@ function added() {
         case "project-body":
         case "trigger":
         case "inputs":
-        case "input": closePane(pane, handler);type = "click";break
-        default: console.log(target.id);
-      }
-        
-    });
-      _techie.grab("body").addHandler("keypress", function handler(event){
-      if(event.keyCode == 27){ //escape key
-        type = "keypress";
-      if (width > 0) {
-        closePane(pane, handler); 
-
+        case "input": 
+        if (this.pane) {
+          closePane.call(this, event, CloseHandler, this);
+          this.type_ = "click";
+        }
+        break
+        default: 
+        // console.info("Delegation no match! id -", target.id);
       }
     }
-    });
 
-    });
-
+    function closePane(event, handler, pane){
+      console.log("closePane invoked", handler.name);
+          this.pane.css({
+            "width": "0px", opacity: 0
+          });
+          $("#equiv").html("&#9776;"/*"&#9776;"*/);
+          width = 0;         
+            if (this.type_ == "click") {
+              $(body).removeHandler("click", handler);
+            } else if (this.type_ == "keypress") {
+              
+              $(body).removeHandler("keypress", handler);
+            }
+          this.pane = null;
+        }
     
-  function Foo(tem, item, amount){ 
+  function Foo(){ 
     if (!validate(item, amount)) {
       return;
     }
