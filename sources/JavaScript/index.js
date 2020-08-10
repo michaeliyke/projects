@@ -29,21 +29,26 @@
 
 Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
 
-    $(body).click(Subscription); 
+    $(body).click(Subscriptions); 
 
-    function Subscription(event, obj, filter) {
+    function Subscriptions(event, obj, filter) {
 
       subscriptions = { //Subscription is purely by criterion -: id, class, name, data-set etc
+        
         "resultsPane": [a],
         "del": [del],
         "submit": [Foo],
         "reset": [Clean], // subscriber: handlers
         "converting": [ConvertToPDF],
-        "default_handlers": [CloseHandler], //Default handlers will always execute
         "grouped_subscribers": [{"names": ["toggler", "equiv"], "handlers": [ActionsMenuToggle]}],
-        "subscriber": event.target,
-        "subscribers": ["resultsPane", "del", "submit", "reset", "converting"], 
+        "default_handlers": [CloseHandler], //Default handlers will always execute
+        "subscribers": ["resultsPane", "del", "submit", "reset", "converting"],
+        "subscriberss": [
+          {"name":"del", "handlers": [del]}, {"name":"submit", "handlers": [Foo]}, 
+          {"name":"reset", "handlers": [Clean]}, {"name":"converting", "handlers": [ConvertToPDF]}
+        ],
         //subscribers -> classes or ids subscribing to the click (event) bubble
+        "subscriber": event.target,
         "activate": function activator(event, subscriberString, actions) {
           if (actions.length < 1) {
             console.warn("You have not specified any actions for subscriber:", subscriberString);
@@ -75,36 +80,27 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
           actions = group.handlers;
         } else {
             actions = subscriptions[subscriberString];
-        }
-        // console.log(subscriberString, actions)
+            subscriptions.subscriberss.forEach(function handleSubscription(subscriber) {
+            if (subscriberString == subscriber.name) {
+              actions = subscriber.handlers;
+            return
+          }
+        });
+          }
           subscriptions.activate(event, subscriberString, actions);
         }
       }
 
     }
 
-    // {
-    //   "click": ["#click"]
-    // }
 
-
-    // Settings
-
-    // $(document).click(function(e) {
-    //   a(this.computedStyle(this.getTarget(e))["font-size"]);
-    // });
     var d = document, getId = this.Id, Total = 0,v1 = "Next item",v2 = '0.00',amount = getId("amount"),
     total = getId("total"), submit = getId("submit"), item = inputItem = getId("item"),
     reset = getId("reset"),  currentV = $("#current > #current"), currentItem =  $("#current > #currentItem"),
     manage = getId("managing"), printing = getId("printing"), saving = getId("saving"), _techie = this,
     table = getId("table");
 
-    // Initial calls 
-    //////
-    //  //
-    //////
-    ///
-   // $("table").click(del)
+
 function del(e, btn){
   if (a("Do you want to delete this row?")) {
     new Promise(function(resolve, reject) {
@@ -233,7 +229,6 @@ function added() {
     }
 
     function closePane(event, handler, pane){
-      console.log("closePane invoked", handler.name);
           this.pane.css({
             "width": "0px", opacity: 0
           });
@@ -248,7 +243,7 @@ function added() {
           this.pane = null;
         }
     
-  function Foo(){ 
+  function Foo(){
     if (!validate(item, amount)) {
       return;
     }
