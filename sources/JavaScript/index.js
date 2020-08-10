@@ -29,26 +29,28 @@
 
 Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
 
-    $(body).click(Subscriptions); 
+    $(body).click(ClickDelegations); 
 
-    function Subscriptions(event, obj, filter) {
 
-      subscriptions = { //Subscription is purely by criterion -: id, class, name, data-set etc
-        
-        "resultsPane": [a],
-        "del": [del],
-        "submit": [Foo],
-        "reset": [Clean], // subscriber: handlers
-        "converting": [ConvertToPDF],
-        "grouped_subscribers": [{"names": ["toggler", "equiv"], "handlers": [ActionsMenuToggle]}],
+    function ClickDelegations(event, obj) {
+      options = {
         "default_handlers": [CloseHandler], //Default handlers will always execute
-        "subscribers": ["resultsPane", "del", "submit", "reset", "converting"],
-        "subscriberss": [
+        "grouped_subscribers": [{"names": ["toggler", "equiv"], "handlers": [ActionsMenuToggle]}],
+        "subscribers": [
           {"name":"del", "handlers": [del]}, {"name":"submit", "handlers": [Foo]}, 
           {"name":"reset", "handlers": [Clean]}, {"name":"converting", "handlers": [ConvertToPDF]}
         ],
+      };
+      Subscriptions(event, obj, options);
+    }
+
+    function Subscriptions(event, obj, options, filter) {
+      subscriptions = { //Subscription is purely by criterion -: id, class, name, data-set etc
+        "default_handlers": options.default_handlers || [], //Default handlers will always execute
+        "grouped_subscribers": options.grouped_subscribers || [],
+        "subscribers": options.subscribers || [],
         //subscribers -> classes or ids subscribing to the click (event) bubble
-        "subscriber": event.target,
+        "subscriber": options.subscriber || event.target,
         "activate": function activator(event, subscriberString, actions) {
           if (actions.length < 1) {
             console.warn("You have not specified any actions for subscriber:", subscriberString);
@@ -59,19 +61,25 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
         }
       };
 
-      filter = filter || ActivationHandler
-      subscriptions.default_handlers.forEach(function(handle) {
-        handle.call(obj, event, subscriptions.subscriber, obj);
+      filter = filter || ActivationHandler;
+      subscriptions.default_handlers.forEach(function(handler) {
+        handler.call(obj, event, subscriptions.subscriber, obj);
       });
-      subscriptions.subscribers.forEach(filter);
-      HandlerGroup();
-      
-      function HandlerGroup(){
+      // subscriptions.subscribers.forEach(filter);
+      HandlerGroup(filter);
+      HandleSingle(filter)
+      function HandlerGroup(handler){
            subscriptions.grouped_subscribers.forEach(function handleSubscription(group) {
-             group.names.forEach(function subscriber(subscriberString,) {
-                 filter(subscriberString, group);           
+             group.names.forEach(function subscriber(subscriberString) {
+                 handler(subscriberString, group); 
              });
            });
+      }
+
+      function HandleSingle(handler) {
+        subscriptions.subscribers.forEach(function handleSubscription(subscriber) {
+          handler(subscriber.name)
+        });
       }
 
       function ActivationHandler(subscriberString, group){
@@ -79,11 +87,9 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
         if (Object.prototype.toString.call(group) == "[object Object]") {
           actions = group.handlers;
         } else {
-            actions = subscriptions[subscriberString];
-            subscriptions.subscriberss.forEach(function handleSubscription(subscriber) {
+            subscriptions.subscribers.forEach(function handleSubscription(subscriber) {
             if (subscriberString == subscriber.name) {
               actions = subscriber.handlers;
-            return
           }
         });
           }
