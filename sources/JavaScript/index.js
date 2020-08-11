@@ -29,7 +29,28 @@
 
 Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
 
-    $(body).click(ClickDelegations); 
+    $(body).click(ClickDelegations);
+
+
+    $(sapi).keydown(EnterDelegations);
+
+      function EnterDelegations(event, obj) {
+      options = {};
+
+      function filter(event, key) {
+        if (event.keyCode == key) {
+          handler();
+        }
+      }
+
+      options.subscribers = [{
+        "name": "enter_key", "handlers": [EnterPress]
+      }];
+      // EnterPress(event);
+
+      Subscriptions(event, obj, options, filter)
+    }
+
 
 
     function ClickDelegations(event, obj) {
@@ -41,7 +62,7 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
           {"name":"reset", "handlers": [Clean]}, {"name":"converting", "handlers": [ConvertToPDF]}
         ],
       };
-      Subscriptions(event, obj, options);
+      Subscriptions(event, obj, options, filter);
     }
 
     function Subscriptions(event, obj, options, filter) {
@@ -61,13 +82,16 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
         }
       };
 
+
       filter = filter || ActivationHandler;
+      console.log(filter)
       subscriptions.default_handlers.forEach(function(handler) {
         handler.call(obj, event, subscriptions.subscriber, obj);
       });
-      // subscriptions.subscribers.forEach(filter);
+
       HandlerGroup(filter);
       HandleSingle(filter)
+
       function HandlerGroup(handler){
            subscriptions.grouped_subscribers.forEach(function handleSubscription(group) {
              group.names.forEach(function subscriber(subscriberString) {
@@ -144,12 +168,16 @@ function del(e, btn){
 
     
     //Hooks an event on the document
-    this.text("Total: 0", total).keydown(function(e){
+    
+      function EnterPress(e){
          var evnt = e || global.event;
          if(evnt.keyCode == 13){
             Foo.call(null, null, item, amount);
          }
-    }, document).oninput(function(e) {
+    }
+
+
+    this.text("Total: 0", total).oninput(function(e) {
       var target = this.getTarget(e);
       if (target.id == "item") {
         currentItem.text(target.value);
