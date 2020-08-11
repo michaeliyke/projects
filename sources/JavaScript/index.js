@@ -28,29 +28,33 @@
  */
 
 Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
+    
+    var context = null;
 
-    $(body).click(ClickDelegations); 
+    $(body).click(Subscriptions).input(HandleTyping).keydown(HandlerKeyPress, $(sapi));
 
+      function HandlerKeyPress(event, obj) {
+      // obj - the target element say it's tabbing functionality targeted
+      [HandleEnter, EscapeKeyHandler, MainEscapeKeyHandler].forEach(function(handler) {
+        handler(event, obj);
+      });
 
-    function ClickDelegations(event, obj) {
-      options = {
-        "default_handlers": [CloseHandler], //Default handlers will always execute
-        "grouped_subscribers": [{"names": ["toggler", "equiv"], "handlers": [ActionsMenuToggle]}],
-        "subscribers": [
-          {"name":"del", "handlers": [del]}, {"name":"submit", "handlers": [Foo]}, 
-          {"name":"reset", "handlers": [Clean]}, {"name":"converting", "handlers": [ConvertToPDF]}
-        ],
-      };
-      Subscriptions(event, obj, options);
     }
 
-    function Subscriptions(event, obj, options, filter) {
+
+
+    function Subscriptions(event, obj) {
       subscriptions = { //Subscription is purely by criterion -: id, class, name, data-set etc
-        "default_handlers": options.default_handlers || [], //Default handlers will always execute
-        "grouped_subscribers": options.grouped_subscribers || [],
-        "subscribers": options.subscribers || [],
+        "default_handlers": [CloseHandler], //Default handlers will always execute
+        "grouped_subscribers": [
+        {"names": ["toggler", "equiv"], "handlers": [ActionsMenuToggle]},
+        ],
+        "subscribers": [
+          {"name":"del", "handlers": [del]}, {"name":"submit", "handlers": [Foo]}, {"name": "first-toggle", "handlers": [init]},
+          {"name":"reset", "handlers": [Clean]}, {"name":"converting", "handlers": [ConvertToPDF]}
+        ],
         //subscribers -> classes or ids subscribing to the click (event) bubble
-        "subscriber": options.subscriber || event.target,
+        "subscriber": event.target,
         "activate": function activator(event, subscriberString, actions) {
           if (actions.length < 1) {
             console.warn("You have not specified any actions for subscriber:", subscriberString);
@@ -61,7 +65,7 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
         }
       };
 
-      filter = filter || ActivationHandler;
+      filter = ActivationHandler;
       subscriptions.default_handlers.forEach(function(handler) {
         handler.call(obj, event, subscriptions.subscriber, obj);
       });
@@ -144,19 +148,23 @@ function del(e, btn){
 
     
     //Hooks an event on the document
-    this.text("Total: 0", total).keydown(function(e){
+    this.text("Total: 0", total);
+
+      function HandleEnter(e){
          var evnt = e || global.event;
          if(evnt.keyCode == 13){
             Foo.call(null, null, item, amount);
          }
-    }, document).oninput(function(e) {
+    }
+
+      function HandleTyping(e) {
       var target = this.getTarget(e);
       if (target.id == "item") {
         currentItem.text(target.value);
       } else if (target.id == "amount") {
         currentV.text(target.value);
       }
-    }, body);
+    }
     // PDF plug
     function ConvertToPDF(){
     if (added()) {
@@ -181,28 +189,29 @@ function added() {
     var width, pane;
       $("#manage").toggleClass(function(){
         pane = this;
+        context = this;
         this.pane = this;
         width = this.computedStyle()["width"].replace(/[A-z]+/i, "");
-        if (width == 0) {
+        context.width = width;
+        if (context.width == 0) {
           this.css({
             border: "0.01em solid",
             width: "250px", opacity: 1
           }); /*#equiv  &#9661;*/
           $("#equiv").html("&#120169;");
-          width = 250;
+          context.width = 250;
         }else{
           closePane.call(this, event, ActionsMenuToggle, this);
         }
       });
       this.pane = pane;
     }
-      _techie.grab("body").addHandler("keypress", EscapeKeyHandler);
+      // _techie.grab("body").addHandler("keypress", EscapeKeyHandler);
 
-      function EscapeKeyHandler(event){
+      function EscapeKeyHandler(event, obj){
       if(event.keyCode == 27){ //escape key
-        this.type_ = "keypress";
-      if (width > 0) {
-        closePane(event, EscapeKeyHandler); 
+      if (context && context.width && context.width > 0) {
+        closePane.call(context, event, EscapeKeyHandler, context);
 
       }
     }
@@ -239,14 +248,10 @@ function added() {
             "width": "0px", opacity: 0
           });
           $("#equiv").html("&#9776;"/*"&#9776;"*/);
-          width = 0;         
-            if (this.type_ == "click") {
-              $(body).removeHandler("click", handler);
-            } else if (this.type_ == "keypress") {
-              
-              $(body).removeHandler("keypress", handler);
-            }
+          width = 0; 
+          context.width = 0;
           this.pane = null;
+          context = null;
         }
     
   function Foo(){
@@ -325,4 +330,33 @@ function printsBlob() {
             }, margins );
     }
 
+       
+        
+        function toggleClass(object) { //toggle({"div": ["red", "blue"]})
+            var selector;
+            for( selector in object) {
+                if(selector && object.hasOwnProperty(selector) && Array.isArray(object[selector])) {
+                    var current = object[selector][0], replacement = object[selector][1];
+                    if(typeof current !== "string" && typeof replacement !== "string") {
+                        return
+                    }
+                    $(selector).toggleClass(current, replacement);
+                }
+            }
+        }
+        
+        function init(){
+                toggleClass({
+                    "#menu-container": ["hide-view", "show-view"],
+                    "#menus": ["hide-view", "show-view"],
+                    "#body-cover": ["body-cover"],
+                    "body": ["fix"]
+                });
+        }
+
+          function MainEscapeKeyHandler(){
+          if (document.body.classList.contains("fix")) {
+            init();
+          }
+        }
 });
