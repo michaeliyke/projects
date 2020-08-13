@@ -25,16 +25,21 @@ header {
 }
 
 
-nav {
+nav:not(#silent-nav) {
     font-size: 1em;
     font-weight: bold;
-    padding-bottom: 1em;
-    padding-top: 1em;
+    align-items: baseline;
+    background-color: rgb(65, 160, 204);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: 0 auto;
+    width: 95%;
 }
 .main-nav {
-    margin: 0 auto;
+    /*margin: 0 auto;*/
     text-align: left;
-    width: 95%;
+    width: auto;
 }
 li {
     display: inline;
@@ -43,7 +48,6 @@ li {
 #nav a {
     color: rgb(255, 255, 255);
     padding: 1em;
-    text-decoration: none;
 }
 #nav a.current {
     border-color: rgb(255, 255, 255);
@@ -55,16 +59,23 @@ li {
 #nav a:hover {
     background-color: rgba(65, 10, 204, 0.2);
 }
-nav ul {
+nav ul:not(.quiet) {
     background-color: rgb(65, 160, 204);
-    padding: 1em;
+    display: inline-flex;
+    padding-bottom: 0.5em;
+    padding-top: 0.5em;
 }
 nav#silent-nav {
     display: flex;
-    height: 3em;
-    justify-content: center;
-    padding: 0;
-    
+    margin: 2.5% auto 1.5%;
+    position: relative;
+    width: 95%;
+}
+#silent-nav .first-toggle {
+    align-self: end;
+    display: inline-block;
+    flex-grow: 0;
+    padding: 0 0.2em;
 }
 #silent-nav a {
     background-color: rgba(204, 211, 203, 0);
@@ -84,20 +95,13 @@ nav#silent-nav {
     text-transform: uppercase;
 }
 #silent-nav > ul {
-    background-color: rgba(0, 0, 0, 0);
-    padding: 0;
-    position: relative;
-    top: 0;
+    align-self: end;
+    flex-grow: 1;
 }
 .first-toggle {
     color: rgb(56, 65, 133);
     cursor: default;
     font-size: 1.6em;
-    height: 1.5em;
-    left: 18%;
-    position: relative;
-    top: 3px;
-    width: 1.5em;
 }
 .first-toggle:hover {
     background-color: rgb(204, 211, 203);
@@ -201,7 +205,7 @@ span#first-toggle ~ div {
 }
 .menu .wrapper {
     display: inline-flex;
-    border-top: 3px solid rgb(255, 255, 255);
+    border-top: 1px solid rgb(255, 255, 255);
 }
 .menu li a {
     border: medium none;
@@ -220,18 +224,15 @@ div#main-heading {
     /*animation: moving 45s linear infinite;*/
     /*background: url("../Images/Hero_openO_CC-800x533.jpg"), url("../Images/Hero_openO_CC-800x533.jpg");*/
      /*background-image: linear-gradient(to bottom, #8ac3fa, #6e9dd1, #5379aa, #385784, #1e375f);*/
-    background-image: linear-gradient(to bottom, #bbd9fb, #99bfea, #78a6d9, #548dc9, #2675b8);
+    /*background-image: linear-gradient(to bottom, #bbd9fb, #99bfea, #78a6d9, #548dc9, #2675b8);*/
     /*https://mycolor.space/gradient?ori=to+bottom&hex=%23BBD9FB&hex2=%232675B8&sub=1*/
 
-    background-repeat: repeat;
-    margin: 0 auto;
-    margin-bottom: -3em;
-    margin-top: -2em;
-    overflow: hidden;
-    background-size: 100% 100%;
-    width: 95%;
     animation-play-state: running;
+    background-image: linear-gradient(to bottom, rgb(187, 217, 251), rgb(153, 191, 234), rgb(120, 166, 217), rgb(84, 141, 201), rgb(38, 117, 184));
+    margin: 0 auto;
     padding-bottom: 3em;
+    width: 95%;
+    overflow: hidden;
 }
 
 div#main-heading ol {
@@ -269,6 +270,7 @@ div#main-heading ol > li{
     color: rgb(102, 104, 136);
     color: #222444;
     color: #beffff;
+    color: #F2C148 !important;
     font-size: 2.2em;
     letter-spacing: 0.51em;
     position: relative;
