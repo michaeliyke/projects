@@ -1,21 +1,30 @@
 
-html, body {
+* { 
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+}
+
+body {
     color: rgb(68, 68, 68);
     font-family: sans-serif;
     font-size: 1em;
     font-weight: lighter;
-    margin: 0;
-    padding: 0;
 }
-.fix {
-    position: fixed;
+
+div#main {
+    max-width: 100%;
 }
-* a {
-    text-decoration: none;
-}
+
 header {
     text-align: center;
 }
+
+
 nav {
     font-size: 1em;
     font-weight: bold;
@@ -55,6 +64,7 @@ nav#silent-nav {
     height: 3em;
     justify-content: center;
     padding: 0;
+    
 }
 #silent-nav a {
     background-color: rgba(204, 211, 203, 0);
@@ -100,29 +110,46 @@ nav#silent-nav {
     width: 100%;
     z-index: 1;
 }
-.hide-view {
-    font-size: 0;
-    transition: all 1.3s ease 0s;
-    width: 0;
-}
+
 #menu-container {
-    display: flex;
-    position: absolute;
-    right: 0;
-    top: -1em;
+    /*position: relative;*/
+    /*top: 0%;*/
+    width: 0;
     z-index: 1;
+    display: flex;
+    transition: all 1.3s ease 0s;
+    background-color: rgb(73, 73, 73);
+    /*transition: all 1.3s ease-in-out 0s;*/
+}
+#menu-container.hide-view {
+    /*width: 0;*/
+    font-size: 0;
+    height: 0;
 }
 #menu-container.show-view {
-    background-color: rgb(73, 73, 73);
-    transition: all 1.3s ease-in-out 0s;
     width: 100%;
 }
+
+#menus.show-view {
+    visibility: visible;
+}
+
+.hide-from-view {
+    visibility: hidden;
+}
+
+.bring-into-view {
+    visibility: visible;
+}
+
 #menus {
     display: flex;
     justify-content: space-between;
     padding: 3em 1em 2em 0;
+    visibility: hidden;
     visibility: visible;
     width: 100%;
+
 }
 #menus li:hover {
     background-color: rgb(137, 137, 137);
@@ -150,23 +177,31 @@ nav#silent-nav {
 span#first-toggle ~ div {
     color: rgb(255, 255, 255);
 }
+.menu-tile {
+    display: flex !important;
+}
 .menu {
     background-color: rgba(112, 112, 112, 0.4);
-    display: flex;
+    display: none;
     flex-flow: column nowrap;
     opacity: 1;
     padding: 2em;
+    border-bottom: 3px solid rgb(255, 255, 255);
 }
 .menu li {
     background-color: rgba(151, 151, 151, 0.2);
     padding: 0.6em;
     text-align: left;
 }
-.menu .wrapper {
+.wrapper-show {
     background-color: rgba(120, 120, 120, 0.4);
     display: flex;
     flex-flow: column nowrap;
     padding: 2em;
+}
+.menu .wrapper {
+    display: inline-flex;
+    border-top: 3px solid rgb(255, 255, 255);
 }
 .menu li a {
     border: medium none;
@@ -489,7 +524,7 @@ input {
 }
 
 #row {
-    width: 70%;
+    /*width: 70%;*/
 }
 #trigger {
     margin: 1em;

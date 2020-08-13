@@ -346,12 +346,20 @@ function printsBlob() {
         }
         
         function init(){
-                toggleClass({
-                    "#menu-container": ["hide-view", "show-view"],
+                obj = {
+                  "#menu-container": ["hide-view", "show-view"],
                     "#menus": ["hide-view", "show-view"],
                     "#body-cover": ["body-cover"],
-                    "body": ["fix"]
-                });
+                    ".wrapper": ["wrapper-show"],
+                    "body": ["fix"]                    
+                };
+          new Promise(function foo(resolve, reject) {
+            resolve(toggleClass(obj));
+          }).then(function bar(obj) {
+            setTimeout(function(){
+              toggleClass({".menu": ["menu-tile"]});
+            }, 500);
+          }).catch((error) => console.log(error));
         }
 
           function MainEscapeKeyHandler(){

@@ -1,0 +1,60 @@
+
+<!-- description is currently 109 characters max = 155 -->
+<!-- 
+
+<meta http-equiv="refresh" content="30">
+<meta http-equiv="refresh" content="x_seconds; url=http://www.yourhost.com/pagetosendto.html">
+ 
+Robots Meta Tag
+The robots meta tag lets you specify that a particular page should not be indexed by a search engine 
+or if you do or do not want links on the page followed.
+
+<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+"Do not Index this page. Do not follow the links on the page."
+
+<META NAME="ROBOTS" CONTENT="NOINDEX, FOLLOW">
+ "Do not Index this page. Do follow the links on the page."
+
+ <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
+ "Do Index this page. Do follow the links on the page."
+
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ -->
+
+<!-- SCRIPTS BEGIN -->
+<!-- <script type="text/javascript" src="https://github.com/PTNigeria/CDN/blob/master/Techie.js"></script> -->
+<!-- <script type="text/javascript" src="https://cdn.rawgit.com/PTNigeria/CDN/master/Techie.js"></script> -->
+
+
+
+
+<!-- &#9776; &#9651;-->
+<!-- &#9776; &#9651;-->
+
+
+
+
+
+
+<!-- 
+			If Admin, fetch all links below and display them
+			Admin is a must login area of the site which features the links below
+			https://unpkg.com/techie@0.1.1/dist/techie.js https://unpkg.com/#/
+				            jsdelivr.net https://www.jsdelivr.com/features
+			 Each of these links below must authenticate for Admin before display.
+			  -->
+			
+			
+	<!-- GITHUB
+	PTCDN
+	Gmail
+	Techiecdn@gmail.com
+	PrizeTechie@gmail.com
+	PTNigeria@gmail.com
+	 -->
+
+
+
+
+
+   <!-- <img src="./Images/Hero_openO_CC-800x533.jpg" alt="Image for the header" width="100%" height="100%" /> -->
