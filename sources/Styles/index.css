@@ -101,11 +101,23 @@ nav [data-role="projects-toggler"]:hover {
     color: #000;
     cursor: default;
 }
+
 nav#silent-nav {
-    display: flex;
     margin: 2.5% auto 1.5%;
     position: relative;
     width: 95%;
+    display: flex;
+}
+#silent-nav h1{
+    flex-grow: 8;
+    text-align: left;
+}
+#silent-nav h1 a:hover{
+    color: darkred;
+    border: none;
+}
+#silent-nav h1 a{
+    color: rgb(65, 160, 204);
 }
 
 #silent-nav a {
@@ -116,6 +128,7 @@ nav#silent-nav {
 #silent-nav a:hover {
     border-bottom: 2px solid rgb(65, 160, 204);
     color: rgb(65, 160, 204);
+    color: darkred;
 }
 #silent-nav > ul > li > a {
     border-top: 0 none;
@@ -126,9 +139,11 @@ nav#silent-nav {
     text-transform: uppercase;
 }
 #silent-nav > ul {
-    -ms-grid-row-align: end;
-        align-self: end;
+    align-self: end;
+    /*background-color: rgb(235, 235, 235);*/
+    display: inline-flex;
     flex-grow: 1;
+    justify-content: space-between;
 }
 .body-cover {
     background-color: rgba(255, 255, 255, 0.6);
