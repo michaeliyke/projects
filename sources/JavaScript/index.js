@@ -50,7 +50,7 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
         {"names": ["toggler", "equiv"], "handlers": [ActionsMenuToggle]},
         ],
         "subscribers": [
-          {"name":"del", "handlers": [del]}, {"name":"submit", "handlers": [Foo]}, {"name": "first-toggle", "handlers": [init]},
+          {"name":"del", "handlers": [del]}, {"name":"submit", "handlers": [Foo]}, {"name": "projects-toggler", "handlers": [init]},
           {"name":"reset", "handlers": [Clean]}, {"name":"converting", "handlers": [ConvertToPDF]}
         ],
         //subscribers -> classes or ids subscribing to the click (event) bubble
@@ -226,7 +226,7 @@ function added() {
       }
       switch(target.id){
         case "main":
-        case "nav":
+        // case "nav":
         case "header":
         case "project":
         case "project-body":

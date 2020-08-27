@@ -43,31 +43,35 @@ header {
 }
 
 
-nav:not(#silent-nav) {
-    font-size: 1em;
-    font-weight: bold;
-    align-items: baseline;
-    background-color: rgb(65, 160, 204);
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+nav.main-nav {
     margin: 0 auto;
     width: 95%;
 }
-.main-nav {
-    /*margin: 0 auto;*/
-    text-align: left;
-    width: auto;
+nav.main-nav ul {
+    background-color: rgb(65, 160, 204);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
-li {
-    display: inline;
-    margin: 8px;
-    list-style: none;
+
+
+nav.main-nav ul li:last-of-type {
+    margin-right: 1em;
 }
-#nav a {
+
+nav.main-nav ul li:first-of-type {
+    margin-left: 1em;
+}
+
+nav.main-nav ul li a {
     color: rgb(255, 255, 255);
-    padding: 1em;
+    padding: 4px;
+    border-radius: 2px;
 }
+nav.main-nav ul li a:hover {
+    color: wheat;
+}
+
 #nav a.current {
     border-color: rgb(255, 255, 255);
     border-radius: 1px;
@@ -75,14 +79,27 @@ li {
     color: rgb(44, 49, 64);
 }
 
-#nav a:hover {
-    background-color: rgba(65, 10, 204, 0.2);
+li {
+    list-style: none;
 }
-nav ul:not(.quiet) {
-    background-color: rgb(65, 160, 204);
-    display: inline-flex;
-    padding-bottom: 0.5em;
-    padding-top: 0.5em;
+
+li:not(.main-menu) {
+    display: inline;
+    margin: 8px;
+}
+nav [data-role="projects-toggler"] {
+    color: rgb(255, 255, 255);
+    display: inline;
+    font-size: 2.6rem;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+    border-radius: 1px;
+    padding-top: 0.1rem;
+}
+nav [data-role="projects-toggler"]:hover {
+    background-color: rgb(116, 183, 213);
+    color: #000;
+    cursor: default;
 }
 nav#silent-nav {
     display: flex;
@@ -90,13 +107,7 @@ nav#silent-nav {
     position: relative;
     width: 95%;
 }
-#silent-nav .first-toggle {
-    -ms-grid-row-align: end;
-        align-self: end;
-    display: inline-block;
-    flex-grow: 0;
-    padding: 0 0.2em;
-}
+
 #silent-nav a {
     background-color: rgba(204, 211, 203, 0);
     border-bottom: 2px solid rgba(204, 204, 204, 0);
@@ -118,14 +129,6 @@ nav#silent-nav {
     -ms-grid-row-align: end;
         align-self: end;
     flex-grow: 1;
-}
-.first-toggle {
-    color: rgb(56, 65, 133);
-    cursor: default;
-    font-size: 1.6em;
-}
-.first-toggle:hover {
-    background-color: rgb(204, 211, 203);
 }
 .body-cover {
     background-color: rgba(255, 255, 255, 0.6);
@@ -183,7 +186,7 @@ nav#silent-nav {
     border-radius: 2px;
 }
 
-#first-toggle {
+.slide-close {
     background-color: rgb(255, 255, 255, 0.3);
     color: rgb(240, 230, 140);
     cursor: default;
@@ -195,12 +198,12 @@ nav#silent-nav {
     position: relative;
     top: 0.7em;
 }
-#first-toggle:hover {
+.slide-close:hover {
     background-color: rgb(232, 17, 35);
     color: rgb(255, 255, 255);
     cursor: pointer;
 }
-span#first-toggle ~ div {
+span.slide-close ~ div {
     color: rgb(255, 255, 255);
 }
 .menu-tile {
