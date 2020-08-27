@@ -48,7 +48,7 @@ nav.main-nav {
     width: 95%;
 }
 nav.main-nav ul {
-    background-color: rgb(65, 160, 204);
+    background-color: #1b7aa6;
     display: flex;
     justify-content: space-between;
     align-items: center;
