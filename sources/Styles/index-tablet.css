@@ -1,0 +1,12 @@
+@media only screen and (min-width: 768px) and (max-width: 1000px), 
+(min-device-width: 768px) and (max-device-width: 1000px) and (orientation: landscape) {
+  body {
+    font-size: var(--font-size--small);
+  }
+ #silent-nav  ul  li:first-of-type{
+  margin-left: 0;
+ }
+ #silent-nav  ul  li:first-of-type a {
+  padding-left: 0;
+ }
+}

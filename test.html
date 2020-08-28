@@ -9,11 +9,13 @@
 <meta name="description" content="Michael C. Iyke | Online Budget Calculator" />
 <meta name="author" content="Michael C. Iyke" />
 <link rel="stylesheet" type="text/css" href="sources/Styles/index.css" />
+<link rel="stylesheet" type="text/css" href="sources/Styles/index-tablet.css" />
+<link rel="stylesheet" type="text/css" href="sources/Styles/index-android.css" />
+<link rel="stylesheet" type="text/css" href="sources/Styles/index-smallies.css" />
 
 <script type="text/javascript" src="sources/JavaScript/PT.js"></script>
 <script type="text/javascript" src="sources/JavaScript/jsPDF.min.js"></script>
 <script type="text/javascript" src="sources/JavaScript/index.js"></script>
-
 	<title>Michael C. Iyke - Budget Calculation Tool</title>
 </head>
 <body class="root-body">
@@ -174,20 +176,17 @@
 We have a simple budget calculation tool ready for use and its free. 
 To use, start by typing an item of your budget and hit enter. That's it! The result is shown in real time and it is free and easy to use. Once you're done listing your budget items, you can print it or just grab the pdf version of your work already prepared for you. </p>
 				</div>
+			</ul>
+			</div>
 				<div class="covered comfirm">This budget calculator is for you &nbsp;
 						<img alt="we've got you covered img" src="sources/images/tick.png" />
 				 </div>
-			</ul>
-			</div>
 		</div>
 	<div id="project">
 	<h2 class="calculator-heading heading">Simple Online Budget Calculator</h2>
 		<form method="post" action="" id="budget" name="budget" >
 		<div id="inputs">
 			<div id="trigger">
-			<div  id="reset"  class="trigger reset" > Reset </div>
-			<div id="total" class="trigger total">Total: 0.00</div>
-			<div id="submit"  class="trigger submit" > Add </div>
 			<div  id="toggler" class="toggler">
 				<span class="show equiv"  id ="equiv">&#9776;</span>
 			<div id="manage">
@@ -197,7 +196,11 @@ To use, start by typing an item of your budget and hit enter. That's it! The res
 			<div class="managed disabled managing" id="managing">manage</div>
 			<div class="managed printing" id="printing"> print</div>
 		</div>
-			</div>		
+			</div>	
+			<div  id="reset"  class="trigger reset" > Reset </div>
+			<div id="total" class="trigger total">Total: 0.00</div>
+			<div id="submit"  class="trigger submit" > Add </div>
+				
 			</div>  
 			<div id="input">
 			<input type="text" name="item" id="item"  class="input type item" placeholder="First Item" 	/>
