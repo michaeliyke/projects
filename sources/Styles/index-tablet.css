@@ -3,6 +3,18 @@
   body {
     font-size: var(--font-size--small);
   }
+  li.title-bullets {
+    display: block;
+    background: #ccc;
+  }
+
+  div#main-heading ol {
+    padding: 0;
+    text-align: inherit;
+  }
+  div#main-heading ol > li:nth-of-type(2) {
+    margin-left: 0;
+  }
  #silent-nav  ul  li:first-of-type{
   margin-left: 0;
  }
