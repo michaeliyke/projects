@@ -186,12 +186,12 @@ nav#silent-nav {
 
 #menus {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     padding: 3em 1em 2em 0;
     visibility: hidden;
     visibility: visible;
     width: 100%;
-
+    flex-wrap: wrap;
 }
 #menus li:hover {
     background-color: rgb(137, 137, 137);
@@ -221,7 +221,7 @@ span.slide-close ~ div {
     color: rgb(255, 255, 255);
 }
 .menu-tile {
-    display: flex !important;
+    display: inline-flex !important;
 }
 .menu {
     background-color: rgba(112, 112, 112, 0.4);
@@ -230,6 +230,7 @@ span.slide-close ~ div {
     opacity: 1;
     padding: 2em;
     border-bottom: 3px solid rgb(255, 255, 255);
+    margin-top: 1em;
 }
 .menu li {
     background-color: rgba(151, 151, 151, 0.2);
