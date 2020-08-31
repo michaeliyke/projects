@@ -156,8 +156,6 @@ nav#silent-nav {
 }
 
 #menu-container {
-    /*position: relative;*/
-    /*top: 0%;*/
     width: 0;
     z-index: 1;
     display: flex;
@@ -254,20 +252,11 @@ span.slide-close ~ div {
     outline: medium none;
 }
 .project-group{
-    color: #a6b5c8;
-    /*color: #41a0cc;*/
-    /*color: #a9cfe1;*/
-    /*color: #90c6f3;*/
     color: #c4dffc;
     font-weight: bold;
 }
 div#main-heading {
-    /*animation: moving 45s linear infinite;*/
-    /*background: url("../Images/Hero_openO_CC-800x533.jpg"), url("../Images/Hero_openO_CC-800x533.jpg");*/
-     /*background-image: linear-gradient(to bottom, #8ac3fa, #6e9dd1, #5379aa, #385784, #1e375f);*/
-    /*background-image: linear-gradient(to bottom, #bbd9fb, #99bfea, #78a6d9, #548dc9, #2675b8);*/
-    /*https://mycolor.space/gradient?ori=to+bottom&hex=%23BBD9FB&hex2=%232675B8&sub=1*/
-
+    
     -webkit-animation-play-state: running;
 
             animation-play-state: running;
@@ -280,32 +269,16 @@ div#main-heading {
 
 div#main-heading ol {
     background-color: rgba(255, 255, 255, 0.05);
-    color: rgb(255, 255, 255);
+    color: #ebebeb;
     display: inline-block;
     font-family: Segoe UI Symbol;
-    font-size: 1.1em;
+    font-size: 1.2em;
     line-height: 1.5;
     padding: 2em;
     text-align: left;
     border-radius: 4px;
 }
 div#main-heading ol li::before {
-    background--------image: linear-gradient(
-        to top, 
-        rgb(28, 30, 49), 
-        rgb(31, 46, 69), 
-        rgb(30, 63, 89), 
-        rgb(23, 81, 107), 
-        rgb(9, 100, 122), 
-        rgb(9, 100, 122), 
-        rgb(9, 100, 122), 
-        rgb(9, 100, 122), 
-
-        rgb(23, 81, 107), 
-        
-        rgb(30, 63, 89), 
-        rgb(31, 46, 69), 
-        rgb(28, 30, 49));
     background-color: rgba(255, 255, 255, 0.05);
     border: 1px solid rgb(255, 255, 255);
     border-radius: 100%;
@@ -315,16 +288,15 @@ div#main-heading ol li::before {
     margin-right: 0.5em;
     width: 0.6em;
 }
-div#main-heading ol > li 
 div#main-heading ol > li:nth-of-type(3) {
     display: block;
 }
-div#main-heading ol > li:nth-of-type(2) {
-    /*margin-left:;*/
-}
 li.title-bullets {
     display: inline-block;
-    /*margin: 8px 2em;*/
+    margin: 8px 2em;
+}
+li.title-bullets-exception {
+    margin: 8px 2em;
 }
 
 
@@ -364,7 +336,6 @@ li.title-bullets {
 }
 
 #title {
-    /*color: #222444; */
     color: #beffff; 
     font-size: 3.8em;
     line-height: 1.5;
@@ -417,7 +388,6 @@ input {
     margin: 2em;
     padding: 2em;
      background-image: linear-gradient(to top, #19222c, #192430, #1a2634, #1a2838, #1a2a3c, #1a2a3c, #1a2a3c, #1a2a3c, #1a2838, #1a2634, #192430, #19222c);
-       /*background-image: linear-gradient(to top, #1c2937, #223243, #283b50, #2e445d, #354d6b, #354d6b, #354d6b, #354d6b, #2e445d, #283b50, #223243, #1c2937);*/
 }
 #questions-list {
     background-color: rgb(40, 135, 179);
@@ -451,6 +421,8 @@ input {
 .heading {
     font-size: 1.1em;
     text-transform: uppercase;
+    font-weight: 900;
+    color: #beffff;
 }
 .heading .dot:nth-of-type(1) {
     background-color: #fff;
@@ -482,9 +454,7 @@ input {
     width: 96%;
     background-color: #41A0CC;
      background-image: linear-gradient(to top, #444444, #51525c, #596176, #5c7291, #5785ab, #5195bd, #46a6ce, #36b7dc, #32c8e5, #38d9eb, #48eaef, #5ffbf1);
-     /*background-image: linear-gradient(to top, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);*/
       background-image: linear-gradient(to top, #4d4e55, #5a6576, #607f98, #5c9bb8, #51b8d3, #51b7d2, #51b7d2, #51b6d1, #5b98b4, #5d7c93, #576170, #494a4e);
-       /*background-image: linear-gradient(to top, #4d4e55, #4d5563, #495e70, #3e677c, #2e7184, #2e7183, #2e7082, #2e7081, #3d6578, #475b6b, #4a525d, #494a4e);*/
         background-image: linear-gradient(to top, #1c1e31, #1f2e45, #1e3f59, #17516b, #09647a, #09647a, #09647a, #09647a, #17516b, #1e3f59, #1f2e45, #1c1e31);
 }
 #inputs {
@@ -556,7 +526,7 @@ input {
     background-color: rgba(118, 144, 255, 0.3)
     color: rgb(255, 255, 255);
     cursor: pointer;
-    background-color: rgba(153, 153, 153, 0.5);/*#7690ff;*/
+    background-color: rgba(153, 153, 153, 0.5);
 }
 .disabled{
     color: #abc38d;
@@ -577,19 +547,11 @@ input {
     padding: 0 6px;
     position: relative;
 }
-
 #toggler:hover {
     color: rgba(163, 254, 176, 1);
 }
 input {
     border-radius: 20px;
-}
-.toggle {
-    width: 250px;
-}
-
-#row {
-    /*width: 70%;*/
 }
 
 #input {
@@ -618,7 +580,6 @@ input {
     display: none;
 }
 .del1 {
-    /*background-color: rgb(0, 255, 255, 0.3);*/
     color: rgb(144, 138, 100);
     font-weight: bold;
     margin-top: 0.6em;
@@ -670,7 +631,6 @@ footer a:hover{
 .popup-head{
 text-align: center;
 }
-.popup-body{}
 .popup-foot{
     display: flex;
     flex-direction: row;

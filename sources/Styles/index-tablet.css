@@ -3,17 +3,34 @@
   body {
     font-size: var(--font-size--small);
   }
-  li.title-bullets {
-    display: block;
-    background: #ccc;
+  nav.main-nav ul li a {
+    border-left: 0.1em solid rgba(255, 255, 255, 0.2);
+    padding: 4px 0 4px 8px;
+}
+nav.main-nav ul li a:first-of-type{
+  border-left:none;
+}
+nav.main-nav ul li a:last-of-type{
+  border-right: 0.1em solid rgba(255, 255, 255, 0.2);
+}
+nav [data-role="projects-toggler"]{
+  margin-left: 0.5em;
+}
+  #title {
+    font-size: 3em;
+    font-weight: 900;
   }
-
   div#main-heading ol {
-    padding: 0;
-    text-align: inherit;
+    padding: 1em;
+    text-align: left;
   }
-  div#main-heading ol > li:nth-of-type(2) {
-    margin-left: 0;
+  div#main-heading ol li {
+    display: block;
+    padding-left: 2em;
+  }
+  div#main-heading ol li::before{
+    height: 0.3em;
+    width: 0.3em;
   }
  #silent-nav  ul  li:first-of-type{
   margin-left: 0;
