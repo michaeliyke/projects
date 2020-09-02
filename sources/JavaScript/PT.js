@@ -2916,10 +2916,17 @@ getStyle: function getStyle(style, element) {
   }
   if (typeof element === "object" && typeof style === "string") {
   switch(true) {
-    case !!element.style[style]: return element.style[style];
-    case !!window.getComputedStyle: return window.getComputedStyle(element, null).getPropertyValue(style);
+    case element.style && element.style[style]: return element.style[style];
+    case !!window.getComputedStyle: 
+    try {
+    return window.getComputedStyle(element, null).getPropertyValue(style);
     break;
-    case !!element.currentStyle: return element.currentStyle[style];
+  }catch(error) {}
+    case !!element.currentStyle === true: 
+    console.log(!!element.currentStyle === true)
+    if (element.currentStyle) {
+      return element.currentStyle[style];
+  }
     break;
     case !!element.runtimeStyle: return element.runtimeStyle[style];
   }
