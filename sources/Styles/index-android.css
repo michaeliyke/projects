@@ -2,5 +2,80 @@
 /* Screen_1.css  - Android*/
 @media only screen and (max-width: 767px) and (min-width: 481px), 
 (max-device-width: 767px) and (min-device-width: 481px) and (orientation: landscape) {
-  
+  header section {
+    overflow-x: hidden;
+    width: 0;
+    position: static;
+    background-color: #eebebe;
+    transition: 0.5s;
+}
+header section nav h1 {
+  position: absolute;
+  top: 0;
+}
+
+nav#silent-nav::before { /*Just for extended border thing*/
+    background: #777777 none repeat scroll 0 0;
+    content: " ";
+    display: block;
+    height: 2em;
+    width: 50%;
+    transition: 0.3s;
+}
+  nav#silent-nav {
+    display: block;
+    margin: 0;
+    position: static;
+    margin-top: 3em;
+}
+#silent-nav > ul {
+    display: block;
+    text-align: left;
+    width: 50%;
+}
+#silent-nav > ul li {
+    background-color: #ebebeb;
+    display: block;
+    margin-top: 1px;
+}
+#silent-nav > ul li a{
+  padding: 0;
+}
+#silent-nav > ul li a:hover{
+  border: none;
+}
+nav.main-nav {
+    margin: 0;
+    transition: 0.3s;
+}
+nav.main-nav ul {
+    width: 50%;
+    background-color: #1b7aa6;
+    display: block;
+    text-align: left;
+}
+nav.main-nav ul li:first-of-type {
+    margin-left: 0;
+}
+nav.main-nav ul li:last-of-type {
+    margin-right: 0;
+    background-color: #ebebeb;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+#silent-nav h1 .open-off-canvass{
+    color: #999;
+    display: inline-block;
+    font-size: 1.4em;
+    padding: 0.2em 0.5em 1em 0.3em;
+}
+#silent-nav h1 .open-off-canvass:hover {
+  color: crimson;
+  cursor: pointer;
+  background-color: #abcdef;
+}
+nav.main-nav ul li a{
+  padding: 0;
+}
 }

@@ -33,9 +33,14 @@ message2 = "Medium strength password"
 message3 = "strong password"
 message4 = "Very Strong password";
 
- function getClass(name) {
-    return doc.getElementsByClassName(name);
+ function getClass(name, index) {
+     if (arguments.length > 1 && +index != index) {
+         return console.error(`Ensure ${index} is an integer number.`);
+     }
+    list = [].slice.call(document.querySelectorAll(`.${name}`));
+    return typeof index === "number" ? list[index]: list;
 }
+
 function getId(name) {
     return doc.getElementById(name);
 }

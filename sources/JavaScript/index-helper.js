@@ -1,12 +1,12 @@
-Techie(function($, body, head, doc, _, w, Log, stringify, stringifyAll, a){
+Techie(function($, body, head, d, _, w, Log, stringify, stringifyAll, a){
   
 
 
 getcss("display")
 
 
-$(w).resize(function(event){
-  log_prop_value(event, "width");
+$(w).resize( function(event){
+  console.log(w.innerWidth)
 });
 
 function log_prop_value(event, prop) {

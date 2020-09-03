@@ -50,8 +50,12 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
         {"names": ["toggler", "equiv"], "handlers": [ActionsMenuToggle]},
         ],
         "subscribers": [
-          {"name":"del", "handlers": [del]}, {"name":"submit", "handlers": [Foo]}, {"name": "projects-toggler", "handlers": [init]},
-          {"name":"reset", "handlers": [Clean]}, {"name":"converting", "handlers": [ConvertToPDF]}
+          {"name":"del", "handlers": [del]}, 
+          {"name":"submit", "handlers": [Foo]}, 
+          {"name": "projects-toggler", "handlers": [init]},
+          {"name":"reset", "handlers": [Clean]}, 
+          {"name":"converting", "handlers": [ConvertToPDF]},
+          {"name":"open-off-canvass", "handlers": [mobile_menu_open]}
         ],
         //subscribers -> classes or ids subscribing to the click (event) bubble
         "subscriber": event.target,
@@ -103,14 +107,42 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
 
     }
 
+    function getByClass(name, index) {
+     if (arguments.length > 1 && +index != index) {
+         return console.error(`Ensure ${index} is an integer number.`);
+     }
+    return typeof index === "number" ? query(`.${name}`, index): query(name);
+}
+    function query(selector, index) {
+     if (arguments.length > 1 && +index != index) {
+         return console.error(`Ensure ${index} is an integer number.`);
+     }
+    list = [].slice.call(document.querySelectorAll(selector));
+    return typeof index === "number" ? list[index]: list;
+}
 
-    var d = document, getId = this.Id, Total = 0,v1 = "Next item",v2 = '0.00',amount = getId("amount"),
+    var d = document, getId = this.Id, Total = 0, v1 = "Next item",v2 = '0.00',amount = getId("amount"),
     total = getId("total"), submit = getId("submit"), item = inputItem = getId("item"),
     reset = getId("reset"),  currentV = $("#current > #current"), currentItem =  $("#current > #currentItem"),
     manage = getId("managing"), printing = getId("printing"), saving = getId("saving"), _techie = this,
     table = getId("table");
+    mobile_menu = getByClass("open-off-canvass");
+    section = query("header section", 0);
 
+mobile_menu_open.dumming = false;
+function mobile_menu_open(){
+  if (mobile_menu_open.dumming) {
+    mobile_menu_open.dumming = false;
+    section.style.width =  0;
+    return 
+  }
+  mobile_menu_open.dumming = true;
+  section.style.width =  "100%";
+}
 
+function mobile_menu_close(){
+  section.style.width = 0;
+}
 function del(e, btn){
   if (a("Do you want to delete this row?")) {
     new Promise(function(resolve, reject) {
