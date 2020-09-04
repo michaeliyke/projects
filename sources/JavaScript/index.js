@@ -138,8 +138,8 @@ function mobile_menu_open(){
     return 
   }
   mobile_menu_open.dumming = true;
-  section_lists[0].style.width = "10em";// "50%";
-  section_lists[1].style.width = "10em";// "50%";
+  section_lists[0].style.width = "14em";// "50%";
+  section_lists[1].style.width = "14em";// "50%";
 }
 
 function mobile_menu_close(){
