@@ -127,17 +127,19 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
     manage = getId("managing"), printing = getId("printing"), saving = getId("saving"), _techie = this,
     table = getId("table");
     mobile_menu = getByClass("open-off-canvass");
-    section = query("header section", 0);
+    section_lists = query("header section nav ul");
 
 mobile_menu_open.dumming = false;
 function mobile_menu_open(){
   if (mobile_menu_open.dumming) {
     mobile_menu_open.dumming = false;
-    section.style.width =  0;
+    section_lists[0].style.width =  0;
+    section_lists[1].style.width =  0;
     return 
   }
   mobile_menu_open.dumming = true;
-  section.style.width =  "100%";
+  section_lists[0].style.width = "10em";// "50%";
+  section_lists[1].style.width = "10em";// "50%";
 }
 
 function mobile_menu_close(){

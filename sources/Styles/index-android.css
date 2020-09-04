@@ -1,81 +1,102 @@
 
-/* Screen_1.css  - Android*/
-@media only screen and (max-width: 767px) and (min-width: 481px), 
-(max-device-width: 767px) and (min-device-width: 481px) and (orientation: landscape) {
-  header section {
+@media only screen and (max-width: 767px) and (min-width: 481px), (max-device-width: 767px) and (min-device-width: 481px) and (orientation: landscape) {
+header section {
+    background-color: #FFF;
+    position: absolute;
+    z-index: 2;
+}
+section nav#nav ul, section nav#silent-nav ul {
     overflow-x: hidden;
+    transition: all 0.5s ease 0s;
     width: 0;
     position: static;
-    background-color: #eebebe;
-    transition: 0.5s;
+    display: block;
+}
+header section nav ul li {
+    /*transition: all 0.3s ease 0s;*/
 }
 header section nav h1 {
-  position: absolute;
-  top: 0;
+    left: 8em;
+    position: absolute;
+    top: -2em;
+    width: 100%;
+    z-index: 1;
 }
-
-nav#silent-nav::before { /*Just for extended border thing*/
+nav#silent-nav::before {
     background: #777777 none repeat scroll 0 0;
     content: " ";
     display: block;
     height: 2em;
+    transition: all 0.3s ease 0s;
     width: 50%;
-    transition: 0.3s;
 }
-  nav#silent-nav {
+nav#silent-nav {
     display: block;
-    margin: 0;
-    position: static;
-    margin-top: 3em;
+    margin: 3em 0 0;
 }
 #silent-nav > ul {
-    display: block;
     text-align: left;
-    width: 50%;
 }
 #silent-nav > ul li {
     background-color: #ebebeb;
     display: block;
     margin-top: 1px;
 }
-#silent-nav > ul li a{
-  padding: 0;
+#silent-nav > ul li a {
+    padding: 0;
 }
-#silent-nav > ul li a:hover{
-  border: none;
+#silent-nav > ul li a:hover {
+    border: medium none;
 }
 nav.main-nav {
     margin: 0;
-    transition: 0.3s;
 }
 nav.main-nav ul {
-    width: 50%;
     background-color: #1b7aa6;
     display: block;
     text-align: left;
+    /*width: 50 %;*/
 }
 nav.main-nav ul li:first-of-type {
     margin-left: 0;
 }
 nav.main-nav ul li:last-of-type {
+  background-color: rgba(0, 128, 0, 0.3);
+    display: block;
     margin-right: 0;
-    background-color: #ebebeb;
-    position: absolute;
-    right: 0;
+    padding: 2em;
+    position: fixed;
     top: 0;
+    width: 100%;
 }
-#silent-nav h1 .open-off-canvass{
-    color: #999;
+#silent-nav h1 .open-off-canvass {
+    color: #fff;
     display: inline-block;
     font-size: 1.4em;
-    padding: 0.2em 0.5em 1em 0.3em;
+    left: -5em;
+    padding: 0 0.05em 0.01em 0.01em;
+    position: absolute;
+    top: -0.4em;
 }
 #silent-nav h1 .open-off-canvass:hover {
-  color: crimson;
-  cursor: pointer;
-  background-color: #abcdef;
+    background-color: rgba(123, 123, 123, 0.2);
+    color: #dc143c;
+    cursor: pointer;
 }
-nav.main-nav ul li a{
-  padding: 0;
+nav.main-nav ul li a {
+    padding: 0;
+}
+
+nav [data-role="projects-toggler"] {
+    border-radius: 1px;
+    color: rgb(255, 255, 255);
+    display: inline-block;
+    font-size: 1.5em;
+    padding-left: 0.19em;
+    padding-right: 0.19em;
+    padding-top: 0.05em;
+    position: absolute;
+    right: 5%;
+    top: 0.5em;
 }
 }
