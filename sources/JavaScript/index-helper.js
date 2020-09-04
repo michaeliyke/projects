@@ -16,6 +16,7 @@ function log_prop_value(event, prop) {
 
 function getcss(css) {
   $(body).click(function(event) {
+    a(w.innerWidth)
     Log(w.innerWidth)
     console.log($(event.target).getStyle(css))
   });
