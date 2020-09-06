@@ -4,5 +4,6 @@
 {
   body {
         font-size: calc(2 * var(--font-size--defualt));
+        font-size: 5em;
     }
 }
