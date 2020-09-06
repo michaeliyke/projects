@@ -26,9 +26,9 @@
 pt(Foo);
 
 function Foo($, body, head, sapi, _, global, Log,stringify, stringifyAll, a) {
-  var find = (name) => document.getElementsByClassName.call(document)[0];
+  var find = (name) => document.getElementsByClassName.call(document, name)[0];
   function update(element, txt) {
-    element.testContext = txt;
+    element.textContent = txt;
   }
 
 
