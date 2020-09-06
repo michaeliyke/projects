@@ -1,9 +1,11 @@
-@media only screen and (max-width: 767px) and (min-width: 481px) and (orientation: portrait)
+/*@media only screen and (max-width: 767px) and (min-width: 481px) and (orientation: portrait)*/
+@media only screen and (max-width: 767px) and (min-width: 300px) and (orientation: portrait)
 
 /*, (max-device-width: 767px) and (min-device-width: 481px) and (orientation: landscape) */
 {
   body {
-        font-size: calc(2 * var(--font-size--defualt));
+        /*font-size: calc(2 * var(--font-size--defualt));*/
         font-size: 5em;
+        color: red;
     }
 }
