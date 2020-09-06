@@ -3,14 +3,7 @@
 
 /*, (max-device-width: 767px) and (min-device-width: 481px) and (orientation: landscape) */
 {
-  body {
-        /*font-size: calc(2 * var(--font-size--defualt));*/
-        /*font-size: 5em;*/
-        /*color: red;*/
-    }
-
-    header section nav h1 {
-        font-size: 3em;
-        color: cyan;
-    }
+  :root {
+    display: none;
+  }
 }
