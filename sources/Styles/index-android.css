@@ -1,8 +1,4 @@
-/*@media only screen and (max-width: 767px) and (min-width: 481px) and (orientation: portrait)*/
-@media only screen (min-width: 300px) and (orientation: portrait)
-
-/*, (max-device-width: 767px) and (min-device-width: 481px) and (orientation: landscape) */
-{
+@media only screen and (max-width: 767px) and (min-width: 481px), (max-device-width: 767px) and (min-device-width: 481px) and (orientation: landscape) {
   body {
     background-color: red;
     color: white;
