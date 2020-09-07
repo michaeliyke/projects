@@ -3,7 +3,8 @@
 
 /*, (max-device-width: 767px) and (min-device-width: 481px) and (orientation: landscape) */
 {
-  :root {
-    display: none;
+  body {
+    background-color: red;
+    color: white;
   }
 }
