@@ -23,6 +23,9 @@ nav [data-role="projects-toggler"]{
     font-size: 3em;
     font-weight: 900;
   }
+  div#main-heading {
+    width: 100%;
+  }
   div#main-heading ol {
     padding: 1em;
     text-align: left;
@@ -41,4 +44,27 @@ nav [data-role="projects-toggler"]{
  #silent-nav  ul  li:first-of-type a {
   padding-left: 0;
  }
+ #questions-list {
+    margin: 3em 0 2em; 
+}
+#options-list {
+  margin: 2em 0;
+  padding: 2em 2em;
+}
+.heading {
+    margin-left: 1em;
+}
+#list ul {
+  width: unset;
+}
+.covered {
+  padding-left: 1em;
+  padding-bottom: 2em;
+}
+#project {
+  width: 100%;
+}
+.dot {
+  margin: 2px 2px 2px 0;
+}
 }

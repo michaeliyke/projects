@@ -390,7 +390,7 @@ input {
     color: rgb(255, 255, 255);
     line-height: 2;
     margin: 2em;
-    padding: 2em;
+    padding: 2em 0;
      background-image: linear-gradient(to top, #19222c, #192430, #1a2634, #1a2838, #1a2a3c, #1a2a3c, #1a2a3c, #1a2a3c, #1a2838, #1a2634, #192430, #19222c);
 }
 #questions-list {
@@ -421,6 +421,17 @@ input {
     font-size: 1.1em;
     font-weight: 900;
     width: 24%
+}
+.questions-intro-1 {
+    margin-left: unset;
+}
+.question {
+    display: inline-block;
+    font-family: Segoe UI Symbol;
+    font-size: 1.1em;
+    font-weight: lighter;
+    margin-left: 5%;
+    width: unset;
 }
 .heading {
     font-size: 1.1em;

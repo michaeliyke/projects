@@ -119,4 +119,30 @@ nav [data-role="projects-toggler"] {
 #title {
     font-size: 2.8em;
 }
+div#main-heading {
+    width: 100%;
+}
+#questions-list {
+    margin: 3em 0 2em; 
+}
+#options-list{
+    margin: 2em 0;
+    padding: 2em 2em;
+}
+.heading {
+    margin-left: 1em;
+}
+#list ul {
+    width: unset;
+}
+.covered {
+  padding-left: 1em;
+  padding-bottom: 2em;
+}
+#project {
+    width: 100%;
+}
+.dot {
+    margin: 2px 2px 2px 0;
+}
 }
