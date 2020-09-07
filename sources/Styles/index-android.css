@@ -26,9 +26,9 @@ header section nav ul li {
 
 header section nav h1 {
     font-size: 1.6em;
-    left: 5em;
+    left: 2em;
     position: absolute;
-    top: -1.3em;
+    top: 0;
     width: 100%;
     z-index: 1;
 }
@@ -81,22 +81,19 @@ nav.main-nav ul li:last-of-type {
     margin-right: 0;
     padding: 2em;
     position: fixed;
-    top: 0;
+    top: 1em;
     width: 100%;
     border-bottom: none;
 }
 #silent-nav h1 .open-off-canvass {
-    color: #eeeeee;
+    color: rgb(255, 255, 255);
     display: inline-block;
     font-size: 1.2em;
-    left: -3.2em;
-    padding: 0 0.05em 0.01em 0.01em;
+    left: -1.2em;
     position: absolute;
-    top: -0.4em;
+    top: -0.3em;
 }
 #silent-nav h1 .open-off-canvass:hover {
-    background-color: rgba(123, 123, 123, 0.2);
-    color: #dc143c;
     cursor: pointer;
 }
 nav.main-nav ul li a {
@@ -113,14 +110,18 @@ nav [data-role="projects-toggler"] {
     padding-top: 0.05em;
     position: absolute;
     right: 5%;
-    top: 0.5em;
+    top: unset;
 }
 
 #title {
-    font-size: 2.8em;
+    font-size: 2.6em;
+    margin-top: 15%;
 }
 div#main-heading {
     width: 100%;
+}
+div#main-heading ol{
+    padding: 1em 0;
 }
 #questions-list {
     margin: 3em 0 2em; 
