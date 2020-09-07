@@ -1,6 +1,6 @@
 @media screen and (max-width: 599px) {
   body {
-        font-size: var(--font-size--defualt);
+        font-size: var(--font-size--default);
     }
 
 
@@ -114,5 +114,9 @@ nav [data-role="projects-toggler"] {
     position: absolute;
     right: 5%;
     top: 0.5em;
+}
+
+#title {
+    font-size: 2.8em;
 }
 }
