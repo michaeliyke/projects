@@ -121,6 +121,9 @@ nav [data-role="projects-toggler"] {
     margin-top: 20vh;
     margin-bottom: 1em;
 }
+div#main-heading ol li::before {
+    background-color: rgba(27, 122, 166, 0.5);
+}
 div#main-heading {
     width: 100%;
 }
@@ -133,6 +136,9 @@ div#main-heading ol{
 #options-list{
     margin: 2em 0;
     padding: 2em 2em;
+}
+.questions-intro-1.heading{
+    padding-left: 1em;
 }
 .heading.shout {
     margin-left: 0;
@@ -147,10 +153,11 @@ div#main-heading ol{
     width: unset;
 }
 .covered {
-    font-size: 3.4vw;
+    font-size: 1.8em;
     font-weight: 900;
     padding-bottom: 4em;
     padding-left: 1em;
+    text-align: right;
 }
 .covered img {
     width: 1.6em;
@@ -160,5 +167,8 @@ div#main-heading ol{
 }
 .dot {
     margin: 2px 2px 2px 0;
+}
+#trigger{
+    width: 100%;
 }
 }
