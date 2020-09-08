@@ -55,7 +55,7 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
           {"name": "projects-toggler", "handlers": [init]},
           {"name":"reset", "handlers": [Clean]}, 
           {"name":"converting", "handlers": [ConvertToPDF]},
-          {"name":"open-off-canvass", "handlers": [mobile_menu_open]}
+          {"name":"open-off-canvass", "handlers": [mobile_menu_open, toggleChange]}
         ],
         //subscribers -> classes or ids subscribing to the click (event) bubble
         "subscriber": event.target,
@@ -364,7 +364,12 @@ function printsBlob() {
             }, margins );
     }
 
-       
+function toggleChange(e) {
+
+  $(this.getTarget(e), function(k){
+    this.toggleClass("unchanged", "changed");
+  });
+}       
         
         function toggleClass(object) { //toggle({"div": ["red", "blue"]})
             var selector;

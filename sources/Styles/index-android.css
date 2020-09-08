@@ -96,6 +96,26 @@ nav.main-nav ul li:last-of-type {
     position: absolute;
     top: -0.3em;
 }
+.three-dots-cross, .three-dots-single {
+    display: inline-block !important;
+    transition: 0.4s;
+}
+
+.three-dots-cross {
+    margin-left: -18px;
+    opacity: 0;
+}
+.changed .three-dots-cross {
+    opacity: 1;
+  -webkit-transform: rotate(-45deg) translate(0px,0px);
+  transform: rotate(-45deg) translate(0px, 0px);
+  color: #F8C143;
+}
+.changed .three-dots-single {
+  -webkit-transform: rotate(45deg) translate(0px, 0px);
+  transform: rotate(45deg) translate(0px, 0px);
+  color: #F8C143;
+}
 #silent-nav h1 .open-off-canvass:hover {
     cursor: pointer;
 }
