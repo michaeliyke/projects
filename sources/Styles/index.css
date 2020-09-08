@@ -164,7 +164,7 @@ nav#silent-nav {
     display: flex;
     transition: all 1.3s ease 0s;
     background-color: rgb(73, 73, 73);
-    /*transition: all 1.3s ease-in-out 0s;*/
+    transition: all 1.3s ease-in-out 0s;
 }
 #menu-container.hide-view {
     /*width: 0;*/

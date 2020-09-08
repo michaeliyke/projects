@@ -103,7 +103,7 @@ nav.main-nav ul li:last-of-type {
 }
 
 .three-dots-cross {
-    margin-left: -17px;
+    margin-left: -70%;
     opacity: 0;
 }
 .changed .three-dots-cross {
@@ -177,8 +177,8 @@ div#main-heading ol{
     font-size: 1.8em;
     font-weight: 900;
     padding-bottom: 4em;
-    padding-left: 0;
-    text-align: right;
+    padding-left: 0.5em;
+    text-align: justify;
 }
 .covered img {
     width: 1.6em;
