@@ -131,15 +131,26 @@ div#main-heading ol{
     margin: 2em 0;
     padding: 2em 2em;
 }
-.heading {
-    margin-left: 1em;
+.heading.shout {
+    margin-left: 0;
+}
+.introducing {
+    padding-left: 0;
+}
+.option {
+    padding-left: unset;
 }
 #list ul {
     width: unset;
 }
 .covered {
-  padding-left: 1em;
-  padding-bottom: 2em;
+    font-size: 3.4vw;
+    font-weight: 900;
+    padding-bottom: 4em;
+    padding-left: 1em;
+}
+.covered img {
+    width: 1.6em;
 }
 #project {
     width: 100%;
