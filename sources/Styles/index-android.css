@@ -28,9 +28,12 @@ header section nav h1 {
     font-size: 1.6em;
     left: 2em;
     position: absolute;
-    top: 0;
+    top: -1em;
     width: 100%;
-    z-index: 1;
+    z-index: 1; 
+}
+#silent-nav h1 a {
+    color: #BEFFFF;
 }
 nav#silent-nav::before {
     content: " ";
@@ -76,12 +79,12 @@ nav.main-nav ul li:first-of-type {
     margin-left: 0;
 }
 nav.main-nav ul li:last-of-type {
-  background-color: rgba(0, 128, 0, 0);
+  background-color: rgb(27, 122, 166);
     display: block;
     margin-right: 0;
     padding: 2em;
     position: fixed;
-    top: 1em;
+    top: 0;
     width: 100%;
     border-bottom: none;
 }
@@ -110,7 +113,7 @@ nav [data-role="projects-toggler"] {
     padding-top: 0.05em;
     position: absolute;
     right: 5%;
-    top: unset;
+    top: 0.5em;
 }
 
 #title {
