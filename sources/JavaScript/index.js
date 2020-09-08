@@ -55,6 +55,7 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
           {"name": "projects-toggler", "handlers": [init]},
           {"name":"reset", "handlers": [Clean]}, 
           {"name":"converting", "handlers": [ConvertToPDF]},
+          {"name":"swap", "handlers": [mobile_menu_open, toggleChange]},
           {"name":"open-off-canvass", "handlers": [mobile_menu_open, toggleChange]}
         ],
         //subscribers -> classes or ids subscribing to the click (event) bubble
@@ -365,8 +366,10 @@ function printsBlob() {
     }
 
 function toggleChange(e) {
+  
+  var target = this.getTarget(e);
 
-  $(this.getTarget(e), function(k){
+  $(target.classList.contains("swap") ? target.parentNode: target, function(k){
     this.toggleClass("unchanged", "changed");
   });
 }       
