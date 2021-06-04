@@ -272,7 +272,7 @@ div#main-heading {
     animation-play-state: running;
     background-position: center center;
     background-repeat: no-repeat;
-    background-size: calc(100%) auto;
+    background-size: 119% auto;   
 }
 
 div#main-heading ol {
