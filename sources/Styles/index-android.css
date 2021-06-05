@@ -3,7 +3,13 @@
         font-size: var(--font-size--default);
     }
 
-section nav#nav ul {
+
+header section {
+    background-color: rgb(116, 116, 116);
+    position: absolute;
+    z-index: 2;
+}
+section nav#nav ul, section nav#silent-nav ul {
     background-color: rgb(116, 116, 116);
     display: block;
     font-weight: bold;
@@ -15,21 +21,53 @@ section nav#nav ul {
 header section nav ul li {
     transition: all 0.3s ease 0s;
     border-bottom: 0.128em solid #565656;
+    padding: 0.6em;
 }
 
-#silent-nav a {
-    border-bottom: none;
+header section nav h1 {
+    font-size: 1.6em;
+    left: 2em;
+    position: absolute;
+    top: -1em;
+    width: 100%;
+    z-index: 1; 
 }
 
-#silent-nav .container-fluid {
-    margin-left: 1em;
+nav#silent-nav::before {
+    content: " ";
+    display: block;
+    height: 2em;
+    transition: all 0.3s ease 0s;
+    width: 50%;
 }
-
-#silent-nav a:hover {
-    border-bottom: none;
+nav#silent-nav {
+    display: block;
+    margin: 3em 0 0;
 }
-
-
+#silent-nav h1 a {
+    margin-left: -2rem;
+    color: #11709c;
+}
+#silent-nav > ul {
+    text-align: left;
+}
+#silent-nav > ul li {
+    /*background-color: rgb(238, 187, 238);*/
+    /*border: 1px solid rgba(153, 153, 153, 0.2);*/
+    display: block;
+    margin-top: 1px;
+    /*padding: 0.6em;*/
+}
+#silent-nav > ul li:first-of-type{
+    border-top: 0.1em solid #565656;
+}
+#silent-nav > ul li a {
+    padding: 0;
+    color: #fff;
+}
+#silent-nav > ul li a:hover {
+    border: medium none;
+}
 nav.main-nav {
     margin: 0;
 }
@@ -43,7 +81,7 @@ nav.main-nav ul li:first-of-type {
     margin-left: 0;
 }
 nav.main-nav ul li:last-of-type {
-  background-color: rgb(27, 122, 166);
+  background-color: rgba(27, 122, 166, 0.1);
     display: block;
     margin-right: 0;
     padding: 2em;
@@ -52,7 +90,15 @@ nav.main-nav ul li:last-of-type {
     width: 100%;
     border-bottom: none;
 }
-
+#silent-nav h1 .open-off-canvass {
+    color: rgb(255, 255, 255);
+    display: inline-block;
+    height: 1.8em;
+    left: -1.8em;
+    padding: 0.3em;
+    position: absolute;
+    top: -0.3em;
+}
 .three-dots-cross, .three-dots-single {
     display: inline-block !important;
     transition: 0.4s;
@@ -73,7 +119,9 @@ nav.main-nav ul li:last-of-type {
   transform: rotate(45deg) translate(0px, 0px);
   color: #F8C143;
 }
-
+#silent-nav h1 .open-off-canvass:hover {
+    cursor: pointer;
+}
 nav.main-nav ul li a {
     padding: 0;
 }
@@ -96,6 +144,10 @@ nav [data-role="projects-toggler"] {
     margin-top: 20vh;
     margin-bottom: 1em;
 }
+div#main-heading ol {
+    background-color: rgba(40, 135, 179, 0);
+    color: #346a96;
+}
 div#main-heading ol li::before {
     background-color: rgba(27, 122, 166, 0.5);
 }
@@ -117,6 +169,9 @@ div#main-heading ol{
 }
 .heading.shout {
     margin-left: 0;
+}
+.calculator-heading {
+    font-size: 1.1em;
 }
 .introducing {
     padding-left: 0;
