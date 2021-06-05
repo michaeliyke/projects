@@ -1,0 +1,10 @@
+
+
+
+
+.fadeIn()
+fadeIn(durationm_ms, complete_fn)
+.fadeIn({}) {} = duration, easing, queue, spaecialEasing, step, progress, start, done, fail, always
+
+.fadeOut(function(){})
+.fadeIn("slow", function(){})
