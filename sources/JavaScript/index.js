@@ -31,8 +31,10 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
     
     var context = null;
 
+    // Abstract all event binding using delegation
     $(body).click(Subscriptions).input(HandleTyping).keydown(HandlerKeyPress, $(sapi));
 
+    // Key press events group handler
       function HandlerKeyPress(event, obj) {
       // obj - the target element say it's tabbing functionality targeted
       [HandleEnter, EscapeKeyHandler, MainEscapeKeyHandler].forEach(function(handler) {
@@ -44,21 +46,27 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
 
 
     function Subscriptions(event, obj) {
-      subscriptions = { //Subscription is purely by criterion -: id, class, name, data-set etc
+
+      subscriptions = { 
+        //Subscription is purely by criterion -: id, class, name, data-set etc
         "default_handlers": [CloseHandler], //Default handlers will always execute
         "grouped_subscribers": [
-        {"names": ["toggler", "equiv"], "handlers": [ActionsMenuToggle]},
+          {
+            "names": ["toggler", "equiv"], 
+            "handlers": [ActionsMenuToggle]
+          }
         ],
         "subscribers": [
-          {"name":"del", "handlers": [del]}, 
-          {"name":"submit", "handlers": [Foo]}, 
-          {"name": "projects-toggler", "handlers": [init]},
-          {"name":"reset", "handlers": [Clean]}, 
-          {"name":"converting", "handlers": [ConvertToPDF]},
-          {"name":"swap", "handlers": [mobile_menu_open, toggleChange]},
-          {"name":"open-off-canvass", "handlers": [mobile_menu_open, toggleChange]}
+          //subscribers -> classes or ids subscribing to the click (event) bubble
+          {"name": "toggle-sign", "handlers": [DropdownMenus]},
+          {"name":"del", "handlers": [del]}, // .del
+          {"name":"submit", "handlers": [Foo]}, //.submit
+          {"name": "projects-toggler", "handlers": [init]}, // .projects-toggler
+          {"name":"reset", "handlers": [Clean]}, // .reset
+          {"name":"converting", "handlers": [ConvertToPDF]}, // .converting
+          {"name":"swap", "handlers": [mobile_menu_open, toggleChange]}, // .swap
+          {"name":"open-off-canvass", "handlers": [mobile_menu_open, toggleChange]} // .open-off-canvass
         ],
-        //subscribers -> classes or ids subscribing to the click (event) bubble
         "subscriber": event.target,
         "activate": function activator(event, subscriberString, actions) {
           if (actions.length < 1) {
@@ -76,7 +84,7 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
       });
       // subscriptions.subscribers.forEach(filter);
       HandlerGroup(filter);
-      HandleSingle(filter)
+      HandleSingle(filter);
       function HandlerGroup(handler){
            subscriptions.grouped_subscribers.forEach(function handleSubscription(group) {
              group.names.forEach(function subscriber(subscriberString) {
@@ -107,6 +115,43 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
       }
 
     }
+
+
+    function DropdownMenus(e, target) {
+       if (target && target.nodeType == 1 && target.classList.contains("toggle-sign")) {
+      parent = traverseUp(target, (e) => e.querySelector(".drop-down-menu") != null);
+      dropdown = parent.querySelector(".drop-down-menu");
+      Techie.dropdownTarget = dropdown;
+      toggleDropdown(dropdown, "show-block", target);
+      return
+    }
+      toggleDropdown(Techie.dropdownTarget, "show-block");
+    }
+
+
+
+    function traverseUp(e, test) {
+      if (e && e.tagName != "BODY") {
+        return test(e) ? e : traverseUp(e.parentNode, test);
+      }
+      return null;
+    }
+
+    function toggleDropdown(element, name, eventTarget) {
+      if (!element) {
+        return
+      }
+    if (!(eventTarget && eventTarget.classList.contains("toggle-sign"))) {
+      element.classList.remove(name);
+      return
+    }
+    if (element.classList.contains(name)) {
+      element.classList.remove(name);
+    } else {
+      element.classList.add(name);
+    }
+  }
+
 
     function getByClass(name, index) {
      if (arguments.length > 1 && +index != index) {
@@ -245,6 +290,7 @@ function added() {
 
       function EscapeKeyHandler(event, obj){
       if(event.keyCode == 27){ //escape key
+        DropdownMenus(event)
       if (context && context.width && context.width > 0) {
         closePane.call(context, event, EscapeKeyHandler, context);
 
@@ -284,7 +330,9 @@ function added() {
           });
           $("#equiv").html("&#9776;"/*"&#9776;"*/);
           width = 0; 
-          context.width = 0;
+          if (context) {
+            context.width = 0;
+          }
           this.pane = null;
           context = null;
         }

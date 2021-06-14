@@ -13,6 +13,13 @@ font-size: 62.5%; /*62.5/100 * 16px = 10px*/
 --font-size--small: 1.4rem; /*14px*/
 --font-size--default: 1.6rem; /*16px*/
 --font-size--large: 2.4rem; /*24px*/
+--color-deep-blue:  #424E82;
+--color-custom-blue:  #1b7aa6;
+--color-logo-blue:  #41A0CC;
+--color-primary: #0073FF;
+--color-white:  #E9E9E9;
+--color-black: #141D28;
+--color-black-1: #212B38;
 }
 
 .font-size-small {
@@ -47,7 +54,7 @@ nav.main-nav {
     width: 95%;
 }
 nav.main-nav ul {
-    background-color: #1b7aa6;
+    background-color: var(--color-deep-blue);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -121,7 +128,7 @@ nav#silent-nav {
     border: none;
 }
 #silent-nav h1 a{
-    color: rgb(65, 160, 204);
+    color: var(--color-logo-blue);
 }
 
 #silent-nav a {
@@ -149,6 +156,45 @@ nav#silent-nav {
     justify-content: space-between;
     flex-wrap: wrap;
 }
+
+#silent-nav > ul li {
+    position: relative;
+}
+
+.drop-down-menu {
+    visibility: hidden;
+    display: none;
+    color: var(--color-deep-blue);
+    position: absolute;
+    left: -2rem;
+    top: 130%;
+    border: 1px solid var(--color-deep-blue);
+    border-radius: 2px;
+    background-color: #fff;
+}
+
+.show-block {
+    display: block;
+    visibility: visible;
+}
+
+.drop-down-menu ul {
+    display: block;
+    margin: 10px;
+}
+
+.drop-down-menu ul li {
+    width: 100px;
+    padding: 10px;
+    padding-left: 0;
+    padding-top: 5px;
+    text-align: left;
+}
+
+#silent-nav .fa-caret-down {
+    font-size: 2rem;
+}
+
 .body-cover {
     background-color: rgba(255, 255, 255, 0.6);
     height: 100%;
@@ -393,7 +439,7 @@ li.title-bullets-exception {
 
 i.is-for-you {
     font-size: 3rem !important; 
-    color:#424E82;
+    color:var(--color-deep-blue);
 }
 
 input {
@@ -414,7 +460,7 @@ input {
      background-image: linear-gradient(to top, #19222c, #192430, #1a2634, #1a2838, #1a2a3c, #1a2a3c, #1a2a3c, #1a2a3c, #1a2838, #1a2634, #192430, #19222c);
 }
 #questions-list {
-    background-color: rgb(40, 135, 179);
+    background-color: var(--color-deep-blue);
     border-top: 10px solid rgb(255, 255, 255);
     color: rgb(255, 255, 255);
     margin: 3em 2em 2em;
@@ -609,7 +655,7 @@ input {
     left: -30%;
 }
 #submit {
-    right: -30%;
+    position: relative;
 }
 .input {
     font-stretch: semi-condensed;
