@@ -32,6 +32,8 @@ body {
 	list-style: none;
 	display: flex;
 }
+
+/*Here on out!*/
 .menu-bar ul li {
 	padding: 10px 30px;
 	position: relative;
