@@ -1,0 +1,55 @@
+{{define "calculator"}}
+<div id="project">
+    <h2 class="calculator-heading heading">Budget Calculator</h2>
+    <form method="post" action="" id="budget" name="budget">
+        <div id="inputs">
+            <div id="trigger">
+                <div id="toggler" class="toggler">
+                    <span class="show equiv" id="equiv">&#9776;</span>
+                    <div id="manage">
+                        <div>Management tools</div>
+                        <hr />
+                        <div class="managed converting" id="converting">convert to pdf</div>
+                        <div class="managed disabled saving" id="saving">save as text</div>
+                        <div class="managed disabled managing" id="managing">share</div>
+                        <div class="managed printing" id="printing"> print</div>
+                    </div>
+                </div>
+                <div id="reset" class="trigger reset"> Reset </div>
+                <div id="total" class="trigger total">Total: 0.00</div>
+                <div id="submit" class="trigger submit">
+                    <span>Save <i class="fas fa-caret-down toggle-sign"></i></span>
+                    <div class="drop-down-menu">
+                        <ul>
+                            <li><a href="#">Item 1</a></li>
+                            <li><a href="#">Item 2</a></li>
+                            <li><a href="#">Item 3</a></li>
+                            <li><a href="#">Item 4</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+            <div id="input">
+                <input type="text" name="item" id="item" class="input type item" placeholder="First Item" />
+                <input type="digit" name="value" id="amount" class="input type amount" placeholder="value" />
+            </div>
+            <div id="current" class="trigger">
+                <span id="currentItem">current value</span> <span>:</span> <span id="current"> 0.0</span>
+            </div>
+        </div>
+        <div id="resultsPane">
+            <table id="table" class="table resultsPane" cellspacing="15" cellpadding="11" border="1" id="table"
+                width="100%">
+
+                <tbody>
+
+                    <tr style="display: none;">
+                        <td colspan="" rowspan="" headers="">results will be shown here</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+{{end}}

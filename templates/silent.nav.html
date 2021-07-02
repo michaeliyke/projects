@@ -1,0 +1,44 @@
+{{ define "silent_nav" }}
+    <nav id="silent-nav">
+        <h1>
+            <div class="open-off-canvass unchanged">
+    
+                <!-- Three dots html entity = &vellip; -->
+                <div class="swap three-dots-single">&#8942;</div>
+                <div class="swap three-dots-cross">&#8942;</div>
+            </div>
+            <a href="https://projects.michaeliyke.com">PLAYGROUND</a>
+        </h1>
+        <ul class="quiet">
+            <li>
+                <a href="#">Admin <i class="fas fa-caret-down toggle-sign"></i></a>
+                <div class="drop-down-menu">
+                    <ul>
+                        <li><a href="#">Item 1</a></li>
+                        <li><a href="#">Item 2</a></li>
+                        <li><a href="#">Item 3</a></li>
+                        <li><a href="#">Item 4</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li><a href="#/manage">Manage</a></li>
+            <li><a href="#/comments">Comments</a></li>
+            <!-- http://ultimateweb.gear.host/ -->
+            <li><a href="#">Share</a></li>
+            <li><a href="#/feedback">Feedback</a></li>
+            <li>
+                <a href="#">Account <i class="fas fa-caret-down toggle-sign"></i></a>
+                <div class="drop-down-menu">
+                    <ul>
+                        <li><a href="#">Item 1</a></li>
+                        <li><a href="#">Item 2</a></li>
+                        <li><a href="#">Item 3</a></li>
+                        <li><a href="#">Item 4</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+        <!-- <span class="f-irst-toggle" >&#9776;</span> -->
+    </nav>
+
+{{end}}

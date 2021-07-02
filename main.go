@@ -19,6 +19,6 @@ func main() {
 }
 
 func serve(w http.ResponseWriter, r *http.Request) {
-	temp := template.Must(template.ParseFiles("index.html"))
-	temp.Execute(w, "")
+	temp := template.Must(template.ParseGlob("templates/*.html"))
+	temp.ExecuteTemplate(w, "homepage", "")
 }

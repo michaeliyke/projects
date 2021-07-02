@@ -1,0 +1,28 @@
+{{define "index_header"}}
+<header id="header">
+   
+    {{ template "catalog" . }}
+
+    <section id="menu-control">
+
+        {{ template "silent_nav" . }}
+
+        {{ template "main_nav" . }}
+
+    </section>
+
+    <div id="main-heading">
+
+        <h1 id="title">Budget Calculation </h1>
+        <ol>
+            <li class="title-bullets">Calculate easy and simple.</li>
+            <li class="title-bullets shift-right">View result, print, and take with you.</li>
+            <li class="title-bullets-exception">Save and view anytime, on any device.</li>
+
+        </ol>
+
+    </div>
+
+</header>
+
+{{end}}
