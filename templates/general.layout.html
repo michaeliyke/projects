@@ -2,17 +2,18 @@
 <!DOCTYPE html>
 <html>
 
-{{template "head" .}}
+`{{template "head" .}}
 
 <body class="root-body">
 
     <div id="main">
-    {{template "index_header" . }}
-    {{ template "torsor" . }}
-    {{ template "calculator" . }}
+    {{ template "silent_nav" . }}
+    
+    {{ template "main_nav" . }}
+    
     {{template "footer" . }}
- 
-</div>
+    </div>
+
 </body>
 
 </html>

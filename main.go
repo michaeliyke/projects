@@ -1,18 +1,30 @@
 package main
 
 import (
-	"html/template"
 	"net/http"
-	"os"
 
 	. "github.com/michaeliyke/Golang/log"
 )
 
 func main() {
-	mux := http.NewServeMux()
-	mux.Handle("/sources/", http.FileServer(http.Dir("")))
-	mux.HandleFunc("/", serve)
-	var port string = os.Getenv("PORT")
+	var mux *http.ServeMux = http.NewServeMux()
+	files := http.FileServer(http.Dir(config.Static))
+	mux.Handle("/sources/", http.StripPrefix("/sources/", files))
+	mux.HandleFunc("/", ServeIndex) // 01
+
+	mux.HandleFunc("/account/signup/", ServeSignUp) // 02
+	mux.HandleFunc("/account/login/", ServeLogin)   // 03
+	mux.HandleFunc("/account/preferences/", ServeUserPreferences)
+	mux.HandleFunc("/user/", UserHandler(&User{})) // POST
+
+	mux.HandleFunc("/jadj", Serve)
+
+	mux.HandleFunc("/app/feedback/", ServeFeedback)
+	mux.HandleFunc("/app/comments/", ServeComments)
+	mux.HandleFunc("/client/chat/", ServeChat)
+
+	mux.HandleFunc("/app/manage/", ServeManageRecords)
+
 	if port == "" || port == "5000" {
 		Log("$PORT var not set. ..")
 		Log("Deafulting to :80")
@@ -28,9 +40,4 @@ func main() {
 	}
 	Println("server running..")
 	server.ListenAndServe()
-}
-
-func serve(w http.ResponseWriter, r *http.Request) {
-	temp := template.Must(template.ParseGlob("templates/*.html"))
-	temp.ExecuteTemplate(w, "homepage", "")
 }

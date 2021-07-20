@@ -1,0 +1,56 @@
+.form-wrapper {
+    padding-top: 2em;
+}
+
+.form.account {
+    border: 1px solid #dfe2e6;
+    margin: 0 auto;
+    padding: 1em 2em 10em;
+    width: 45%;
+}
+
+
+.form-control {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5em;
+    transition: all 1s;
+}
+
+
+.form-control .control {
+    border: 1px solid #dfe2e6;
+    border-radius: 4px;
+    padding: 0.8em 1.2em;
+    width: 80%;
+}
+
+.checkbox-control {
+    font-size: 0.9em;
+    justify-content: flex-start;
+    margin-left: 20%;
+}
+
+.checkbox-control .control {
+    margin-right: 1em;
+    width: unset;
+}
+
+.submit-control {
+    justify-content: flex-start;
+    margin-left: 20%;
+}
+
+.submit-control .control {
+    background-color: #0d6efd;
+    border: medium none;
+    color: #ffffff;
+    font-size: 1em;
+    padding: 0.5em 1.2em;
+    width: unset;
+}
+
+.submit-control .control:hover {
+    background-color: #0025B4;
+    cursor: pointer;
+}

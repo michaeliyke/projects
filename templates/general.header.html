@@ -1,0 +1,15 @@
+{{define "general_header"}}
+<header id="header">
+   
+    {{ template "catalog" . }}
+
+    <section id="menu-control">
+
+        {{ template "silent_nav" . }}
+
+        {{ template "main_nav" . }}
+
+    </section>
+</header>
+
+{{end}}
