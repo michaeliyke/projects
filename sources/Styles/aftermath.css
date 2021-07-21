@@ -9,14 +9,32 @@
     width: 45%;
 }
 
+.signup.form.account {
+    padding-bottom: 5em;
+}
+
+.signup .form-control.break-up {
+    flex-flow: row nowrap;
+}
+
+.form-control.break-up .form-control:nth-of-type(1) {
+    margin-right: 0.6em;
+}
+
+.form-control.break-up .form-control:nth-of-type(2) {
+    margin-left: 0.6em;
+}
 
 .form-control {
     display: flex;
     justify-content: space-between;
     margin-top: 1.5em;
-    transition: all 1s;
+    transition: all 1s ease 0s;
 }
 
+.signup .form-control {
+    flex-flow: column nowrap;
+}
 
 .form-control .control {
     border: 1px solid #dfe2e6;
@@ -25,7 +43,16 @@
     width: 80%;
 }
 
-.checkbox-control {
+.signup .form-control .control {
+    width: 100%;
+}
+
+.signup .form-control .form-control {
+    width: 50%;
+}
+
+.form-control.checkbox-control {
+    flex-flow: row nowrap;
     font-size: 0.9em;
     justify-content: flex-start;
     margin-left: 20%;
@@ -36,12 +63,13 @@
     width: unset;
 }
 
-.submit-control {
+.form-control.submit-control {
+    flex-flow: row nowrap;
     justify-content: flex-start;
     margin-left: 20%;
 }
 
-.submit-control .control {
+.form-control.submit-control .control {
     background-color: #0d6efd;
     border: medium none;
     color: #ffffff;
@@ -50,7 +78,64 @@
     width: unset;
 }
 
+.signup .submit-control {
+    justify-content: flex-start;
+    margin-left: 0;
+    margin-top: 4em;
+}
+
 .submit-control .control:hover {
-    background-color: #0025B4;
+    background-color: #0025b4;
     cursor: pointer;
+}
+
+.signup .form-control input {
+    margin-top: 0.6em;
+}
+
+@media screen and (max-width: 800px) {
+    .form.account {
+        width: 60%;
+    }
+}
+
+@media screen and (max-width: 599px) {
+    .form.account {
+        width: 90%;
+        margin-top: 3em;
+        border: none;
+    }
+    .signup.form.account {
+        margin-top: 0;
+    }
+    .signup .form-control.break-up {
+        flex-flow: column nowrap;
+    }
+    .form-control.break-up .form-control:nth-of-type(2) {
+        margin-left: 0;
+    }
+    .signup .form-control .form-control {
+        width: 100%;
+    }
+    .signup .checkbox-control {
+        padding-top: 0 !important;
+    }
+    .signup .submit-control {
+        margin-top: 2em !important;
+    }
+}
+
+@media screen and (max-width: 414px) {
+    .form.account {
+        width: 100%;
+    }
+    .form-control {
+        flex-flow: column nowrap;
+    }
+    .checkbox-control, .submit-control {
+        margin-left: 0 !important;
+    }
+    label~input {
+        margin-top: 0.6em;
+    }
 }
