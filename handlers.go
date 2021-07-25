@@ -66,7 +66,22 @@ func EndPointUserCreate(w http.ResponseWriter, r *http.Request) {
 		Privileges: privileges,
 		CreatedAt:  time.Now(),
 	}
-	UserHandler(w, r, &user)
+	err = user.CreateAcount(w, r)
+	if err != nil {
+		if err.Error() == "user already exists" {
+			http.Redirect(w, r, "/user/auth/", http.StatusFound)
+			return
+		}
+		http.Redirect(w, r, "/user/create/", http.StatusFound)
+		return
+	}
+	err = user.Authenticate(w, r)
+	if err != nil {
+		http.Redirect(w, r, "/user/auth/", http.StatusFound)
+		return
+	}
+	http.Redirect(w, r, "/", http.StatusFound)
+	return
 }
 
 func EndPointUserFeedback(w http.ResponseWriter, r *http.Request) {

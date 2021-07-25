@@ -22,6 +22,7 @@ type User struct {
 	CreatedAt  time.Time `json:"created_at"`
 }
 
+// perfom actual auth chores
 func (user *User) Authenticate(w http.ResponseWriter, r *http.Request) (err error) {
 	u, err := user.GetByEmail()
 	if err != nil {
@@ -50,8 +51,24 @@ func (user *User) Authenticate(w http.ResponseWriter, r *http.Request) (err erro
 	return
 }
 
-func (user *User) Logout()       {}
-func (user *User) CreateAcount() {}
+// perfom actual account creation chores
+func (user *User) CreateAcount(w http.ResponseWriter, r *http.Request) (err error) {
+	// check if user exists using temporary data
+	u := User{Email: user.Email}
+	_, err = u.GetByEmail()
+	// err is either ErrNoRows or nil if user already exists
+	if err == nil {
+		err = errors.New("user already exists")
+		return
+	}
+	err = user.Create()
+	if err != nil {
+		return errors.New("cannot create user")
+	}
+	return // user has been created successfully
+}
+
+func (user *User) Logout() {}
 
 // fetches user with the given id
 func (u *User) Fetch(id int) (err error) {
@@ -153,6 +170,10 @@ func GetByUUID(uuid string) (user User, err error) {
 		&user.Privileges, &user.CreatedAt,
 	)
 	return
+}
+
+func (user *User) GetByUUID() (User, error) {
+	return GetByUUID(user.Uuid)
 }
 
 // Facilitates fetch of a given user or user id
