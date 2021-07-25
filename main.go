@@ -13,11 +13,16 @@ func main() {
 	mux.HandleFunc("/", ServeIndex) // 01
 
 	mux.HandleFunc("/account/signup/", ServeSignUp) // 02
+	mux.HandleFunc("/signup/", ServeSignUp)         // aliase
+	mux.HandleFunc("/account/", ServeSignUp)        // aliase
 	mux.HandleFunc("/account/login/", ServeLogin)   // 03
+	mux.HandleFunc("/login/", ServeLogin)           // aliase
 	mux.HandleFunc("/account/preferences/", ServeUserPreferences)
-	mux.HandleFunc("/user/", UserHandler(&User{})) // POST
 
-	mux.HandleFunc("/jadj", Serve)
+	mux.HandleFunc("/user/create/", EndPointUserCreate)          // POST
+	mux.HandleFunc("/user/auth/", EndPointUserAuth)              // POST
+	mux.HandleFunc("/user/preferences/", ServeUpdatePreferences) // POST
+	mux.HandleFunc("/user/feedback/", EndPointUserFeedback)      // POST
 
 	mux.HandleFunc("/app/feedback/", ServeFeedback)
 	mux.HandleFunc("/app/comments/", ServeComments)

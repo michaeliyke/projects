@@ -122,7 +122,7 @@ func ServeIndex(w http.ResponseWriter, r *http.Request) {
 	Log("generating HTML for: ", r.URL.Path)
 	files := updateTempPaths(files, "general.layout", "index.layout")
 	files = updateTempPaths(files, "general.header", "index.header")
-	_, err := Session(w, r) // check if user has a sesion set, retrieve if so
+	session, err := Session(w, r) // check if user has a sesion set, retrieve if so
 	if err != nil {
 		files = append(files, "torsor", "calculator")
 		Log("user is not logged in")
@@ -130,7 +130,7 @@ func ServeIndex(w http.ResponseWriter, r *http.Request) {
 	} else {
 		files = append(files, "torsor", "calculator")
 		Log(" user is logged in")
-		GenerateHTML(w, nil, files...)
+		GenerateHTML(w, session, files...)
 	}
 }
 

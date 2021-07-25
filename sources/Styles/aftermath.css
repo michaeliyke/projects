@@ -58,6 +58,10 @@
     margin-left: 20%;
 }
 
+.signup .form-control.checkbox-control {
+    margin-left: unset !important;
+}
+
 .checkbox-control .control {
     margin-right: 1em;
     width: unset;

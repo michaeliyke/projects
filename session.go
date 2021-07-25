@@ -7,30 +7,32 @@ import (
 )
 
 type Session_ struct {
-	Id        int       `json:"id"`
-	Uuid      string    `json:"uuid"`
-	UserId    int       `json:"user_id"`
-	UserUuid  string    `json:"user_uuid"`
-	Active    bool      `json:"active"`
-	CreatedAt time.Time `json:"created_at"`
+	Id         int       `json:"id"`
+	Uuid       string    `json:"uuid"`
+	UserId     int       `json:"user_id"`
+	UserUuid   string    `json:"user_uuid"`
+	KeepLogged bool      `json:"keep_login"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 // creates a new session
 func (user *User) CreateSession() (session Session_, err error) {
 	stmt, err := Db.Prepare(
-		`INSERT INTO sessions (uuid, user_id, user_uuid, active, created_at) 
-		VALUES ($1, $2, $3, $4, $5) 
-		RETURNING id, uuid, user_id, user_uuid, active, created_at`,
+		`INSERT INTO sessions (
+			uuid, user_id, user_uuid, keep_login, created_at
+			) 
+		VALUES ($1, $2, $3, $4, $5, $6) 
+		RETURNING id, uuid, user_id, user_uuid, keep_login, created_at`,
 	)
 	if err != nil {
 		return
 	}
 	defer stmt.Close()
 	err = Db.QueryRow(
-		CreateUuid(), user.Id, user.Uuid, true, time.Now(),
+		CreateUuid(), user.Id, user.Uuid, true, user.KeepLogged, time.Now(),
 	).Scan(
 		&session.Id, &session.Uuid, &session.UserId, &session.UserUuid,
-		&session.Active, &session.CreatedAt,
+		&session.KeepLogged, &session.CreatedAt,
 	)
 	return
 }
@@ -60,12 +62,12 @@ func Session(w http.ResponseWriter, r *http.Request) (session Session_, err erro
 func (user *User) Session() (session Session_, err error) {
 	session = Session_{}
 	err = Db.QueryRow(
-		`SELECT id, uuid, user_id, user_uuid, active, created_at
+		`SELECT id, uuid, user_id, user_uuid, keep_login, created_at
 		FROM sessions WHERE user_uuid = $1
 		`, user.Uuid,
 	).Scan(
 		&session.Id, &session.Uuid, &session.UserId, &session.UserUuid,
-		&session.Active, &session.CreatedAt,
+		&session.KeepLogged, &session.CreatedAt,
 	)
 	return
 }
@@ -73,11 +75,11 @@ func (user *User) Session() (session Session_, err error) {
 // check is session is valid in the database
 func (session *Session_) Check() (valid bool, err error) {
 	err = Db.QueryRow(
-		`SELECT id, uuid, user_id, user_uuid, active, created_at
+		`SELECT id, uuid, user_id, user_uuid, keep_login, created_at
 		FROM sessions WHERE uuid = $1`, session.Uuid,
 	).Scan(
 		&session.Id, &session.Uuid, &session.UserId, &session.UserUuid,
-		&session.Active, &session.CreatedAt,
+		&session.KeepLogged, &session.CreatedAt,
 	)
 	if err != nil {
 		valid = false
