@@ -3,6 +3,7 @@
 <html>
 
 {{template "head" .}}
+{{ $pipeline := . }}
 
 <body class="root-body">
 
@@ -28,7 +29,7 @@
             
             <div class="form-control checkbox-control">
                <span>Have an account? 
-                    <a href="/account/signup/"> Log in</a>
+                    <a href="/account/login/"> Log in</a>
                 </span>
             </div>
             <div class="form-control submit-control">

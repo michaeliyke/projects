@@ -11,17 +11,21 @@ import (
 
 // /user/auth/  --> this authenticates a user
 func EndPointUserAuth(w http.ResponseWriter, r *http.Request) {
-	// requester := r.RequestURI
+	// Log("Auth Endpoint Herereer")
 	err := r.ParseForm()
 	if err != nil {
+		// Log("Form parsing failed-----------")
 		ErrorMessage(w, r, "invalid information in form")
 		return
 	}
+	// Log("Form parsed ok -----------")
 	email, err := ValidateEmail(strings.TrimSpace(r.FormValue("email")))
 	if err != nil {
+		// Log("Email validation failed --------------------")
 		ErrorMessage(w, r, err.Error())
 		return
 	}
+	// Log("Email ok------------------")
 	password := Encrypt(r.FormValue("password"))
 	keepLogged := r.FormValue("keep-login") == "on"
 	user := User{
@@ -29,20 +33,43 @@ func EndPointUserAuth(w http.ResponseWriter, r *http.Request) {
 		Password:   password,
 		KeepLogged: keepLogged,
 	}
+	// Log("User create ok --------------------")
 	err = user.Authenticate(w, r)
 	if err != nil {
-		http.Redirect(w, r, "/user/auth/", http.StatusFound)
+		// Log("User Auth failed -------------------- : ", err)
+		ErrorMessage(w, r, err.Error())
 		return
 	}
+	// Log("Auth ok ------------------")
+	// Log("User: ", user)
 	http.Redirect(w, r, "/", http.StatusFound)
 	return
 }
 
-func ServeUpdatePreferences(w http.ResponseWriter, r *http.Request) {}
+// /user/logout/ --> this logs out a user
+func EndPointUserLogout(w http.ResponseWriter, r *http.Request) {
+	_ = UserLogout(w, r)
+	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+func EndPointUpdateProfile(w http.ResponseWriter, r *http.Request) {
+	// assemble user details from form
+	err := r.ParseForm()
+	if err != nil {
+		ErrorMessage(w, r, "invalid information in form")
+		return
+	}
+	// wILL WORK ON THIS LATER ON
+}
 
 // /user/create/  --> this creates a new user
 func EndPointUserCreate(w http.ResponseWriter, r *http.Request) {
 	// requester := r.RequestURI
+	err := r.ParseForm()
+	if err != nil {
+		ErrorMessage(w, r, "invalid information in form")
+		return
+	}
 	email, err := ValidateEmail(strings.TrimSpace(r.FormValue("email")))
 	if err != nil {
 		ErrorMessage(w, r, err.Error())
@@ -68,16 +95,12 @@ func EndPointUserCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	err = user.CreateAcount(w, r)
 	if err != nil {
-		if err.Error() == "user already exists" {
-			http.Redirect(w, r, "/user/auth/", http.StatusFound)
-			return
-		}
-		http.Redirect(w, r, "/user/create/", http.StatusFound)
+		ErrorMessage(w, r, err.Error())
 		return
 	}
 	err = user.Authenticate(w, r)
 	if err != nil {
-		http.Redirect(w, r, "/user/auth/", http.StatusFound)
+		ErrorMessage(w, r, err.Error())
 		return
 	}
 	http.Redirect(w, r, "/", http.StatusFound)
@@ -85,6 +108,11 @@ func EndPointUserCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func EndPointUserFeedback(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		ErrorMessage(w, r, "invalid information in form")
+		return
+	}
 	email := mail.NewMessage()
 	email.SetHeader("To", "admin@example.com")
 	email.SetHeader("From", "server@example.com")
@@ -95,7 +123,7 @@ func EndPointUserFeedback(w http.ResponseWriter, r *http.Request) {
 	// Details for your mailtrap.io account
 	username := "mike"
 	password := "micky"
-	err := mail.NewDialer(
+	err = mail.NewDialer(
 		"smtp.mailtrap.io", 25, username, password,
 	).DialAndSend(email)
 	if err != nil {

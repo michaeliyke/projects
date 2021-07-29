@@ -51,6 +51,23 @@ func (user *User) Authenticate(w http.ResponseWriter, r *http.Request) (err erro
 	return
 }
 
+func UserLogout(w http.ResponseWriter, r *http.Request) (err error) {
+	cookie, err := r.Cookie("__session__")
+	if err != http.ErrNoCookie {
+		Warning("failed to get cookie")
+		session := Session_{Uuid: cookie.Value}
+		session.DeleteByUUID()
+		cookie = &http.Cookie{
+			Name:     "__session__",
+			Value:    "expired",
+			HttpOnly: true,
+			MaxAge:   -1,
+		}
+		http.SetCookie(w, cookie)
+	}
+	return
+}
+
 // perfom actual account creation chores
 func (user *User) CreateAcount(w http.ResponseWriter, r *http.Request) (err error) {
 	// check if user exists using temporary data
@@ -68,7 +85,9 @@ func (user *User) CreateAcount(w http.ResponseWriter, r *http.Request) (err erro
 	return // user has been created successfully
 }
 
-func (user *User) Logout() {}
+func (user *User) Logout(w http.ResponseWriter, r *http.Request) error {
+	return UserLogout(w, r)
+}
 
 // fetches user with the given id
 func (u *User) Fetch(id int) (err error) {

@@ -20,6 +20,10 @@ type Configurations struct {
 	Static       string
 }
 
+type Pipeline struct {
+	ErrorMessage string
+}
+
 var config Configurations
 var logger *log.Logger
 var port string
@@ -56,7 +60,7 @@ func CreateUuid() (uuid string) {
 	return
 }
 
-// hashes plain texT with SHA-1
+// hashes plain text with SHA-1
 func Encrypt(text string) (cryptext string) {
 	cryptext = Sprintf("%x", sha1.Sum([]byte(text)))
 	return
@@ -68,6 +72,18 @@ func updateTempPaths(files []string, old string, new_ string) (x []string) {
 		strings.Replace(strings.Join(files, " "), old, new_, 1), " ",
 	)
 	return
+}
+
+func UnloadTemplates(files, junks []string) []string {
+	var files_ []string
+	for _, junk := range junks {
+		for _, file := range files {
+			if file != junk {
+				files_ = append(files_, file)
+			}
+		}
+	}
+	return files_
 }
 
 func GenerateHTML(w http.ResponseWriter, data interface{}, filenames ...string) {
@@ -90,8 +106,8 @@ func ParseTemplateFiles(filenames ...string) (t *template.Template) {
 }
 
 func ErrorMessage(w http.ResponseWriter, r *http.Request, message string) {
-	url := []string{"/errpg?m=", message}
-	http.Redirect(w, r, strings.Join(url, ""), http.StatusFound)
+	url := Sprintf("/errpg?m=%v", message)
+	http.Redirect(w, r, url, http.StatusFound)
 }
 
 func LoadConfigs() {
