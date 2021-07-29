@@ -74,13 +74,21 @@ func updateTempPaths(files []string, old string, new_ string) (x []string) {
 	return
 }
 
+func Contains(array []string, s string) (present bool) {
+	for _, element := range array {
+		if element == s {
+			present = true
+			break
+		}
+	}
+	return
+}
+
 func UnloadTemplates(files, junks []string) []string {
 	var files_ []string
-	for _, junk := range junks {
-		for _, file := range files {
-			if file != junk {
-				files_ = append(files_, file)
-			}
+	for _, file := range files {
+		if Contains(junks, file) == false {
+			files_ = append(files_, file)
 		}
 	}
 	return files_

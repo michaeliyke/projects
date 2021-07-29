@@ -53,12 +53,8 @@ func ServeErrPg(w http.ResponseWriter, r *http.Request) {
 		Log("Message is empty")
 		m = "NOO ERRORS FOUND"
 	}
-
-	files := updateTempPaths(files, "general.layout", "errpg.layout")
-	files = UnloadTemplates(files, []string{
-		"general.header", "silent.nav",
-		"main.nav", "catalog.nav",
-	})
+	files := []string{"errpg.layout", "head"}
+	Log(files)
 	var pipeline Pipeline = Pipeline{
 		ErrorMessage: r.URL.Query().Get("m"),
 	}
