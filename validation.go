@@ -6,7 +6,9 @@ import (
 	"strings"
 )
 
-func ValidateEmail(email string) (email_ string, err error) {
+// checks if email is correct format
+// returns the error or nil
+func ValidateEmail(email string) (err error) {
 	x := "^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
 	emailRegex := regexp.MustCompile(x)
 	switch {
@@ -16,8 +18,6 @@ func ValidateEmail(email string) (email_ string, err error) {
 		err = errors.New("Email length too short")
 	case len(email) > 254:
 		err = errors.New("Email length too long")
-	default:
-		email_ = email
 	}
 	// _, err = net.LookupMX(host) ----- used to confirm hosT Bdoes exist
 	return
@@ -30,7 +30,21 @@ func ValidatePassword(password string) (err error) {
 	return
 }
 
-func ValidateFullName(name string) (name_ string, err error) {
+// check is UUID is correct.
+// returns the error or nil
+func ValidateUuid(uuid string) (err error) {
+	includesDash, _ := regexp.Match(`-`, []byte(uuid))
+	noSpaces, _ := regexp.Match(`\s`, []byte(uuid))
+	isAlphNum, _ := regexp.Match(`([a-z][0-9])+|([0-9][a-z])+`, []byte(uuid))
+	if !(includesDash && noSpaces && isAlphNum) {
+		err = errors.New("invalid UUID")
+	}
+	return
+}
+
+// check that fullname is correct
+// returns error is nil
+func ValidateFullName(name string) (err error) {
 	start := name[0]
 	end := name[len(name)-1]
 	ln := len(name)
@@ -50,8 +64,6 @@ func ValidateFullName(name string) (name_ string, err error) {
 		strings.Contains(name, "..") || strings.Contains(name, "-.") ||
 		strings.Contains(name, ".-"):
 		err = errors.New("Name contains invalid character")
-	default:
-		name_ = name
 	}
 	return
 }

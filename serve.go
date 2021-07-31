@@ -64,14 +64,17 @@ func ServeErrPg(w http.ResponseWriter, r *http.Request) {
 
 func ServeSignUp(w http.ResponseWriter, r *http.Request) {
 	CheckRoute(w, r, "/account/signup/")
+	session, err := Session(w, r) // check for and retrieve user session
+	pipeline := Pipeline{
+		Session: session,
+	}
 	files := updateTempPaths(files, "general.layout", "signup.layout")
-	_, err := Session(w, r) // check if user has a sesion set, retrieve if so
 	if err != nil {
 		files = append(files, "torsor", "calculator")
 		GenerateHTML(w, nil, files...)
 	} else {
 		files = append(files, "torsor", "calculator")
-		GenerateHTML(w, nil, files...)
+		GenerateHTML(w, pipeline, files...)
 	}
 	return
 }
@@ -163,13 +166,17 @@ func ServeIndex(w http.ResponseWriter, r *http.Request) {
 	CheckRoute(w, r, "/")
 	files := updateTempPaths(files, "general.layout", "index.layout")
 	files = updateTempPaths(files, "general.header", "index.header")
-	session, err := Session(w, r) // check if user has a sesion set, retrieve if so
+	session, err := Session(w, r) // check for and retrieve user session
 	if err != nil {
 		files = append(files, "torsor", "calculator")
 		GenerateHTML(w, nil, files...)
-	} else {
-		files = append(files, "torsor", "calculator")
-		GenerateHTML(w, session, files...)
+		return
 	}
+	pipeline := Pipeline{
+		Session: session,
+	}
+	pipeline.SetPrivilege()
+	files = append(files, "torsor", "calculator")
+	GenerateHTML(w, session, files...)
 	return
 }

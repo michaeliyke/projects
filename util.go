@@ -20,10 +20,6 @@ type Configurations struct {
 	Static       string
 }
 
-type Pipeline struct {
-	ErrorMessage string
-}
-
 var config Configurations
 var logger *log.Logger
 var port string
