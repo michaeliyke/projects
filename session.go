@@ -17,23 +17,25 @@ type Session_ struct {
 
 // creates a new session
 func (user *User) CreateSession() (session Session_, err error) {
+	if !(user.Id > 0 && len(user.Uuid) > 10) {
+		err = errors.New("incorrect user information")
+		return
+	}
 	stmt, err := Db.Prepare(
-		`INSERT INTO sessions (
-			uuid, user_id, user_uuid, keep_login, created_at
-			) 
-		VALUES ($1, $2, $3, $4, $5, $6) 
-		RETURNING id, uuid, user_id, user_uuid, keep_login, created_at`,
+		`INSERT INTO sessions( user_id, user_uuid, uuid, keep_login, created_at)
+		VALUES($1, $2, $3, $4, $5)
+		RETURNING id, user_id, user_uuid, uuid, keep_login, created_at`,
 	)
 	if err != nil {
 		return
 	}
-	defer stmt.Close()
-	err = Db.QueryRow(
-		CreateUuid(), user.Id, user.Uuid, true, user.KeepLogged, time.Now(),
+	err = stmt.QueryRow(
+		user.Id, user.Uuid, CreateUuid(), user.KeepLogged, time.Now(),
 	).Scan(
-		&session.Id, &session.Uuid, &session.UserId, &session.UserUuid,
-		&session.KeepLogged, &session.CreatedAt,
+		&session.Id, &user.Id, &user.Uuid, &session.Uuid,
+		&user.KeepLogged, &session.CreatedAt,
 	)
+	stmt.Close()
 	return
 }
 

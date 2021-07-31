@@ -35,7 +35,8 @@ func CreateUserAccount(w http.ResponseWriter, r *http.Request) {
 // authenticates a user in and creates cookie named __session_ for persistence
 func Authenticate(w http.ResponseWriter, r *http.Request) {
 	_ = r.ParseForm()
-	user, err := GetByEmail(r.PostFormValue("email"))
+	var user User = User{Email: r.PostFormValue("email")}
+	err := user.GetByEmail()
 	if err != nil {
 		Log("cannot find user", err)
 		http.Redirect(w, r, "/login", http.StatusNotFound)
@@ -65,14 +66,14 @@ func Authenticate(w http.ResponseWriter, r *http.Request) {
 }
 
 // logs a user out by revoking their session
-func Logout(w http.ResponseWriter, r *http.Request) {
+func Logout(w http.ResponseWriter, r *http.Request) (err error) {
 	cookie, err := r.Cookie("_session_")
 	if err != http.ErrNoCookie {
 		Log("failed to get cookie: ", err)
 		session := Session_{Uuid: cookie.Value}
 		session.DeleteByUUID()
 	}
-	http.Redirect(w, r, "/", http.StatusFound)
+	return
 }
 
 func (user *User) Verify() {

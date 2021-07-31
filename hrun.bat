@@ -1,5 +1,7 @@
 @ECHO OFF
-CLS
-ECHO ^heroku local web
+
+ECHO. ^heroku local web
 
 heroku local web
+
+ECHO.

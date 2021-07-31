@@ -19,8 +19,7 @@ func TestEmailValidation(t *testing.T) {
 
 	emails := []string{
 		"!#$%&'*+-/=?^_`{|}~0123456789@mail.com", "a@email.com",
-		"janedoe@email.com", "JaneDoe@email.com",
-		"Jane.Doe@email.com", "Jane-Doe@email.com",
+		"JaneDoe@email.com", "Jane.Doe@email.com", "Jane-Doe@email.com",
 	}
 	for _, email := range emails {
 		_, err := ValidateEmail(strings.TrimSpace(email))

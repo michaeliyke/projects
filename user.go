@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/lib/pq"
 	. "github.com/michaeliyke/Golang/log"
 )
 
@@ -24,15 +25,17 @@ type User struct {
 
 // perfom actual auth chores
 func (user *User) Authenticate(w http.ResponseWriter, r *http.Request) (err error) {
-	u, err := user.GetByEmail()
+	err = user.GetByEmail()
 	if err != nil {
 		return errors.New("cannot find user")
 	}
-	if user.Password != u.Password {
+	if user.Password != Encrypt(r.FormValue("password")) {
 		return errors.New("incorrect password")
 	}
+	Log(Marshal(user))
 	session, err := user.CreateSession()
 	if err != nil {
+		Log("Error creating session: ", err)
 		return errors.New("cannot create session")
 	}
 	// create a session cookie by defult. It is deleted once browser closes
@@ -51,7 +54,7 @@ func (user *User) Authenticate(w http.ResponseWriter, r *http.Request) (err erro
 	return
 }
 
-func UserLogout(w http.ResponseWriter, r *http.Request) (err error) {
+func (user *User) Logout(w http.ResponseWriter, r *http.Request) (err error) {
 	cookie, err := r.Cookie("__session__")
 	if err != http.ErrNoCookie {
 		Warning("failed to get cookie")
@@ -71,8 +74,7 @@ func UserLogout(w http.ResponseWriter, r *http.Request) (err error) {
 // perfom actual account creation chores
 func (user *User) CreateAcount(w http.ResponseWriter, r *http.Request) (err error) {
 	// check if user exists using temporary data
-	u := User{Email: user.Email}
-	_, err = u.GetByEmail()
+	err = user.GetByEmail()
 	// err is either ErrNoRows or nil if user already exists
 	if err == nil {
 		err = errors.New("user already exists")
@@ -80,13 +82,10 @@ func (user *User) CreateAcount(w http.ResponseWriter, r *http.Request) (err erro
 	}
 	err = user.Create()
 	if err != nil {
+		// Log("Error creating user account: ", err)
 		return errors.New("cannot create user")
 	}
 	return // user has been created successfully
-}
-
-func (user *User) Logout(w http.ResponseWriter, r *http.Request) error {
-	return UserLogout(w, r)
 }
 
 // fetches user with the given id
@@ -97,7 +96,7 @@ func (u *User) Fetch(id int) (err error) {
 	`, id,
 	).Scan(
 		&user.Id, &user.Email, &user.Name, &user.Uuid, &user.Password,
-		&user.Privileges, &user.CreatedAt,
+		pq.Array(&user.Privileges), &user.CreatedAt,
 	)
 	return
 }
@@ -114,11 +113,11 @@ func (user *User) Create() (err error) {
 	}
 	defer stmt.Close()
 	err = stmt.QueryRow(
-		&user.Email, &user.Name, user.Uuid, &user.Password, &user.Privileges,
+		&user.Email, &user.Name, &user.Uuid, &user.Password, pq.Array(&user.Privileges),
 		time.Now(),
 	).Scan(
-		&user.Id, &user.Email, &user.Name, user.Uuid, &user.Password,
-		&user.Privileges, &user.CreatedAt,
+		&user.Id, &user.Email, &user.Name, &user.Uuid, &user.Password,
+		pq.Array(&user.Privileges), &user.CreatedAt,
 	)
 	return
 }
@@ -128,7 +127,7 @@ func (user *User) Update() (err error) {
 	_, err = Db.Exec(
 		`UPDATE users SET email = $2, name = $3, uuid = $4, password = $5, 
 		privileges = $6, created_at = $7 WHERE id = $1`,
-		user.Id, user.Email, user.Name, user.Uuid, user.Password, user.Privileges,
+		user.Id, user.Email, user.Name, user.Uuid, user.Password, pq.Array(user.Privileges),
 		time.Now(),
 	)
 	return
@@ -143,7 +142,8 @@ func (user *User) Delete() (err error) {
 // fetch all users
 func Users() (users []User, err error) {
 	rows, err := Db.Query(
-		`SELECT id, email, name, uuid, password, privileges, created_at FROM users`,
+		`SELECT id, email, name, uuid, password, privileges, created_at 
+		FROM users`,
 	)
 	if err != nil {
 		return
@@ -152,7 +152,7 @@ func Users() (users []User, err error) {
 		user = User{}
 		err = rows.Scan(
 			&user.Id, &user.Email, &user.Name, &user.Uuid, &user.Password,
-			&user.Privileges, &user.CreatedAt,
+			pq.Array(&user.Privileges), &user.CreatedAt,
 		)
 		if err != nil {
 			return
@@ -164,35 +164,30 @@ func Users() (users []User, err error) {
 }
 
 // gets user by email address
-func GetByEmail(email string) (user User, err error) {
-	user = User{}
-	err = Db.QueryRow(
+func (user *User) GetByEmail() (err error) {
+	stmt, err := Db.Prepare(
 		`SELECT id, email, name, uuid, password, privileges, created_at
-			FROM users WHERE email = $1`, email,
-	).Scan(&user.Id, &user.Email, &user.Name, &user.Uuid, &user.Password,
-		&user.Privileges, &user.CreatedAt,
+			FROM users WHERE email = $1`,
+	)
+	if err != nil {
+		return
+	}
+	err = stmt.QueryRow(user.Email).Scan(
+		&user.Id, &user.Email, &user.Name, &user.Uuid, &user.Password,
+		pq.Array(&user.Privileges), &user.CreatedAt,
 	)
 	return // err is nil or ErrNoRows
 }
 
-// aliase to GetByEmail function
-func (user *User) GetByEmail() (User, error) {
-	return GetByEmail(user.Email)
-}
-
 // gets user by uuid
-func GetByUUID(uuid string) (user User, err error) {
+func (user *User) GetByUUID() (err error) {
 	err = Db.QueryRow(
 		`SELECT id, email, name, uuid, password, privileges, created_at
-			FROM users WHERE uuid = $1`, uuid,
+			FROM users WHERE uuid = $1`, user.Uuid,
 	).Scan(&user.Id, &user.Email, &user.Name, &user.Uuid, &user.Password,
-		&user.Privileges, &user.CreatedAt,
+		pq.Array(&user.Privileges), &user.CreatedAt,
 	)
 	return
-}
-
-func (user *User) GetByUUID() (User, error) {
-	return GetByUUID(user.Uuid)
 }
 
 // Facilitates fetch of a given user or user id

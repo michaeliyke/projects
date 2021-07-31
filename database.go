@@ -9,7 +9,7 @@ import (
 var Db *sql.DB
 
 func init() {
-	credentials := `user=iyke dname=projects sslmode=disable`
+	credentials := `user=iyke dbname=projects sslmode=disable`
 	var err error
 	Db, err = sql.Open("postgres", credentials)
 	if err != nil {

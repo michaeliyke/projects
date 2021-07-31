@@ -23,6 +23,13 @@ func ValidateEmail(email string) (email_ string, err error) {
 	return
 }
 
+func ValidatePassword(password string) (err error) {
+	if len(password) < 3 {
+		err = errors.New("password istoo short")
+	}
+	return
+}
+
 func ValidateFullName(name string) (name_ string, err error) {
 	start := name[0]
 	end := name[len(name)-1]

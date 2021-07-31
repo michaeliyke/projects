@@ -45,6 +45,18 @@ func init() {
 	)
 }
 
+func Marshal(arguments ...interface{}) (marshalled []string) {
+	for _, datum := range arguments {
+		json_, err := json.MarshalIndent(datum, "", "  ")
+		if err != nil {
+			Fatal(err)
+			return
+		}
+		marshalled = append(marshalled, string(json_))
+	}
+	return
+}
+
 func CreateUuid() (uuid string) {
 	u := new([16]byte)
 	_, err := rand.Read(u[:])
