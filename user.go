@@ -32,41 +32,27 @@ func (user *User) Authenticate(w http.ResponseWriter, r *http.Request) (err erro
 	if user.Password != Encrypt(r.FormValue("password")) {
 		return errors.New("incorrect password")
 	}
-	Log(Marshal(user))
 	session, err := user.CreateSession()
 	if err != nil {
 		Log("Error creating session: ", err)
 		return errors.New("cannot create session")
 	}
 	// create a session cookie by defult. It is deleted once browser closes
-	var cookie = http.Cookie{
-		Name:     "__session__",
-		Value:    session.UserUuid,
-		HttpOnly: true,
-	}
-	/*
-		For logging out: MaxAge: -1
-	*/
-	if session.KeepLogged {
-		cookie.MaxAge = 1 * 60 * 60 * 24 * 30
-	}
-	http.SetCookie(w, &cookie)
+	SetCookie(w, config.AuthCookieName, session.Uuid, session.User.KeepLogged)
 	return
 }
 
 func (user *User) Logout(w http.ResponseWriter, r *http.Request) (err error) {
-	cookie, err := r.Cookie("__session__")
-	if err != http.ErrNoCookie {
-		Warning("failed to get cookie")
+	return UserLogout(w, r)
+}
+
+func UserLogout(w http.ResponseWriter, r *http.Request) (err error) {
+	cookie, err := GetCookie(r, config.AuthCookieName)
+	if err == nil {
 		session := Session_{Uuid: cookie.Value}
 		session.DeleteByUUID()
-		cookie = &http.Cookie{
-			Name:     "__session__",
-			Value:    "expired",
-			HttpOnly: true,
-			MaxAge:   -1,
-		}
-		http.SetCookie(w, cookie)
+		UnsetCookie(w, config.AuthCookieName)
+
 	}
 	return
 }

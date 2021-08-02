@@ -4,6 +4,8 @@ import (
 	"errors"
 	"regexp"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 // checks if email is correct format
@@ -32,13 +34,8 @@ func ValidatePassword(password string) (err error) {
 
 // check is UUID is correct.
 // returns the error or nil
-func ValidateUuid(uuid string) (err error) {
-	includesDash, _ := regexp.Match(`-`, []byte(uuid))
-	noSpaces, _ := regexp.Match(`\s`, []byte(uuid))
-	isAlphNum, _ := regexp.Match(`([a-z][0-9])+|([0-9][a-z])+`, []byte(uuid))
-	if !(includesDash && noSpaces && isAlphNum) {
-		err = errors.New("invalid UUID")
-	}
+func ValidateUuid(u string) (err error) {
+	_, err = uuid.Parse(u)
 	return
 }
 
@@ -50,7 +47,7 @@ func ValidateFullName(name string) (err error) {
 	ln := len(name)
 	switch {
 	// check name is > 4 and less than 21
-	case ln > 20:
+	case ln > 100:
 		err = errors.New("Name is too long")
 	case ln < 5:
 		err = errors.New("Name should be at leasT 3 characters long")

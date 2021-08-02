@@ -17,6 +17,7 @@ func main() {
 	mux.HandleFunc("/notfound/", Serve404)          // 001 404
 	mux.HandleFunc("/account/signup/", ServeSignUp) // 02
 	mux.HandleFunc("/account/login/", ServeLogin)   // 03
+	mux.HandleFunc("/account/logout/", ServeLogout) // 03
 	mux.HandleFunc("/account/preferences/", ServeUpdateProfile)
 	mux.HandleFunc("/errpg/", ServeErrPg) // 001 Error page
 	mux.HandleFunc("/app/feedback", ServeFeedback)
@@ -27,6 +28,7 @@ func main() {
 	//Aliases (GET)
 	mux.HandleFunc("/signup/", RouteTo("/account/signup/"))
 	mux.HandleFunc("/login/", RouteTo("/account/login/"))
+	mux.HandleFunc("/logout/", RouteTo("/account/logout/"))
 	mux.HandleFunc("/account/", RouteTo("/account/login/"))
 
 	// POST, PUT

@@ -14,10 +14,11 @@ import (
 )
 
 type Configurations struct {
-	Address      string
-	ReadTimeout  int64
-	WriteTimeout int64
-	Static       string
+	Address        string
+	ReadTimeout    int64
+	WriteTimeout   int64
+	Static         string
+	AuthCookieName string
 }
 
 var config Configurations
@@ -80,6 +81,10 @@ func updateTempPaths(files []string, old string, new_ string) (x []string) {
 		strings.Replace(strings.Join(files, " "), old, new_, 1), " ",
 	)
 	return
+}
+
+func AddTemplates(files []string, others ...string) []string {
+	return append(files, others...)
 }
 
 func Contains(array []string, s string) (present bool) {

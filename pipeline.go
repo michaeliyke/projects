@@ -9,26 +9,23 @@ type Pipeline struct {
 	Session      Session_
 }
 
-func (pipline *Pipeline) SetPrivilege() {
+func (pipeline *Pipeline) SetPrivilege() {
 	// privileges are set in order so that owner has both admin and user access
-	switch {
-	case Contains(pipline.Session.User.Privileges, "user"):
-		pipline.IsUser = true
-	case Contains(pipline.Session.User.Privileges, "admin"):
-		pipline.IsAdmin = true
-	case Contains(pipline.Session.User.Privileges, "owner"):
-		pipline.IsOwner = true
+	if Contains(pipeline.Session.User.Privileges, "user") {
+		pipeline.IsUser = true
+	}
+	if Contains(pipeline.Session.User.Privileges, "admin") {
+		pipeline.IsAdmin = true
+	}
+	if Contains(pipeline.Session.User.Privileges, "owner") {
+		pipeline.IsOwner = true
+	}
+	privileges := pipeline.Session.User.Privileges
+	if len(privileges) > 0 {
+		pipeline.Privilege = privileges[len(privileges)-1]
 	}
 }
 
-func (pipline *Pipeline) GetPrivilege() (privilege string) {
-	switch {
-	case pipline.IsAdmin:
-		privilege = "admin"
-	case pipline.IsOwner:
-		privilege = "owner"
-	case pipline.IsUser:
-		privilege = "user"
-	}
-	return
+func (pipeline *Pipeline) GetPrivilege() (privilege string) {
+	return pipeline.Privilege
 }

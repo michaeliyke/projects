@@ -1,61 +1,59 @@
-{{ 
-    define "silent_nav"
-}}
+{{ define "silent_nav" }}
 
-{{
-    $pipeline := .
-}}
-    <nav id="silent-nav">
-        <h1>
-            <div class="open-off-canvass unchanged">
-    
-                <!-- Three dots html entity = &vellip; -->
-                <div class="swap three-dots-single">&#8942;</div>
-                <div class="swap three-dots-cross">&#8942;</div>
+
+{{ $pipeline := . }}
+
+<nav id="silent-nav">
+    <h1>
+        <div class="open-off-canvass unchanged">
+
+            <!-- Three dots html entity = &vellip; -->
+            <div class="swap three-dots-single">&#8942;</div>
+            <div class="swap three-dots-cross">&#8942;</div>
+        </div>
+        <a href="/">PLAYGROUND</a>
+    </h1>
+    <ul class="quiet">
+
+        {{ if and $pipeline  $pipeline.IsAdmin $pipeline.IsUser }}
+        <li>
+            <a href="#">Admin <i class="fas fa-caret-down toggle-sign"></i></a>
+            <div class="drop-down-menu">
+                <ul>
+                    <li><a href="#">Item 1</a></li>
+                    <li><a href="#">Item 2</a></li>
+                    <li><a href="#">Item 3</a></li>
+                    <li><a href="#">Item 4</a></li>
+                    {{ if and $pipeline (and .IsUser .IsOwner)}}
+                    <li><a href="#">Owner</a></li>
+                    {{ end }}
+                </ul>
             </div>
-            <a href="/">PLAYGROUND</a>
-        </h1>
-        <ul class="quiet">
-            {{ if $pipeline }}
-            <li>
-                <a href="#">Admin <i class="fas fa-caret-down toggle-sign"></i></a>
-                <div class="drop-down-menu">
-                    <ul>
-                        <li><a href="#">Item 1</a></li>
-                        <li><a href="#">Item 2</a></li>
-                        <li><a href="#">Item 3</a></li>
-                        <li><a href="#">Item 4</a></li>
-                    </ul>
-                </div>
-            </li>
-            {{ end }}
-            <li><a href="/app/manage/">Manage</a></li>
-            <li><a href="/app/comments/">Comments</a></li>
-            <!-- http://ultimateweb.gear.host/ -->
-            <li><a href="/app/feedback/">Feedback</a></li>
-            <li><a href="/client/chat/">CHAT</a></li>
-            {{
-                if and (and $pipeline $pipeline.User) ($pipeline.User $pipeline.Admin)
-            }}
-            <li>
-                <a href="#">Account <i class="fas fa-caret-down toggle-sign"></i></a>
-                <div class="drop-down-menu">
-                    <ul>
-                        <li><a href="#">Item 1</a></li>
-                        <li><a href="#">Item 2</a></li>
-                        <li><a href="#">Item 3</a></li>
-                        <li><a href="#">Item 4</a></li>
-                        <li><a href="/account/preferences/">Prefences</a></li>
-                        <li><a href="#">SHARE</a></li>
-                    </ul>
-                </div>
-            </li>
-            {{ else  }}
-                <li><a href="/account/login/">Account</a></li>
-            {{ end }}
-            
-        </ul>
-        <!-- <span class="f-irst-toggle" >&#9776;</span> -->
-    </nav>
+        </li>
+        {{ end }}
+        <li><a href="/app/manage/">Manage</a></li>
+        <li><a href="/app/comments/">Comments</a></li>
+        <!-- http://ultimateweb.gear.host/ -->
+        <li><a href="/app/feedback/">Feedback</a></li>
+        <li><a href="/client/chat/">CHAT</a></li>
 
-{{end}}
+        {{ if .IsUser }}
+        <li>
+            <a href="#">Account <i class="fas fa-caret-down toggle-sign"></i></a>
+            <div class="drop-down-menu">
+                <ul>
+                    <li><a href="#">Item 1</a></li>
+                    <li><a href="#">Item 2</a></li>
+                    <li><a href="/account/preferences/">Prefences</a></li>
+                    <li><a href="#">SHARE</a></li>
+                    <li><a href="/account/logout/">Logout</a></li>
+                </ul>
+            </div>
+        </li>
+        {{ else }}
+        <li><a href="/account/login/">Account</a></li>
+        {{ end }}
+        
+    </ul>
+</nav>
+{{ end }}

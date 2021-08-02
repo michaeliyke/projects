@@ -84,13 +84,16 @@ func ServeLogin(w http.ResponseWriter, r *http.Request) {
 	files := updateTempPaths(files, "general.layout", "login.layout")
 	_, err := Session(w, r) // check if user has a sesion set, retrieve if so
 	if err != nil {
-		files = append(files, "torsor", "calculator")
 		GenerateHTML(w, nil, files...)
 	} else {
-		files = append(files, "torsor", "calculator")
 		GenerateHTML(w, nil, files...)
 	}
 	return
+}
+
+func ServeLogout(w http.ResponseWriter, r *http.Request) {
+	_ = UserLogout(w, r)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func ServeComments(w http.ResponseWriter, r *http.Request) {
@@ -164,19 +167,29 @@ func ServeUpdateProfile(w http.ResponseWriter, r *http.Request) {
 
 func ServeIndex(w http.ResponseWriter, r *http.Request) {
 	CheckRoute(w, r, "/")
-	files := updateTempPaths(files, "general.layout", "index.layout")
-	files = updateTempPaths(files, "general.header", "index.header")
+
+	// additional files
+	files := AddTemplates(
+		files, "index.layout", "index.header", "torsor", "calculator",
+	)
+
+	// Remove unneeded files
+	files = UnloadTemplates(files, []string{
+		"general.layout", "general.header",
+	})
+
 	session, err := Session(w, r) // check for and retrieve user session
 	if err != nil {
-		files = append(files, "torsor", "calculator")
+		Log("cannot retrieve login sesion: ", err)
 		GenerateHTML(w, nil, files...)
 		return
 	}
+
 	pipeline := Pipeline{
 		Session: session,
 	}
+
 	pipeline.SetPrivilege()
-	files = append(files, "torsor", "calculator")
-	GenerateHTML(w, session, files...)
+	GenerateHTML(w, pipeline, files...)
 	return
 }

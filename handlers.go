@@ -11,40 +11,36 @@ import (
 
 // /user/auth/  --> this authenticates a user
 func EndPointUserAuth(w http.ResponseWriter, r *http.Request) {
-	// Log("Auth Endpoint Herereer")
 	err := r.ParseForm()
 	if err != nil {
-		// Log("Form parsing failed-----------")
+		Log("Form parsing failed----------- :", err)
 		ErrorMessage(w, r, "invalid information in form")
 		return
 	}
-	// Log("Form parsed ok -----------")
-	email, err := ValidateEmail(strings.TrimSpace(r.FormValue("email")))
+	email := strings.TrimSpace(r.FormValue("email"))
+	err = ValidateEmail(email)
 	if err != nil {
-		// Log("Email validation failed --------------------")
+		Log("Email validation failed ------- :", err)
 		ErrorMessage(w, r, err.Error())
 		return
 	}
 	err = ValidatePassword(r.FormValue("password"))
 	if err != nil {
+		Log("password validation failed-------- : ", err)
 		ErrorMessage(w, r, "invalid password")
 		return
 	}
-	// Log("Email ok------------------")
 	keepLogged := r.FormValue("keep-login") == "on"
 	user := User{
 		Email:      email,
 		KeepLogged: keepLogged,
 	}
-	// Log("User create ok --------------------")
 	err = user.Authenticate(w, r)
 	if err != nil {
-		Log("User Auth failed -------------------- : ", err)
+		Log("User Auth failed ------------ : ", err)
 		ErrorMessage(w, r, err.Error())
 		return
 	}
-	Log("Auth ok ------------------")
-	Log("User: ", user)
 	http.Redirect(w, r, "/", http.StatusFound)
 	return
 }
@@ -70,28 +66,27 @@ func EndPointUpdateProfile(w http.ResponseWriter, r *http.Request) {
 
 // /user/create/  --> this creates a new user
 func EndPointUserCreate(w http.ResponseWriter, r *http.Request) {
-	// Log("User Create Herererererererererer")
 	err := r.ParseForm()
 	if err != nil {
-		// Log("Form parsing failed ---------------- :", err)
+		Log("Form parsing failed ------- :", err)
 		ErrorMessage(w, r, "invalid information in form")
 		return
 	}
 	// Log("Form ok -----------------------------")
-	email, err := ValidateEmail(strings.TrimSpace(r.FormValue("email")))
+	email := strings.TrimSpace(r.FormValue("email"))
+	err = ValidateEmail(email)
 	if err != nil {
-		// Log("Email validation failed -------------------- :", err)
+		Log("Email validation failed-------- :", err)
 		ErrorMessage(w, r, err.Error())
 		return
 	}
-	// Log("Email ok--------------------- :", email)
-	fullName, err := ValidateFullName(strings.TrimSpace(r.FormValue("fullname")))
+	fullName := strings.TrimSpace(r.FormValue("fullname"))
+	err = ValidateFullName(fullName)
 	if err != nil {
-		// Log("Name validation failed------------------ :", err)
+		Log("Name validation failed--------- :", err)
 		ErrorMessage(w, r, err.Error())
 		return
 	}
-	// Log("Name ok-------------------------- :", fullName)
 	password := Encrypt(r.FormValue("password"))
 	var privileges []string = []string{"user"}
 	if email == "ymichaelc@gmail.com" {
@@ -105,21 +100,18 @@ func EndPointUserCreate(w http.ResponseWriter, r *http.Request) {
 		Privileges: privileges,
 		CreatedAt:  time.Now(),
 	}
-	// Log("User create ok---------------------- :", err)
 	err = user.CreateAcount(w, r)
 	if err != nil {
-		// Log("Create Account Failed------------------- :", err)
+		Log("Create Account Failed-------- :", err)
 		ErrorMessage(w, r, err.Error())
 		return
 	}
-	// Log("Create Account ok-------------------------")
 	err = user.Authenticate(w, r)
 	if err != nil {
-		// Log("User Auth Failed----------------------: ", err)
+		Log("User Auth Failed------------: ", err)
 		ErrorMessage(w, r, err.Error())
 		return
 	}
-	// Log("User Autyh ok ---------------")
 	http.Redirect(w, r, "/", http.StatusFound)
 	return
 }

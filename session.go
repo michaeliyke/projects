@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/lib/pq"
+
+	. "github.com/michaeliyke/Golang/log"
 )
 
 type Session_ struct {
@@ -18,7 +20,45 @@ type Session_ struct {
 	User       User      `json:"user"`
 }
 
-func (session *Session_) IsLoggedIn() (logged bool) {
+func GetCookie(r *http.Request, x string) (cookie *http.Cookie, err error) {
+	cookie, err = r.Cookie(x)
+	if err == http.ErrNoCookie {
+		Log(r.Cookies())
+		err = errors.New(Sprintf("cookie '%v' cannot be found.", x))
+	} else if err != nil {
+		Log("problems retrieving cookie: ", err)
+		err = errors.New("error retrieving cookie")
+	}
+	Log("Found token: ", cookie)
+	return
+}
+
+func SetCookie(w http.ResponseWriter, n string, v string, keepLogged bool) {
+	cookie := http.Cookie{
+		Name:     n,
+		Value:    v,
+		HttpOnly: true,
+		Path:     "/",
+		// HttpOnly - allow access to http and https protocols and non else
+		// So, only http clients can access the cookie, AJAX can't
+	}
+	if keepLogged {
+		cookie.MaxAge = 1 * 60 * 60 * 24 * 30
+	}
+	// add the cookie to the reponse header
+	http.SetCookie(w, &cookie)
+}
+
+func UnsetCookie(w http.ResponseWriter, n string) (cookie *http.Cookie, err error) {
+	// For logging out: MaxAge: -1
+	cookie = &http.Cookie{
+		Name:     n,
+		Value:    "expired",
+		HttpOnly: true,
+		Path:     "/",
+		MaxAge:   -1,
+	}
+	http.SetCookie(w, cookie)
 	return
 }
 
@@ -39,8 +79,8 @@ func (user *User) CreateSession() (session Session_, err error) {
 	err = stmt.QueryRow(
 		user.Id, user.Uuid, CreateUuid(), user.KeepLogged, time.Now(),
 	).Scan(
-		&session.Id, &user.Id, &user.Uuid, &session.Uuid,
-		&user.KeepLogged, &session.CreatedAt,
+		&session.Id, &session.UserId, &session.UserUuid, &session.Uuid,
+		&session.KeepLogged, &session.CreatedAt,
 	)
 	session.User = *user
 	stmt.Close()
@@ -48,9 +88,8 @@ func (user *User) CreateSession() (session Session_, err error) {
 }
 
 func Session(w http.ResponseWriter, r *http.Request) (session Session_, err error) {
-	cookie, err := r.Cookie("_session_")
+	cookie, err := GetCookie(r, config.AuthCookieName)
 	if err != nil {
-		err = errors.New("error occurred while retreiving cookie")
 		return
 	}
 	if err = ValidateUuid(cookie.Value); err != nil {
@@ -59,6 +98,7 @@ func Session(w http.ResponseWriter, r *http.Request) (session Session_, err erro
 	session.Uuid = cookie.Value
 	ok, err := session.Check()
 	if err != nil {
+		Log(err)
 		err = errors.New("error occurred while checking session")
 		return
 	}
@@ -73,12 +113,14 @@ func Session(w http.ResponseWriter, r *http.Request) (session Session_, err erro
 func (user *User) Session() (session Session_, err error) {
 	err = Db.QueryRow(
 		`SELECT s.id, s.uuid, s.keep_login, s.created_at,
+		s.user_id, s.user_uuid,
 		 u.id, u.name, u.email, u.uuid, u.password, u.privileges
 		FROM sessions AS s JOIN users AS u ON s.user_uuid = u.uuid
 		WHERE s.user_uuid = $1
 		`, user.Uuid,
 	).Scan(
 		&session.Id, &session.Uuid, &session.KeepLogged, &session.CreatedAt,
+		&session.UserId, &session.UserUuid,
 		&session.User.Id, &session.User.Name, &session.User.Email,
 		&session.User.Uuid, &session.User.Password, &session.User.Privileges,
 	)
@@ -100,12 +142,14 @@ func (session *Session_) Check() (valid bool, err error) {
 // retrieves a user's session from database
 func (session *Session_) Retrieve() (err error) {
 	err = Db.QueryRow(
-		`SELECT s.id, s.uuid, s.keep_login, s.created_at,
+		`SELECT s.id, s.uuid, s.keep_login, s.created_at, 
+			s.user_id, s.user_uuid,
 			u.id, u.name, u.email, u.uuid, u.password, u.privileges
 		FROM sessions AS s JOIN users AS u ON s.user_uuid = u.uuid
-		WHERE uuid = $1`, session.Uuid,
+		WHERE s.uuid = $1`, session.Uuid,
 	).Scan(
 		&session.Id, &session.Uuid, &session.KeepLogged, &session.CreatedAt,
+		&session.UserId, &session.UserUuid,
 		&session.User.Id, &session.User.Name, &session.User.Email,
 		&session.User.Uuid, &session.User.Password,
 		pq.Array(&session.User.Privileges),

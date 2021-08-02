@@ -47,16 +47,7 @@ func Authenticate(w http.ResponseWriter, r *http.Request) {
 				Log("cannot create session", err)
 				http.Redirect(w, r, "/login", http.StatusInternalServerError)
 			} else {
-				cookie := http.Cookie{
-					Name:     "_session_",
-					Value:    session.Uuid,
-					HttpOnly: true,
-					/*
-						HttpOnly - allow access to http and https protocols and non else
-						So, only http clients can access the cookie, AJAX can't
-					*/
-				}
-				http.SetCookie(w, &cookie) // adds the cookie to the reponse header
+				SetCookie(w, config.AuthCookieName, session.Uuid, true)
 				http.Redirect(w, r, "/", http.StatusFound)
 			}
 		} else {
