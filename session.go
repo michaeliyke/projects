@@ -24,10 +24,13 @@ func GetCookie(r *http.Request, x string) (cookie *http.Cookie, err error) {
 	cookie, err = r.Cookie(x)
 	if err == http.ErrNoCookie {
 		Log(r.Cookies())
-		err = errors.New(Sprintf("cookie '%v' cannot be found.", x))
-	} else if err != nil {
-		Log("problems retrieving cookie: ", err)
-		err = errors.New("error retrieving cookie")
+		err = errors.New(Sprintf("cookie '%v' coud not be found.", x))
+		return
+	}
+	if err != nil {
+		Log("cookie not found: ", err)
+		err = errors.New("cookie not found")
+		return
 	}
 	Log("Found token: ", cookie)
 	return
@@ -99,7 +102,7 @@ func Session(w http.ResponseWriter, r *http.Request) (session Session_, err erro
 	ok, err := session.Check()
 	if err != nil {
 		Log(err)
-		err = errors.New("error occurred while checking session")
+		err = errors.New("session not found")
 		return
 	}
 	if ok == false {

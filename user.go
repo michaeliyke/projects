@@ -27,7 +27,7 @@ type User struct {
 func (user *User) Authenticate(w http.ResponseWriter, r *http.Request) (err error) {
 	err = user.GetByEmail()
 	if err != nil {
-		return errors.New("cannot find user")
+		return errors.New("user not found")
 	}
 	if user.Password != Encrypt(r.FormValue("password")) {
 		return errors.New("incorrect password")

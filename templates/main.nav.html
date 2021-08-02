@@ -12,9 +12,11 @@
             <li class="main-menu"><a href="#">Blog page</a></li>
             <li class="main-menu"><a href="#">Brief survey</a></li>
             <li class="main-menu"><a href="#">Contact page</a></li>
+            {{ if and  $pipeline $pipeline.IsUser $pipeline.IsAdmin}}
             <li class="main-menu" data-role="projects-menu">
                 <span data-role="projects-toggler" class="projects-toggler slide-open">&#9776;</span>
             </li>
+            {{ end }}
         </ul>
     </nav>
 {{end}}
