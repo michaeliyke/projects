@@ -12,30 +12,25 @@ func main() {
 	mux.Handle("/sources/", http.StripPrefix("/sources/", files))
 	mux.Handle("/favicon.ico", http.StripPrefix("/sources/", files))
 
-	// Serving pages
-	mux.HandleFunc("/", ServeIndex)                 // 01
-	mux.HandleFunc("/notfound/", Serve404)          // 001 404
-	mux.HandleFunc("/account/signup/", ServeSignUp) // 02
-	mux.HandleFunc("/account/login/", ServeLogin)   // 03
-	mux.HandleFunc("/account/logout/", ServeLogout) // 03
-	mux.HandleFunc("/account/preferences/", ServeUpdateProfile)
-	mux.HandleFunc("/errpg/", ServeErrPg) // 001 Error page
-	mux.HandleFunc("/app/feedback", ServeFeedback)
-	mux.HandleFunc("/app/comments", ServeComments)
-	mux.HandleFunc("/client/chat", ServeChat)
-	mux.HandleFunc("/app/manage", ServeManageRecords)
-
 	//Aliases (GET)
 	mux.HandleFunc("/signup/", RouteTo("/account/signup/"))
 	mux.HandleFunc("/login/", RouteTo("/account/login/"))
 	mux.HandleFunc("/logout/", RouteTo("/account/logout/"))
 	mux.HandleFunc("/account/", RouteTo("/account/login/"))
 
-	// POST, PUT
-	mux.HandleFunc("/user/create/", EndPointUserCreate)         // POST
-	mux.HandleFunc("/user/auth/", EndPointUserAuth)             // POST
-	mux.HandleFunc("/user/preferences/", EndPointUpdateProfile) // POST
-	mux.HandleFunc("/user/feedback/", EndPointUserFeedback)     // POST
+	// POST, PUT, GET, PATCH, OPTIONS, HEAD, DELETE, RENAME
+	mux.HandleFunc("/notfound/", NotFound)     // 001 404
+	mux.HandleFunc("/account/logout/", LogOut) // 03
+	mux.HandleFunc("/errpg/", ErrPG)           // 001 Error page
+	mux.HandleFunc("/user/comments/", Comments)
+	mux.HandleFunc("/", Index)                 // 01
+	mux.HandleFunc("/account/signup/", SignUp) // 02
+	mux.HandleFunc("/contact-us/", ContactUs)
+	mux.HandleFunc("/client/chat/", Chat)
+	mux.HandleFunc("/account/login/", LogIn) // 03
+	mux.HandleFunc("/user/feedback/", Feedback)
+	mux.HandleFunc("/account/preferences/", AccountUpdate)
+	mux.HandleFunc("/app/manage/", ManageRecords)
 
 	if port == "" || port == "5000" {
 		Log("$PORT var not set. ..")

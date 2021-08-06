@@ -22,19 +22,21 @@
                 <ul>
                     <li><a href="#">Item 1</a></li>
                     <li><a href="#">Item 2</a></li>
-                    <li><a href="#">Item 3</a></li>
-                    <li><a href="#">Item 4</a></li>
+                    {{ if not $pipeline.IsOwner}}
+                    <li><a href="#">View users</a></li>
+                    {{ end }}
                     {{ if and $pipeline (and .IsUser .IsOwner)}}
-                    <li><a href="#">Owner</a></li>
+                    <li><a href="#">Manage users</a></li>
+                    <li><a href="#">Grant</a></li>
                     {{ end }}
                 </ul>
             </div>
         </li>
         {{ end }}
         <li><a href="/app/manage/">Manage</a></li>
-        <li><a href="/app/comments/">Comments</a></li>
+        <li><a href="/user/comments/">Comments</a></li>
         <!-- http://ultimateweb.gear.host/ -->
-        <li><a href="/app/feedback/">Feedback</a></li>
+        <li><a href="/user/feedback/">Feedback</a></li>
         <li><a href="/client/chat/">CHAT</a></li>
 
         {{ if .IsUser }}

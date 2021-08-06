@@ -64,6 +64,10 @@ func EndPointUpdateProfile(w http.ResponseWriter, r *http.Request) {
 	// wILL WORK ON THIS LATER ON
 }
 
+func EndPointProcessFeedback(w http.ResponseWriter, r *http.Request) {}
+func EndPointProcessComment(w http.ResponseWriter, r *http.Request)  {}
+func EndPointProcessChat(w http.ResponseWriter, r *http.Request)     {}
+
 // /user/create/  --> this creates a new user
 func EndPointUserCreate(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()

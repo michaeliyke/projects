@@ -1,0 +1,53 @@
+{{ define "layout" }}
+<!DOCTYPE html>
+<html>
+
+{{template "head" .}}
+{{ $pipeline := . }}
+
+<body class="root-body">
+
+    <div id="main">
+        {{ template "silent_nav" . }}
+
+        {{ template "main_nav" . }}
+    </div>
+    <div class="form-wrapper">
+        <form novalidate action="/user/feedback/" method="POST" class="account form signup"
+            enctype="application/x-www-form-urlencoded">
+            <h2>Tell us how you feel</h2>
+
+            <div class="form-control">
+                <label for="fullname" class="lable">Name</label>
+                <input type="text" name="fullname" class="control" placholder="Enter Name" />
+            </div>
+
+            <div class="form-control">
+                <label for="email" class="lable">Email address</label>
+                <input type="email" name="fullname" class="control" paceholder="Enter Email" />
+            </div>
+
+            <div class="form-control">
+                <label for="fullname" class="lable">Message</label>
+                <textarea draggable="false" class="control" name="feedback" cols="30" rows="10"></textarea>
+            </div>
+            <div class="form-control submit-control">
+                <input type="submit" name="submit" class="control" value="Submit feedback" />
+            </div>
+        </form>
+    </div>
+    {{template "footer" . }}
+
+    <style>
+        .signup.form.account {
+            padding-bottom: 2em;
+        }
+
+        .signup .submit-control {
+            margin-top: 1em;
+        }
+    </style>
+</body>
+
+</html>
+{{ end }}

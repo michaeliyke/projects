@@ -1,12 +1,18 @@
 package main
 
 type Pipeline struct {
-	Privilege    string
 	IsAdmin      bool
 	IsUser       bool
 	IsOwner      bool
+	IsLogged     bool
+	Privilege    string
 	ErrorMessage string
 	Session      Session_
+}
+
+func InitPipelineVars(pipeline Pipeline) Pipeline {
+	pipeline.SetPrivilege()
+	return pipeline
 }
 
 func (pipeline *Pipeline) SetPrivilege() {
@@ -23,6 +29,9 @@ func (pipeline *Pipeline) SetPrivilege() {
 	privileges := pipeline.Session.User.Privileges
 	if len(privileges) > 0 {
 		pipeline.Privilege = privileges[len(privileges)-1]
+	}
+	if len(pipeline.Privilege) > 0 {
+		pipeline.IsLogged = true
 	}
 }
 

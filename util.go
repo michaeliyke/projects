@@ -42,6 +42,10 @@ func init() {
 	)
 }
 
+func Note(r *http.Request) {
+	Log(GetIpAddress(r))
+}
+
 func Marshal(arguments ...interface{}) (marshalled []string) {
 	for _, datum := range arguments {
 		json_, err := json.MarshalIndent(datum, "", "  ")

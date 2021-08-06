@@ -8,10 +8,14 @@
 <body class="root-body">
 
     <div id="main">
-        {{ template "general_header" . }}
+        <section id="menu-control">
+            {{ template "silent_nav" . }}
+            
+            {{ template "main_nav" . }}
+        </section>
     </div>
     <div class="form-wrapper">
-        <form novalidate action="/user/create/" method="POST" class="account form signup" enctype="application/x-www-form-urlencoded">
+        <form novalidate action="/account/signup/" method="POST" class="account form signup" enctype="application/x-www-form-urlencoded">
             <div class="form-control break-up">
             <div class="form-control">
                 <label for="email" class="lable">Email</label>
