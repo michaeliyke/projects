@@ -1,70 +1,110 @@
 package main
 
 import (
-	"errors"
-	"regexp"
+	"html"
 	"strings"
 
-	"github.com/google/uuid"
+	"github.com/michaeliyke/Golang/log"
+
+	"github.com/go-playground/validator/v10"
+	// "github.com/google/uuid"
 )
 
-// checks if email is correct format
-// returns the error or nil
+var validate *validator.Validate = validator.New()
+var v = validate
+
+// ERROR MESSAGES
+
+// Says: invalid input in form
+var msgInvalid = "invalid input in form"
+
+// Says: form input too short
+var msgTooShort = "form input too short"
+
+// Says: form input too long
+var msgTooLong = "form input too long"
+
+// ValidateEmail checks if email is correct format. Returns the error or nil
 func ValidateEmail(email string) (err error) {
-	x := "^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
-	emailRegex := regexp.MustCompile(x)
-	switch {
-	case emailRegex.MatchString(email) == false:
-		err = errors.New("Invalid email address")
-	case len(email) < 4:
-		err = errors.New("Email length too short")
-	case len(email) > 254:
-		err = errors.New("Email length too long")
+	if v.Var(email, "required,email,gte=4,lte=255") != nil {
+		return NewError("invalid email")
 	}
 	// _, err = net.LookupMX(host) ----- used to confirm hosT Bdoes exist
 	return
 }
 
+// ValidatePassword checks that password is ok. Returns error or nil
 func ValidatePassword(password string) (err error) {
-	if len(password) < 3 {
-		err = errors.New("password istoo short")
+	if v.Var(password, "required,gte=3,lte=50") != nil {
+		return NewError("invalid password")
 	}
 	return
 }
 
-// check is UUID is correct.
-// returns the error or nil
+// ValidateUuid checks if UUID is correct. Returns the error or nil
 func ValidateUuid(u string) (err error) {
-	_, err = uuid.Parse(u)
+	err = v.Var(u, "required,uuid")
+	if err != nil {
+		return NewError("invalid uuid")
+	}
+	/*
+		"github.com/google/uuid"
+		 _, err = uuid.Parse(u) // Merely repetition
+		if err != nil {
+			return NewError("invalid uuid")
+		} */
 	return
 }
 
-// check that fullname is correct
-// returns error is nil
+// ValidateFullName checks that fullname is correc. Returns error or nil
 func ValidateFullName(name string) (err error) {
-	start := name[0]
-	end := name[len(name)-1]
-	ln := len(name)
-	switch {
-	// check name is > 4 and less than 21
-	case ln > 100:
-		err = errors.New("Name is too long")
-	case ln < 5:
-		err = errors.New("Name should be at leasT 3 characters long")
-		// check name does not begin or end with the -, _,or . characters
-	case strings.ContainsAny(".-_", string(start)):
-		err = errors.New("Name cannot start with invalid character")
-	case strings.ContainsAny(".-_", string(end)):
-		err = errors.New("Name cannot end with invalid character")
-		// check name does not contain --, __, .., -., .-
-	case strings.Contains(name, "--") || strings.Contains(name, "__") ||
-		strings.Contains(name, "..") || strings.Contains(name, "-.") ||
-		strings.Contains(name, ".-"):
-		err = errors.New("Name contains invalid character")
+	// Disallow --, and __ in name
+	if strings.Contains(name, "--") || strings.Contains(name, "__") {
+		return NewError(msgInvalid)
+	}
+	// Allow single - and _ in name by hiding them at this point
+	name = StrReplaceAny(name, "-_", "")
+	// screen for aphabets and or numbers only
+	err = v.Var(strings.Replace(name, " ", "", -1), "alphanum")
+	if err != nil {
+		return NewError(msgInvalid)
+	}
+	if v.Var(name, "required,gte=3") != nil {
+		return NewError(msgTooShort)
+	}
+	if v.Var(name, "lte=50") != nil {
+		return NewError(msgTooLong)
 	}
 	return
 }
 
-func ValidateWord(word string) (err error) {
+// Replaces dangerous HTML characters with respective encoding
+func EscapeHtml(text string) string {
+	return html.EscapeString(text)
+}
+
+// ValidateMessage checks a text for presence of bad strings forms
+func ValidateMessage(text string) (err error) {
+	// Disallow --, and __ in name
+	s := RemoveAllSpaces(text)
+	if ContainsSub(s, "--", "__", "..", ".-", "-_", "._") {
+		return NewError(msgInvalid)
+	}
+	// Allow following chars by hiding them at this point
+	chars := strings.Split("._-,?;:\"/%#()+=*@!$&'", "")
+	s = StripChars(s, chars...)
+	// screen for aphabets and or numbers only
+	err = v.Var(s, "alphanum")
+	if err != nil {
+		log.Log(s)
+		// return NewError(msgInvalid)
+		return NewError("NOT ALPHANUM!!!!!!!!!")
+	}
+	if v.Var(text, "gte=1") != nil { // use the orginal text here
+		return NewError(msgTooShort)
+	}
+	if v.Var(text, "lte=500") != nil {
+		return NewError(msgTooLong)
+	}
 	return
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"net/http"
 	"time"
 
@@ -23,16 +22,15 @@ type Session_ struct {
 func GetCookie(r *http.Request, x string) (cookie *http.Cookie, err error) {
 	cookie, err = r.Cookie(x)
 	if err == http.ErrNoCookie {
-		Log(r.Cookies())
-		err = errors.New(Sprintf("cookie '%v' coud not be found.", x))
+		err = NewError(Sprintf("cookie '%v' coud not be found.", x))
 		return
 	}
 	if err != nil {
-		Log("cookie not found: ", err)
-		err = errors.New("cookie not found")
+		// Log("cookie not found: ", err)
+		err = NewError("cookie not found")
 		return
 	}
-	Log("Found token: ", cookie)
+	// Log("Found token: ", cookie)
 	return
 }
 
@@ -68,7 +66,7 @@ func UnsetCookie(w http.ResponseWriter, n string) (cookie *http.Cookie, err erro
 // creates a new session
 func (user *User) CreateSession() (session Session_, err error) {
 	if !(user.Id > 0 && len(user.Uuid) > 10) {
-		err = errors.New("incorrect user information")
+		err = NewError("incorrect user information")
 		return
 	}
 	stmt, err := Db.Prepare(
@@ -101,12 +99,12 @@ func Session(w http.ResponseWriter, r *http.Request) (session Session_, err erro
 	session.Uuid = cookie.Value
 	ok, err := session.Check()
 	if err != nil {
-		Log(err)
-		err = errors.New("session not found")
+		// Log(err)
+		err = NewError("session not found")
 		return
 	}
 	if ok == false {
-		err = errors.New("invalid sessions")
+		err = NewError("invalid sessions")
 		return
 	}
 	return

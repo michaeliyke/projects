@@ -22,20 +22,20 @@ func TestEmailValidation(t *testing.T) {
 		"JaneDoe@email.com", "Jane.Doe@email.com", "Jane-Doe@email.com",
 	}
 	for _, email := range emails {
-		_, err := ValidateEmail(strings.TrimSpace(email))
+		err := ValidateEmail(strings.TrimSpace(email))
 		if err != nil {
 			t.Errorf("cannot detect correct email: %v", email)
 		}
 	}
 	for _, email := range emailsX {
-		_, err := ValidateEmail(strings.TrimSpace(email))
+		err := ValidateEmail(strings.TrimSpace(email))
 		if err == nil {
 			t.Errorf("cannot detect invalid email: %v", email)
 		}
 	}
 }
 
-func TestUserAuth(t *testing.T) {
+func TestAccountLogin(t *testing.T) {
 	var mux *http.ServeMux = http.NewServeMux()
 	var writer *httptest.ResponseRecorder = httptest.NewRecorder()
 	var json_ io.Reader = strings.NewReader(
@@ -44,13 +44,13 @@ func TestUserAuth(t *testing.T) {
 			"password": "usually",
 		}`,
 	)
-	mux.HandleFunc("/user/auth/", func(w http.ResponseWriter, r *http.Request) {
-		email, _ := ValidateEmail(strings.TrimSpace(r.PostFormValue("email")))
-		password := Encrypt(r.PostFormValue("password"))
-		keepLogged := r.PostFormValue("keep-login") == "on"
+	mux.HandleFunc("/account/login/", func(w http.ResponseWriter, r *http.Request) {
 		user := &MockUser{
-			Email: email, Password: password, KeepLogged: keepLogged,
+			Email:      "iou@gm.org",
+			Password:   "secretes",
+			KeepLogged: false,
 		}
+
 		UserHandler(w, r, user)
 		if user.Id != 2021 {
 			t.Fatal("TestUserAuth failed")
@@ -138,37 +138,3 @@ func TestUserDelete(t *testing.T) {
 		t.FailNow()
 	}
 }
-
-func TestUserLogout(t *testing.T) {
-	var json io.Reader = strings.NewReader(
-		`{
-			"name": "Ikechukwu Chukwuma",
-			"email": "okeysajogwuoke@gmail.com",
-			"password": "usually"
-		}`,
-	)
-	var user MockUser = MockUser{}
-	var mux *http.ServeMux = http.NewServeMux()
-	var writer *httptest.ResponseRecorder = httptest.NewRecorder()
-	var request *http.Request = httptest.NewRequest("GET", "/user/logout", json)
-	mux.HandleFunc("/user/", UserHandler(&user))
-	mux.ServeHTTP(writer, request)
-}
-
-/*
-func TestUserVerify(t *testing.T) {
-	var json io.Reader = strings.NewReader(
-		`{
-			"name": "Ikechukwu Chukwuma",
-			"email": "okeysajogwuoke@gmail.com",
-			"password": "usually"
-		}`,
-	)
-	var user MockUser = MockUser{}
-	var mux *http.ServeMux = http.NewServeMux()
-	var writer *httptest.ResponseRecorder = httptest.NewRecorder()
-	var request *http.Request = httptest.NewRequest("GET", "/user/confirm/", json)
-	mux.HandleFunc("/user/", UserHandler(&user))
-	mux.ServeHTTP(writer, request)
-}
-*/

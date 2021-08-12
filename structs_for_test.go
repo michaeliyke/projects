@@ -1,6 +1,9 @@
 package main
 
-import "time"
+import (
+	"net/http"
+	"time"
+)
 
 /*
 	All the test structs will be written here.
@@ -18,9 +21,18 @@ type MockUser struct {
 	KeepLogged bool      `json:"keep-login"`
 }
 
-func (u *MockUser) Verify() (err error) {
+func (u *MockUser) Authenticate(w http.ResponseWriter, r *http.Request) (err error) {
 	return
 }
+
+func (u *MockUser) CreateAcount(w http.ResponseWriter, r *http.Request) (err error) {
+	return
+}
+
+func (u *MockUser) UpdateAccount(w http.ResponseWriter, r *http.Request) (err error) {
+	return
+}
+
 func (u *MockUser) Create() (err error) {
 	return
 }

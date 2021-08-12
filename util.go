@@ -8,7 +8,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
+	"unicode"
 
 	. "github.com/michaeliyke/Golang/log"
 )
@@ -91,6 +93,69 @@ func AddTemplates(files []string, others ...string) []string {
 	return append(files, others...)
 }
 
+// Replaces every occurence of char found in s with repl
+func StrReplaceAny(s string, chars string, repl string) string {
+	for _, ch := range strings.Split(chars, "") {
+		s = strings.ReplaceAll(s, ch, repl)
+	}
+	return s
+}
+
+// Strips out all occurence of individual chars or group thereof from a string
+func StripChars_(s string, chars ...string) string {
+	for _, ch := range chars {
+		s = strings.ReplaceAll(s, ch, "")
+	}
+	return s
+}
+
+// StripChar removes the specified rune from s and returns what is left
+func StripChar(s, ch string) string {
+	return strings.Map(func(r rune) rune {
+		if strings.IndexRune(ch, r) < 0 {
+			return r
+		}
+		return -1
+	}, s)
+}
+
+// StripChars removes each of the runes chars from s and returns what is left
+func StripChars(s string, chars ...string) string {
+	for _, ch := range chars {
+		s = StripChar(s, ch)
+	}
+	return s
+}
+
+// ContainsSub checks if any of chars is present in s.
+// ContainsSub(s, "f", "foo", "bar", "baz", ...)
+func ContainsSub(s string, chars ...string) (b bool) {
+	for _, ch := range chars {
+		if strings.Contains(s, ch) {
+			b = true
+			break
+		}
+	}
+	return b
+}
+
+// RemoveNewLines replaces all new lines runes with single spaces
+func RemoveNewLines(s string) string {
+	re := regexp.MustCompile(`\r?\n`) // \r\n, \n, \r
+	return re.ReplaceAllString(s, " ")
+}
+
+// RemoveAllSpaces removes all white spaces in a string
+func RemoveAllSpaces(s string) string {
+	return strings.Map(func(r rune) rune {
+		if unicode.IsSpace(r) {
+			return -1
+		}
+		return r
+	}, s)
+}
+
+// Contains checks if a string is present as an element in an array of strings
 func Contains(array []string, s string) (present bool) {
 	for _, element := range array {
 		if element == s {
@@ -111,7 +176,11 @@ func UnloadTemplates(files, junks []string) []string {
 	return files_
 }
 
-func GenerateHTML(w http.ResponseWriter, data interface{}, filenames ...string) {
+func GenerateHTML(w http.ResponseWriter, data *Payload, filenames ...string) {
+	if data == nil {
+		Fatal("valid payload object required")
+		return
+	}
 	var files []string
 	for _, filename := range filenames {
 		files = append(files, Sprintf("templates/%s.html", filename))
@@ -133,6 +202,10 @@ func ParseTemplateFiles(filenames ...string) (t *template.Template) {
 func ErrorMessage(w http.ResponseWriter, r *http.Request, message string) {
 	url := Sprintf("/errpg?m=%v", message)
 	http.Redirect(w, r, url, http.StatusFound)
+}
+
+func InfoMessage(w http.ResponseWriter, r *http.Request, message string) {
+	ErrorMessage(w, r, message)
 }
 
 func LoadConfigs() {

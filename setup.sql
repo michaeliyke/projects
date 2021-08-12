@@ -1,9 +1,13 @@
-DROP TABLE posts;
-DROP TABLE threads;
-DROP TABLE sessions;
-DROP TABLE users;
+/* 
+    psql –f setup.sql –d chitchat
+    psql -U gwp -d gwp -c "TRUNCATE public.posts RESTART IDENTITY CASCADE;" 
+ */
+DROP TABLE IF EXISTS posts;
+DROP TABLE IF EXISTS threads;
+DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS users;
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     uuid VARCHAR(64) NOT NULL UNIQUE,
     name VARCHAR(255),
@@ -12,7 +16,7 @@ CREATE TABLE users (
     created_at TIMESTAMP NOT NULL
 );
 
-CREATE TABLE sessions (
+CREATE TABLE IF NOT EXISTS sessions (
     id SERIAL PRIMARY KEY,
     uuid VARCHAR(64) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -20,7 +24,7 @@ CREATE TABLE sessions (
     created_at TIMESTAMP NOT NULL
 );
 
-CREATE TABLE threads (
+CREATE TABLE IF NOT EXISTS threads (
     id SERIAL PRIMARY KEY,
     uuid VARCHAR(64) NOT NULL UNIQUE,
     topic TEXT,
@@ -28,7 +32,7 @@ CREATE TABLE threads (
     created_at TIMESTAMP NOT NULL
 );
 
-CREATE TABLE posts (
+CREATE TABLE IF NOT EXISTS posts (
     id SERIAL PRIMARY KEY,
     uuid VARCHAR(64) NOT NULL UNIQUE,
     body TEXT,

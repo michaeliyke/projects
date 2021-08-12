@@ -1,5 +1,5 @@
 {{define "main_nav"}}
-{{ $pipeline := . }}
+{{ $load := . }}
     <nav id="nav" class="main-nav">
     
         <ul>
@@ -11,8 +11,8 @@
             <li class="main-menu"><a href="https://michaeliyke.com/">Portfolio</a> </li>
             <li class="main-menu"><a href="#">Blog</a></li>
             <li class="main-menu"><a href="#">survey app</a></li>
-            <li class="main-menu"><a href="/contact-us/">Help</a></li>
-            {{ if and  $pipeline $pipeline.IsUser $pipeline.IsAdmin}}
+            <li class="main-menu"><a href="/help/">Help</a></li>
+            {{ if and  $load $load.IsUser $load.IsAdmin}}
             <li class="main-menu" data-role="projects-menu">
                 <span data-role="projects-toggler" class="projects-toggler slide-open">&#9776;</span>
             </li>

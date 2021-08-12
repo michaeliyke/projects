@@ -1,5 +1,5 @@
 {{ define "layout" }}
-{{ $pipeline := . }}
+{{ $load := . }}
 
 <!DOCTYPE html>
 <html>
@@ -9,7 +9,7 @@
 
     <div id="main">
         <h1>ERROR PAGE</h1>
-        <h2>{{ $pipeline.ErrorMessage }}</h2>
+        <h2>{{ $load.ErrorMessage }}</h2>
     </div>
 
 </body>

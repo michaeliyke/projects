@@ -25,11 +25,11 @@ func main() {
 	mux.HandleFunc("/user/comments/", Comments)
 	mux.HandleFunc("/", Index)                 // 01
 	mux.HandleFunc("/account/signup/", SignUp) // 02
-	mux.HandleFunc("/contact-us/", ContactUs)
+	mux.HandleFunc("/help/", Help)
 	mux.HandleFunc("/client/chat/", Chat)
 	mux.HandleFunc("/account/login/", LogIn) // 03
 	mux.HandleFunc("/user/feedback/", Feedback)
-	mux.HandleFunc("/account/preferences/", AccountUpdate)
+	mux.HandleFunc("/account/update/", AccountUpdate)
 	mux.HandleFunc("/app/manage/", ManageRecords)
 
 	if port == "" || port == "5000" {

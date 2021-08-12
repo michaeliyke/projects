@@ -12,18 +12,21 @@ import (
 	. "github.com/michaeliyke/Golang/log"
 )
 
+/*
+	The User Struct
+*/
 type User struct {
 	Id         int       `json:"id"`
-	Email      string    `json:"email"`
-	Name       string    `json:"name"`
-	Uuid       string    `json:"uuid"`
-	Password   string    `json:"password"`
+	Email      string    `json:"email" validate:"required,email,lte=4,gte=254"`
+	Name       string    `json:"name" validate:"required"`
+	Uuid       string    `json:"uuid" validate:"required"`
+	Password   string    `json:"password" validate:"required"`
 	KeepLogged bool      `json:"keep_login"`
 	Privileges []string  `json:"privileges"`
 	CreatedAt  time.Time `json:"created_at"`
 }
 
-// perfom actual auth chores
+// Performs user authentication chores
 func (user *User) Authenticate(w http.ResponseWriter, r *http.Request) (err error) {
 	err = user.GetByEmail()
 	if err != nil {
@@ -42,10 +45,12 @@ func (user *User) Authenticate(w http.ResponseWriter, r *http.Request) (err erro
 	return
 }
 
+// Performs user logout chores
 func (user *User) Logout(w http.ResponseWriter, r *http.Request) (err error) {
 	return UserLogout(w, r)
 }
 
+// Effects user logout
 func UserLogout(w http.ResponseWriter, r *http.Request) (err error) {
 	cookie, err := GetCookie(r, config.AuthCookieName)
 	if err == nil {
@@ -57,7 +62,7 @@ func UserLogout(w http.ResponseWriter, r *http.Request) (err error) {
 	return
 }
 
-// perfom actual account creation chores
+// Perfom account creation chores
 func (user *User) CreateAcount(w http.ResponseWriter, r *http.Request) (err error) {
 	// check if user exists using temporary data
 	err = user.GetByEmail()
@@ -74,7 +79,12 @@ func (user *User) CreateAcount(w http.ResponseWriter, r *http.Request) (err erro
 	return // user has been created successfully
 }
 
-// fetches user with the given id
+// Performs account update chores
+func (user *User) UpdateAccount(w http.ResponseWriter, r *http.Request) (err error) {
+	return
+}
+
+// Fetches user with the given id from the database
 func (u *User) Fetch(id int) (err error) {
 	err = Db.QueryRow(`
 		SELECT id, email, name, uuid, password, privileges, created_at
@@ -87,7 +97,7 @@ func (u *User) Fetch(id int) (err error) {
 	return
 }
 
-// cretes a new user
+// Creates a new user in the database
 func (user *User) Create() (err error) {
 	stmt, err := Db.Prepare(
 		`INSERT INTO users (email, name, uuid, password, privileges, created_at)
@@ -108,7 +118,7 @@ func (user *User) Create() (err error) {
 	return
 }
 
-// updates a user's information
+// Updates a user's information in the database
 func (user *User) Update() (err error) {
 	_, err = Db.Exec(
 		`UPDATE users SET email = $2, name = $3, uuid = $4, password = $5, 
@@ -119,13 +129,13 @@ func (user *User) Update() (err error) {
 	return
 }
 
-// deletes a user
+// Deletes a user from the database
 func (user *User) Delete() (err error) {
 	_, err = Db.Exec(`DELETE FROM users WHERE id = $1`, user.Id)
 	return
 }
 
-// fetch all users
+// Fetch all users in the database
 func Users() (users []User, err error) {
 	rows, err := Db.Query(
 		`SELECT id, email, name, uuid, password, privileges, created_at 
@@ -149,7 +159,7 @@ func Users() (users []User, err error) {
 	return
 }
 
-// gets user by email address
+// Gets a user from the database by their email address
 func (user *User) GetByEmail() (err error) {
 	stmt, err := Db.Prepare(
 		`SELECT id, email, name, uuid, password, privileges, created_at
@@ -165,7 +175,7 @@ func (user *User) GetByEmail() (err error) {
 	return // err is nil or ErrNoRows
 }
 
-// gets user by uuid
+// Gets a user from the database by their uuid
 func (user *User) GetByUUID() (err error) {
 	err = Db.QueryRow(
 		`SELECT id, email, name, uuid, password, privileges, created_at
@@ -176,7 +186,7 @@ func (user *User) GetByUUID() (err error) {
 	return
 }
 
-// Facilitates fetch of a given user or user id
+// Effects user fetch
 func UserGET(w http.ResponseWriter, r *http.Request, u IUser) (err error) {
 	id, err := strconv.Atoi(path.Base(r.URL.Path))
 	if err != nil {
@@ -198,7 +208,7 @@ func UserGET(w http.ResponseWriter, r *http.Request, u IUser) (err error) {
 	return
 }
 
-// facilitates create of a given user
+// Effects user create
 func UserPOST(w http.ResponseWriter, r *http.Request, u IUser) (err error) {
 	leng := r.ContentLength
 	body := make([]byte, leng)
@@ -213,7 +223,7 @@ func UserPOST(w http.ResponseWriter, r *http.Request, u IUser) (err error) {
 	return
 }
 
-// facilitates update a givenn user
+// Effects user update
 func UserPUT(w http.ResponseWriter, r *http.Request, u IUser) (err error) {
 	id, err := strconv.Atoi(path.Base(r.URL.Path))
 	if err != nil {
@@ -239,7 +249,7 @@ func UserPUT(w http.ResponseWriter, r *http.Request, u IUser) (err error) {
 	return
 }
 
-// facilitates delete of a given user
+// Effects user delete
 func UserDELETE(w http.ResponseWriter, r *http.Request, u IUser) (err error) {
 	id, err := strconv.Atoi(path.Base(r.URL.Path))
 	if err != nil {
