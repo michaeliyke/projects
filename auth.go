@@ -3,8 +3,6 @@ package main
 import (
 	"net/http"
 	"time"
-
-	. "github.com/michaeliyke/Golang/log"
 )
 
 // Create user account

@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-
-	. "github.com/michaeliyke/Golang/log"
 )
 
 func GetIpAddress(r *http.Request) string {

@@ -12,7 +12,7 @@ import (
 	"strings"
 	"unicode"
 
-	. "github.com/michaeliyke/Golang/log"
+	log_ "github.com/michaeliyke/Golang/log"
 )
 
 type Configurations struct {
@@ -26,6 +26,10 @@ type Configurations struct {
 var config Configurations
 var logger *log.Logger
 var port string
+var Log = log_.Log
+var Fatal = log_.Fatal
+var Sprintf = log_.Sprintf
+var Println = log_.Println
 
 func init() {
 	LoadConfigs()

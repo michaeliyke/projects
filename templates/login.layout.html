@@ -17,7 +17,7 @@
     </section>
 </div>
 <div class="form-wrapper">
-    <form action="/account/login/" method="POST" class="account form" enctype="application/x-www-form-urlencoded">
+    <form action="/account/login/?{{.Action}}" method="POST" class="account form" enctype="application/x-www-form-urlencoded">
         <div class="form-control">
             <label for="email" class="lable">Email</label>
             <input type="email" name="email" class="control" />

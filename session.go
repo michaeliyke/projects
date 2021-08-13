@@ -5,8 +5,6 @@ import (
 	"time"
 
 	"github.com/lib/pq"
-
-	. "github.com/michaeliyke/Golang/log"
 )
 
 type Session_ struct {

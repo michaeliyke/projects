@@ -3,8 +3,6 @@ package main
 import (
 	"net/http"
 	"strings"
-
-	. "github.com/michaeliyke/Golang/log"
 )
 
 type UserMiddleware struct{}
@@ -13,24 +11,20 @@ func (user *UserMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	//
 }
 
-/*
-	The M type specifies request methods and their handlers for an endpoint.
-
-	It's a map of request methods to their respecive handlers on an endpoint,
-	one for each.
-
-	Only specified entries are considerd to be allowed.
-	Request whose entries are not present are treated as error
-*/
+// The M type specifies request methods and their handlers for an endpoint.
+//
+// It's a map of request methods to their respecive handlers on an endpoint,
+// one for each.
+//
+// Only specified entries are considerd to be allowed.
+// Request whose entries are not present are treated as error
 type M map[string]func(w http.ResponseWriter, r *http.Request)
 
-/*
-Routes all requests: POST, GET, PATCH, PUT, DELETE, HEAD, OPTIONS, etc
-to matching handlers.
-All requests on a route are disallowed by default except its a GET.
-If it's a GET and no handler is found, it's directed to 404.
-For others, if handler is not found, disallowed header is issued
-*/
+// Routes all requests: POST, GET, PATCH, PUT, DELETE, HEAD, OPTIONS, etc
+// to matching handlers.
+// All requests on a route are disallowed by default except its a GET.
+// If it's a GET and no handler is found, it's directed to 404.
+// For others, if handler is not found, disallowed header is issued
 func Multiplex(routes M, route string, w http.ResponseWriter, r *http.Request) {
 	CheckRoute(w, r, route)
 	var routed bool
@@ -52,9 +46,18 @@ func Multiplex(routes M, route string, w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// RouteTo reroutes a path to another
+//
+// Returns http.HandlerFunc
+func RouteTo(route string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		Log(Marshal(r.URL.Query()))
+		http.Redirect(w, r, IncludeURIParts(route, r), http.StatusFound)
+	}
+}
+
 // Index router - "/"
 func Index(w http.ResponseWriter, r *http.Request) {
-	Log("Index router - '/' ")
 	mult := M{"GET": ServeIndex}
 	Multiplex(mult, "/", w, r)
 }

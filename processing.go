@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
-	. "github.com/michaeliyke/Golang/log"
 )
 
 // Processes user login - /account/login/
@@ -40,7 +38,8 @@ func ProcessUserAuth(w http.ResponseWriter, r *http.Request) {
 		ErrorMessage(w, r, err.Error())
 		return
 	}
-	http.Redirect(w, r, "/", http.StatusFound)
+	Log("ProcessUserAuth ------------------- ", Marshal(Queries(r)))
+	RedirectToReferer(w, r)
 	return
 }
 

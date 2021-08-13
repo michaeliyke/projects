@@ -2,8 +2,6 @@ package main
 
 import (
 	"net/http"
-
-	. "github.com/michaeliyke/Golang/log"
 )
 
 func main() {

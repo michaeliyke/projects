@@ -6,11 +6,13 @@ type Payload struct {
 	IsUser         bool
 	IsOwner        bool
 	IsLogged       bool
-	authorization  string
-	authorizations []string
-	privilege      string
-	privileges     []string
 	ErrorMessage   string
+	privilege      string
+	authorization  string
+	Referer        string
+	Action         string
+	privileges     []string
+	authorizations []string
 	Session        Session_
 }
 
