@@ -127,3 +127,9 @@ func ManageRecords(w http.ResponseWriter, r *http.Request) {
 	mult := M{"GET": ServeManageRecords}
 	Multiplex(mult, "/app/manage/", w, r)
 }
+
+// Record management router - /app/manage/
+func T(w http.ResponseWriter, r *http.Request) {
+	mult := M{"GET": ServeT}
+	Multiplex(mult, "/t/", w, r)
+}

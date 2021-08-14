@@ -97,6 +97,24 @@ func AddTemplates(files []string, others ...string) []string {
 	return append(files, others...)
 }
 
+// ListTemplates takes a single string s containing all the file names
+// It then creates a string array of these file names.
+// If there's no default layout file provided, general.layout is included
+func ListTemplates(s string) (files []string) {
+	fileNames := strings.Split(s, ",")
+	layoutAbsent := true
+	for _, filefileName := range fileNames {
+		if ContainsSub(filefileName, ".layout") {
+			layoutAbsent = false
+		}
+		files = append(files, strings.TrimSpace(filefileName))
+	}
+	if layoutAbsent {
+		fileNames = append(fileNames, "general.layout")
+	}
+	return files
+}
+
 // Replaces every occurence of char found in s with repl
 func StrReplaceAny(s string, chars string, repl string) string {
 	for _, ch := range strings.Split(chars, "") {
@@ -131,7 +149,7 @@ func StripChars(s string, chars ...string) string {
 	return s
 }
 
-// ContainsSub checks if any of chars is present in s.
+// ContainsSub checks if any of substrings is present in s.
 // ContainsSub(s, "f", "foo", "bar", "baz", ...)
 func ContainsSub(s string, chars ...string) (b bool) {
 	for _, ch := range chars {

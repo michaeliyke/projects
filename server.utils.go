@@ -5,13 +5,6 @@ import (
 	"net/url"
 )
 
-// head, general.header, silent.nav, main.nav,catalog.nav, general.layout,
-// footer
-var files []string = []string{
-	"head", "general.header", "silent.nav", "main.nav",
-	"catalog.nav", "general.layout", "footer",
-}
-
 // Queries retrieves all the items in the query string - 0 depth only
 // Returns url.Values map, call its .Encode() method to get it as string
 func Queries(r *http.Request) url.Values {

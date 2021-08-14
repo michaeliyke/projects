@@ -6,8 +6,8 @@ import (
 
 // Serves the 404 page
 func Serve404(w http.ResponseWriter, r *http.Request) {
-	files := UnloadTemplates(files, []string{"catalog.nav", "general.layout"})
-	files = AddTemplates(files, "errpg.layout")
+	s := "head, general.header, silent.nav, main.nav, footer, errpg.layout"
+	files := ListTemplates(s)
 	var load *Payload = InitPayload(&Payload{
 		ErrorMessage: r.URL.Query().Get("m"),
 	})
@@ -17,10 +17,8 @@ func Serve404(w http.ResponseWriter, r *http.Request) {
 
 // ServeS the ErrPg page
 func ServeErrPg(w http.ResponseWriter, r *http.Request) {
-	files := UnloadTemplates(files, []string{
-		"catalog.nav", "general.layout",
-	})
-	files = AddTemplates(files, "errpg.layout", "head")
+	s := "general.header, silent.nav, main.nav, footer, errpg.layout, head"
+	files := ListTemplates(s)
 	m := r.URL.Query().Get("m")
 	if m == "" {
 		// Log("Message is empty")
@@ -28,7 +26,18 @@ func ServeErrPg(w http.ResponseWriter, r *http.Request) {
 	}
 	// Log(files)
 	var load *Payload = InitPayload(&Payload{
-		ErrorMessage: r.URL.Query().Get("m"),
+		ErrorMessage: m,
+	})
+	GenerateHTML(w, load, files...)
+	return
+}
+
+// ServeS the ErrPg page
+func ServeT(w http.ResponseWriter, r *http.Request) {
+	files := ListTemplates("t.layout, head, silent.nav, main.nav")
+	m := "This is some error message"
+	var load *Payload = InitPayload(&Payload{
+		ErrorMessage: m,
 	})
 	GenerateHTML(w, load, files...)
 	return
@@ -43,10 +52,7 @@ func ServeSignUp(w http.ResponseWriter, r *http.Request) {
 		RedirectTo("/", w, r)
 		return
 	}
-	files := UnloadTemplates(files, []string{
-		"general.header", "catalog.nav", "general.layout",
-	})
-	files = AddTemplates(files, "signup.layout")
+	files := ListTemplates("head, silent.nav, main.nav, footer, signup.layout")
 	if err != nil {
 		// Log(err)
 		GenerateHTML(w, &Payload{}, files...)
@@ -63,23 +69,20 @@ func ServeLogin(w http.ResponseWriter, r *http.Request) {
 	session, err := Session(w, r)
 	// check if user has a sesion set, retrieve if so
 	referer := Queries(r).Encode()
-	action := "/account/login/"
+	// action := "/account/login/"
 	if referer != "" {
-		action = Sprintf("/account/login?%v", referer)
+		// action = Sprintf("/account/login?%v", referer)
 	}
 	load := InitPayload(&Payload{
 		Session: session,
 		Referer: referer,
-		Action:  action,
+		action:  "menu",
 	})
 	if load.IsLogged {
 		RedirectToReferer(w, r)
 		return
 	}
-	files := UnloadTemplates(files, []string{
-		"general.header", "catalog.nav", "general.layout",
-	})
-	files = AddTemplates(files, "login.layout")
+	files := ListTemplates("head, silent.nav, main.nav, footer, login.layout")
 	if err != nil {
 		// Log(err)
 		GenerateHTML(w, &Payload{}, files...)
@@ -108,10 +111,8 @@ func ServeComments(w http.ResponseWriter, r *http.Request) {
 		RedirectTo("/login/", w, r)
 		return
 	}
-	files := UnloadTemplates(files, []string{
-		"catalog.nav", "general.layout",
-	})
-	files = AddTemplates(files, "comments.layout")
+	s := "head, general.header, silent.nav, main.nav, footer, comments.layout"
+	files := ListTemplates(s)
 	GenerateHTML(w, &Payload{}, files...)
 	return
 }
@@ -130,16 +131,16 @@ func ServeFeedback(w http.ResponseWriter, r *http.Request) {
 		RedirectWithReferer("/login/", w, r)
 		return
 	}
-	files := UnloadTemplates(files, []string{"catalog.nav", "general.layout"})
-	files = AddTemplates(files, "feedback.layout")
+	s := "head, general.header, silent.nav, main.nav, footer, feedback.layout"
+	files := ListTemplates(s)
 	GenerateHTML(w, load, files...)
 	return
 }
 
 // Serves the Help page
 func ServeHelp(w http.ResponseWriter, r *http.Request) {
-	files := UnloadTemplates(files, []string{"catalog.nav", "general.layout"})
-	files = AddTemplates(files, "help.layout")
+	s := "head, general.header, silent.nav, main.nav, footer, help.layout"
+	files := ListTemplates(s)
 	session, _ := Session(w, r)
 	// check if user has a sesion set, retrieve if so
 	load := InitPayload(&Payload{Session: session})
@@ -162,10 +163,8 @@ func ServeChat(w http.ResponseWriter, r *http.Request) {
 		RedirectTo("/login/", w, r)
 		return
 	}
-	files := UnloadTemplates(files, []string{
-		"catalog.nav", "general.layout",
-	})
-	files = AddTemplates(files, "chat.layout")
+	s := "head, general.header, silent.nav, main.nav, footer, chat.layout"
+	files := ListTemplates(s)
 	GenerateHTML(w, load, files...)
 	return
 }
@@ -184,8 +183,10 @@ func ServeManageRecords(w http.ResponseWriter, r *http.Request) {
 		RedirectTo("/login/", w, r)
 		return
 	}
-	files := UnloadTemplates(files, []string{"catalog.nav", "general.layout"})
-	files = AddTemplates(files, "managerecords.layout")
+	s := `
+	head, general.header, silent.nav, main.nav, footer, managerecords.layout
+	`
+	files := ListTemplates(s)
 	GenerateHTML(w, load, files...)
 	return
 }
@@ -203,8 +204,8 @@ func ServeUpdateProfile(w http.ResponseWriter, r *http.Request) {
 		RedirectTo("/login/", w, r)
 		return
 	}
-	files := UnloadTemplates(files, []string{"catalog.nav", "general.layout"})
-	files = AddTemplates(files, "prefences.layout")
+	s := "head, general.header, silent.nav, main.nav, footer, prefences.layout"
+	files := ListTemplates(s)
 	GenerateHTML(w, load, files...)
 	return
 }
@@ -212,14 +213,9 @@ func ServeUpdateProfile(w http.ResponseWriter, r *http.Request) {
 // serves the index/home page
 func ServeIndex(w http.ResponseWriter, r *http.Request) {
 	GetReferer(r)
-	// additional files
-	files := AddTemplates(
-		files, "index.layout", "index.header", "torsor", "calculator",
-	)
-	// Remove unneeded files
-	files = UnloadTemplates(files, []string{
-		"general.layout", "general.header",
-	})
+	s := `head, silent.nav, main.nav, catalog.nav, footer, 
+	index.layout, index.header, torsor, calculator`
+	files := ListTemplates(s)
 	session, err := Session(w, r)
 	// check for and retrieve user session
 	load := InitPayload(&Payload{Session: session})

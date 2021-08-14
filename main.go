@@ -29,6 +29,7 @@ func main() {
 	mux.HandleFunc("/user/feedback/", Feedback)
 	mux.HandleFunc("/account/update/", AccountUpdate)
 	mux.HandleFunc("/app/manage/", ManageRecords)
+	mux.HandleFunc("/t/", T)
 
 	if port == "" || port == "5000" {
 		Log("$PORT var not set. ..")
