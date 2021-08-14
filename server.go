@@ -66,29 +66,18 @@ func ServeSignUp(w http.ResponseWriter, r *http.Request) {
 
 // Serves the feed back page
 func ServeLogin(w http.ResponseWriter, r *http.Request) {
-	session, err := Session(w, r)
+	session, _ := Session(w, r)
 	// check if user has a sesion set, retrieve if so
-	referer := Queries(r).Encode()
-	// action := "/account/login/"
-	if referer != "" {
-		// action = Sprintf("/account/login?%v", referer)
-	}
 	load := InitPayload(&Payload{
 		Session: session,
-		Referer: referer,
-		action:  "menu",
+		Referer: Queries(r).Encode(),
 	})
 	if load.IsLogged {
 		RedirectToReferer(w, r)
 		return
 	}
 	files := ListTemplates("head, silent.nav, main.nav, footer, login.layout")
-	if err != nil {
-		// Log(err)
-		GenerateHTML(w, &Payload{}, files...)
-	} else {
-		GenerateHTML(w, load, files...)
-	}
+	GenerateHTML(w, load, files...)
 	return
 }
 
@@ -119,9 +108,8 @@ func ServeComments(w http.ResponseWriter, r *http.Request) {
 
 // Serves the feed back page
 func ServeFeedback(w http.ResponseWriter, r *http.Request) {
-	GetReferer(r)
-	session, err := Session(w, r)
 	// check if user has a sesion set, retrieve if so
+	session, err := Session(w, r)
 	if err != nil {
 		RedirectWithReferer("/login/", w, r)
 		return
@@ -212,7 +200,6 @@ func ServeUpdateProfile(w http.ResponseWriter, r *http.Request) {
 
 // serves the index/home page
 func ServeIndex(w http.ResponseWriter, r *http.Request) {
-	GetReferer(r)
 	s := `head, silent.nav, main.nav, catalog.nav, footer, 
 	index.layout, index.header, torsor, calculator`
 	files := ListTemplates(s)

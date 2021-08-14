@@ -8,26 +8,20 @@ import (
 
 // Processes user login - /account/login/
 func ProcessUserAuth(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		Log("Form parsing failed----------- :", err)
-		ErrorMessage(w, r, "invalid information in form")
-		return
-	}
-	email := strings.TrimSpace(r.FormValue("email"))
-	err = ValidateEmail(email)
+	email := strings.TrimSpace(r.PostFormValue("email"))
+	err := ValidateEmail(email)
 	if err != nil {
 		Log("Email validation failed ------- :", err)
 		ErrorMessage(w, r, err.Error())
 		return
 	}
-	err = ValidatePassword(r.FormValue("password"))
+	err = ValidatePassword(r.PostFormValue("password"))
 	if err != nil {
 		Log("password validation failed-------- : ", err)
 		ErrorMessage(w, r, "invalid password")
 		return
 	}
-	keepLogged := r.FormValue("keep-login") == "on"
+	keepLogged := r.PostFormValue("keep-login") == "on"
 	user := User{
 		Email:      email,
 		KeepLogged: keepLogged,
@@ -38,7 +32,6 @@ func ProcessUserAuth(w http.ResponseWriter, r *http.Request) {
 		ErrorMessage(w, r, err.Error())
 		return
 	}
-	Log("ProcessUserAuth ------------------- ", Marshal(Queries(r)))
 	RedirectToReferer(w, r)
 	return
 }

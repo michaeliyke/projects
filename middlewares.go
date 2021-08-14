@@ -51,7 +51,6 @@ func Multiplex(routes M, route string, w http.ResponseWriter, r *http.Request) {
 // Returns http.HandlerFunc
 func RouteTo(route string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		Log(Marshal(r.URL.Query()))
 		http.Redirect(w, r, IncludeURIParts(route, r), http.StatusFound)
 	}
 }

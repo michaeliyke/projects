@@ -5,10 +5,19 @@ import (
 	"net/url"
 )
 
-// Queries retrieves all the items in the query string - 0 depth only
+// Queries retrieves the items in the query string - 0 depth only
 // Returns url.Values map, call its .Encode() method to get it as string
-func Queries(r *http.Request) url.Values {
-	params := url.Values{}
+// Hidden form input with name referer will take priority if it's not empty
+func Queries(r *http.Request) (params url.Values) {
+	// Retrieve the ref from form if available else proceed below
+	query := r.PostFormValue("query")
+	if query != "" {
+		params, _ = url.ParseQuery(query)
+		if params != nil {
+			return params
+		}
+	}
+	params = url.Values{}
 	for k, v := range r.URL.Query() {
 		if len(v) < 1 {
 			params.Add(k, "")
@@ -31,7 +40,7 @@ func IncludeURIParts(route string, r *http.Request) string {
 
 // GetQuery get a single query by named key
 func GetQuery(k string, r *http.Request) string {
-	return r.URL.Query().Get(k)
+	return Queries(r).Get(k)
 }
 
 // AddQuery adds a query to the provided query params using the k and the v
@@ -65,8 +74,8 @@ func RedirectTo(route string, w http.ResponseWriter, r *http.Request) {
 // RedirectWithReferer forwards a request with referer to another path.
 // The orginal referer is saved in the query string
 func RedirectWithReferer(route string, w http.ResponseWriter, r *http.Request) {
-	params := AddQuery("ref", r.URL.Path, Queries(r))
-	u := Sprintf("%v?%v", route, params.Encode())
+	query := AddQuery("ref", r.URL.Path, Queries(r))
+	u := Sprintf("%v?%v", route, query.Encode())
 	http.Redirect(w, r, u, http.StatusFound)
 }
 
@@ -76,21 +85,17 @@ func RedirectWithReferer(route string, w http.ResponseWriter, r *http.Request) {
 // It exracts and decodes the ref route from ref query param
 func RedirectToReferer(w http.ResponseWriter, r *http.Request) {
 	referred, referer := Referred(r)
-	Log("RedirectToReferer ------------ CALLED!")
+	Log("RedirectToReferer: ", Queries(r).Get("ref"))
+	Log("RedirectToReferer: ", referer, referred)
 	if referred {
-		Log("RedirectToRef - Ref: ", referer)
 		http.Redirect(w, r, referer, http.StatusFound)
+		return
 	}
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
-func DumpQuery(r *http.Request) {
-	Log(Marshal(r.URL.Query()))
-}
-
 func GetReferer(r *http.Request) (ref string) {
-	ref = r.URL.Query().Get("ref")
-	Log("GetReferer:- ", "REF: ", ref, ", PATH: ", r.URL.Path)
+	ref = Queries(r).Get("ref")
 	return ref
 }
 
@@ -98,6 +103,7 @@ func ClearReferer(r *http.Request) {
 	r.URL.Query().Del("ref")
 }
 
+// Referred reports if there's a referer either in the form or in the url
 func Referred(r *http.Request) (referred bool, ref string) {
 	ref = GetQuery("ref", r)
 	if len(ref) > 0 {
