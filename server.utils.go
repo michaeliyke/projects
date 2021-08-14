@@ -62,6 +62,16 @@ func CreateQuery(k, v string) url.Values {
 	return AddQuery(k, v, url.Values{})
 }
 
+// EncodeString will return the url encoded version of a string
+func EncodeString(s string) string {
+	return url.QueryEscape(s)
+}
+
+// DecodeString reverses a url encoded string to normal text
+func DecodeString(s string) (string, error) {
+	return url.QueryUnescape(s)
+}
+
 // RedirectTo pushes a traffic on a path to another at run time
 //
 // It saves the orginal path in the query string as ref
@@ -85,8 +95,6 @@ func RedirectWithReferer(route string, w http.ResponseWriter, r *http.Request) {
 // It exracts and decodes the ref route from ref query param
 func RedirectToReferer(w http.ResponseWriter, r *http.Request) {
 	referred, referer := Referred(r)
-	Log("RedirectToReferer: ", Queries(r).Get("ref"))
-	Log("RedirectToReferer: ", referer, referred)
 	if referred {
 		http.Redirect(w, r, referer, http.StatusFound)
 		return

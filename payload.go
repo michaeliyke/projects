@@ -10,6 +10,7 @@ type Payload struct {
 	privilege      string
 	authorization  string
 	Referer        string
+	Query          string
 	privileges     []string
 	authorizations []string
 	Session        Session_
