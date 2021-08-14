@@ -222,6 +222,8 @@ func ParseTemplateFiles(filenames ...string) (t *template.Template) {
 }
 
 func ErrorMessage(w http.ResponseWriter, r *http.Request, message string) {
+	query := Queries(r)
+	Log(query.Get("ref"))
 	url := Sprintf("/errpg?m=%v", message)
 	http.Redirect(w, r, url, http.StatusFound)
 }

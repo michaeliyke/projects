@@ -32,7 +32,7 @@
         </div>
         <div class="form-control checkbox-control">
             <span>
-                {{.Referer}}
+                {{if .Referer}}
                 <a href="/account/signup?{{.Referer}}">Create an Account </a>
                 {{else}}
                 <a href="/account/signup/">Create an Account </a>

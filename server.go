@@ -45,22 +45,18 @@ func ServeT(w http.ResponseWriter, r *http.Request) {
 
 // Serves the signup page
 func ServeSignUp(w http.ResponseWriter, r *http.Request) {
-	session, err := Session(w, r)
+	session, _ := Session(w, r)
 	// check for and retrieve user session
-	load := InitPayload(&Payload{Session: session})
+	load := InitPayload(&Payload{
+		Session: session,
+		Referer: Queries(r).Encode(),
+	})
 	if load.IsLogged {
 		RedirectTo("/", w, r)
 		return
 	}
 	files := ListTemplates("head, silent.nav, main.nav, footer, signup.layout")
-	if err != nil {
-		// Log(err)
-		GenerateHTML(w, &Payload{}, files...)
-	} else {
-		// Log(Marshal(load))
-		GenerateHTML(w, load, files...)
-
-	}
+	GenerateHTML(w, load, files...)
 	return
 }
 

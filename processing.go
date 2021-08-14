@@ -44,21 +44,21 @@ func ProcessHelp(w http.ResponseWriter, r *http.Request) {
 		ErrorMessage(w, r, "could not parse form")
 		return
 	}
-	email := strings.TrimSpace(r.FormValue("email"))
+	email := strings.TrimSpace(r.PostFormValue("email"))
 	err = ValidateEmail(email)
 	if err != nil {
 		Log("Email validation failed ------- :", err)
 		ErrorMessage(w, r, err.Error())
 		return
 	}
-	fullName := strings.TrimSpace(r.FormValue("fullname"))
+	fullName := strings.TrimSpace(r.PostFormValue("fullname"))
 	err = ValidateFullName(fullName)
 	if err != nil {
 		Log("Name validation failed--------- :", err)
 		ErrorMessage(w, r, err.Error())
 		return
 	}
-	message := strings.TrimSpace(r.FormValue("message"))
+	message := strings.TrimSpace(r.PostFormValue("message"))
 	err = ValidateMessage(message)
 	if err != nil {
 		Log("message validation failed--------- :", err)
@@ -112,28 +112,24 @@ func ProcessChat(w http.ResponseWriter, r *http.Request) {}
 
 // Processes signup - /account/signup/
 func ProcessSignUp(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
+	email := strings.TrimSpace(r.PostFormValue("email"))
+	err := ValidateEmail(email)
 	if err != nil {
-		Log("Form parsing failed ------- :", err)
-		ErrorMessage(w, r, "invalid information in form")
-		return
-	}
-	// Log("Form ok -----------------------------")
-	email := strings.TrimSpace(r.FormValue("email"))
-	err = ValidateEmail(email)
-	if err != nil {
-		Log("Email validation failed-------- :", err)
 		ErrorMessage(w, r, err.Error())
 		return
 	}
-	fullName := strings.TrimSpace(r.FormValue("fullname"))
+	fullName := strings.TrimSpace(r.PostFormValue("fullname"))
 	err = ValidateFullName(fullName)
 	if err != nil {
-		Log("Name validation failed--------- :", err)
 		ErrorMessage(w, r, err.Error())
 		return
 	}
-	password := Encrypt(r.FormValue("password"))
+	err = ValidatePassword(r.PostFormValue("password"))
+	if err != nil {
+		ErrorMessage(w, r, err.Error())
+		return
+	}
+	password := Encrypt(r.PostFormValue("password"))
 	var privileges []string = []string{"user"}
 	if email == "ymichaelc@gmail.com" {
 		privileges = []string{"user", "admin", "owner"}
@@ -148,17 +144,15 @@ func ProcessSignUp(w http.ResponseWriter, r *http.Request) {
 	}
 	err = user.CreateAcount(w, r)
 	if err != nil {
-		Log("Create Account Failed-------- :", err)
 		ErrorMessage(w, r, err.Error())
 		return
 	}
 	err = user.Authenticate(w, r)
 	if err != nil {
-		Log("User Auth Failed------------: ", err)
 		ErrorMessage(w, r, err.Error())
 		return
 	}
-	http.Redirect(w, r, "/", http.StatusFound)
+	RedirectToReferer(w, r)
 	return
 }
 
@@ -169,21 +163,21 @@ func ProcessFeedback(w http.ResponseWriter, r *http.Request) {
 		ErrorMessage(w, r, msgInvalid)
 		return
 	}
-	email := strings.TrimSpace(r.FormValue("email"))
+	email := strings.TrimSpace(r.PostFormValue("email"))
 	err = ValidateEmail(email)
 	if err != nil {
 		Log(err)
 		ErrorMessage(w, r, msgInvalid)
 		return
 	}
-	fullName := strings.TrimSpace(r.FormValue("fullname"))
+	fullName := strings.TrimSpace(r.PostFormValue("fullname"))
 	err = ValidateFullName(fullName)
 	if err != nil {
 		Log(err)
 		ErrorMessage(w, r, msgInvalid)
 		return
 	}
-	message := strings.TrimSpace(r.FormValue("fullname"))
+	message := strings.TrimSpace(r.PostFormValue("fullname"))
 	err = ValidateMessage(message)
 	if err != nil {
 		Log(err)
