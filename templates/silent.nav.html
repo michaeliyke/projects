@@ -32,11 +32,11 @@
             </div>
         </li>
         {{ end }}
-        <li><a href="/app/manage/">Manage</a></li>
-        <li><a href="/user/comments/">Comments</a></li>
+        <li><a href="/app/manage/" route="manage">Manage</a></li>
+        <li><a href="/user/comments/" route="comments">Comments</a></li>
         <!-- http://ultimateweb.gear.host/ -->
-        <li><a href="/user/feedback/">Feedback</a></li>
-        <li><a href="/client/chat/">CHAT</a></li>
+        <li><a href="/user/feedback/" route="feedback">Feedback</a></li>
+        <li><a href="/client/chat/" route="chat">CHAT</a></li>
 
         {{ if and $load $load.IsUser }}
         <li>
