@@ -6,6 +6,7 @@ import (
 
 // Serves the 404 page
 func Serve404(w http.ResponseWriter, r *http.Request) {
+	// Serve404 Serves the 404 page
 	s := "head, general.header, silent.nav, main.nav, footer, errpg.layout"
 	files := ListTemplates(s)
 	var load *Payload = InitPayload(&Payload{
@@ -90,12 +91,12 @@ func ServeComments(w http.ResponseWriter, r *http.Request) {
 	session, err := Session(w, r)
 	// check if user has a sesion set, retrieve if so
 	if err != nil {
-		RedirectTo("/login/", w, r)
+		RedirectWithReferer("/login/", w, r)
 		return
 	}
 	load := InitPayload(&Payload{Session: session})
 	if load.IsLogged != true {
-		RedirectTo("/login/", w, r)
+		RedirectWithReferer("/login/", w, r)
 		return
 	}
 	s := "head, general.header, silent.nav, main.nav, footer, comments.layout"
@@ -141,12 +142,12 @@ func ServeChat(w http.ResponseWriter, r *http.Request) {
 	session, err := Session(w, r)
 	// check if user has a sesion set, retrieve if so
 	if err != nil {
-		RedirectTo("/login/", w, r)
+		RedirectWithReferer("/login/", w, r)
 		return
 	}
 	load := InitPayload(&Payload{Session: session})
 	if load.IsLogged != true {
-		RedirectTo("/login/", w, r)
+		RedirectWithReferer("/login/", w, r)
 		return
 	}
 	s := "head, general.header, silent.nav, main.nav, footer, chat.layout"
@@ -159,18 +160,17 @@ func ServeChat(w http.ResponseWriter, r *http.Request) {
 // This page is for managing saved budget entries
 func ServeManageRecords(w http.ResponseWriter, r *http.Request) {
 	session, err := Session(w, r)
-	// check if user has a sesion set, retrieve if so
 	if err != nil {
-		RedirectTo("/login/", w, r)
+		RedirectWithReferer("/login/", w, r)
 		return
 	}
 	load := InitPayload(&Payload{Session: session})
 	if load.IsLogged != true {
-		RedirectTo("/login/", w, r)
+		RedirectWithReferer("/login/", w, r)
 		return
 	}
 	s := `
-	head, general.header, silent.nav, main.nav, footer, managerecords.layout
+	head, general.header, silent.nav, main.nav, footer, manage-records.layout
 	`
 	files := ListTemplates(s)
 	GenerateHTML(w, load, files...)
@@ -182,12 +182,12 @@ func ServeUpdateProfile(w http.ResponseWriter, r *http.Request) {
 	session, err := Session(w, r)
 	// check if user has a sesion set, retrieve if so
 	if err != nil {
-		RedirectTo("/login/", w, r)
+		RedirectWithReferer("/login/", w, r)
 		return
 	}
 	load := InitPayload(&Payload{Session: session})
 	if load.IsLogged != true {
-		RedirectTo("/login/", w, r)
+		RedirectWithReferer("/login/", w, r)
 		return
 	}
 	s := "head, general.header, silent.nav, main.nav, footer, prefences.layout"

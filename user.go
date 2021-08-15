@@ -11,10 +11,8 @@ import (
 	"github.com/lib/pq"
 )
 
-/*
-	The User Struct
-*/
 type User struct {
+	// The User Struct
 	Id         int       `json:"id"`
 	Email      string    `json:"email" validate:"required,email,lte=4,gte=254"`
 	Name       string    `json:"name" validate:"required"`
