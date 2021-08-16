@@ -1,5 +1,4 @@
-
-textarea{
+textarea {
     resize: none;
 }
 
@@ -100,6 +99,35 @@ textarea{
 
 .signup .form-control input {
     margin-top: 0.6em;
+}
+
+.rating {
+    font-size: 1.7rem;
+}
+
+.rates {
+    padding: 1rem;
+    padding-bottom: .3rem;
+    padding-top: .3rem;
+    margin-top: 1rem;
+    margin-right: 2rem;
+    display: inline-block;
+    border: 1px solid rgb(65, 160, 204);
+    background-color: #ffffff;
+}
+
+.rates:hover {
+    background-color: #dfe2e6;
+    cursor: pointer;
+}
+
+.rate {
+    background-color: #dfe2e6;
+    border: 1px solid rgb(240, 234, 234);
+}
+
+.rate:hover {
+    background-color: #0025b4;
 }
 
 @media screen and (max-width: 800px) {

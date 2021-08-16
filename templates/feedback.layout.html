@@ -20,16 +20,21 @@
         class="account form signup"
         enctype="application/x-www-form-urlencoded"
         >
+        <input type="hidden" name="rating" value="">
             <h2>Tell us how you feel</h2>
 
             <div class="form-control">
-                <label for="fullname" class="lable">Name</label>
-                <input type="text" name="fullname" class="control" placholder="Enter Name" />
-            </div>
-
-            <div class="form-control">
-                <label for="email" class="lable">Email address</label>
-                <input type="email" name="email" class="control" paceholder="Enter Email" />
+                <label for="email" class="lable">
+                    Rate your experince on the platform: 
+                    <span id="rate-text"> . .</span>
+                </label>
+                <div class="rating">
+                    <button level="1" type="button" class="rates">1</button> 
+                    <button level="2" type="button" class="rates">2</button> 
+                    <button level="3" type="button" class="rates">3</button>
+                    <button level="4" type="button" class="rates">4</button> 
+                    <button level="5" type="button" class="rates">5</button>
+                </div>
             </div>
 
             <div class="form-control">
@@ -47,7 +52,7 @@
             </div>
         </form>
     </div>
-    {{template "footer" . }}
+    <!-- {R{template "footer" . }R} -->
 
     <style>
         .signup.form.account {
