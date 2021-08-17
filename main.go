@@ -15,6 +15,7 @@ func main() {
 	mux.HandleFunc("/login/", RouteTo("/account/login/"))
 	mux.HandleFunc("/logout/", RouteTo("/account/logout/"))
 	mux.HandleFunc("/account/", RouteTo("/account/login/"))
+	mux.HandleFunc("/comments/", RouteTo("/user/comments/"))
 
 	// POST, PUT, GET, PATCH, OPTIONS, HEAD, DELETE, RENAME
 	mux.HandleFunc("/notfound/", NotFound)     // 001 404

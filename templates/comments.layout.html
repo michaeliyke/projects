@@ -15,28 +15,18 @@
     <div class="form-wrapper">
         <form novalidate action="/user/comments/" method="POST" class="account form signup"
             enctype="application/x-www-form-urlencoded">
-            <h2>Tell us how you feel</h2>
+            <h2>Share your thoughts below</h2>
 
             <div class="form-control">
-                <label for="fullname" class="lable">Name</label>
-                <input type="text" name="fullname" class="control" placholder="Enter Name" />
-            </div>
-
-            <div class="form-control">
-                <label for="email" class="lable">Email address</label>
-                <input type="email" name="fullname" class="control" paceholder="Enter Email" />
-            </div>
-
-            <div class="form-control">
-                <label for="fullname" class="lable">Message</label>
-                <textarea draggable="false" class="control" name="feedback" cols="30" rows="10"></textarea>
+                <label for="body" class="lable">Message</label>
+                <textarea autofocus draggable="false" class="control" name="body" cols="20" rows="10"></textarea>
             </div>
             <div class="form-control submit-control">
-                <input type="submit" name="submit" class="control" value="Submit feedback" />
+                <input type="submit" name="submit" class="control" value="Submit" />
             </div>
         </form>
     </div>
-    {{template "footer" . }}
+    <!-- {{template "footer" . }} -->
 
     <style>
         .signup.form.account {

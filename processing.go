@@ -109,7 +109,32 @@ func ProcessAccountUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 // Processes comments - /user/comments/
-func ProcessComments(w http.ResponseWriter, r *http.Request) {}
+func ProcessComments(w http.ResponseWriter, r *http.Request) {
+	body := strings.TrimSpace(r.PostFormValue("body"))
+	err := ValidateMessage(body)
+	if err != nil {
+		ErrorMessage(w, r, err.Error())
+		return
+	}
+	session, err := Session(w, r)
+	if err != nil {
+		ErrorMessage(w, r, err.Error())
+		return
+	}
+	comment := &CommentStruct{
+		UserUuid:  session.UserUuid,
+		Uuid:      CreateUuid(),
+		Body:      body,
+		CreatedAt: time.Now(),
+	}
+	err = SendComment(comment)
+	if err != nil {
+		ErrorMessage(w, r, err.Error())
+		return
+	}
+	RedirectTo("/user/comments/", w, r)
+	return
+}
 
 // Processes chat - /client/chat/
 func ProcessChat(w http.ResponseWriter, r *http.Request) {}

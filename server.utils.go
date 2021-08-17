@@ -72,11 +72,11 @@ func DecodeString(s string) (string, error) {
 	return url.QueryUnescape(s)
 }
 
-// RedirectTo pushes a traffic on a path to another at run time
+// RedirectTo pushes a traffic on a path to another at run time.
 //
-// It saves the orginal path in the query string as ref
+// It saves the orginal path in the query string as ref.
 //
-// route is expected to be a simple path string for now
+// Route is expected to be a simple path string for now.
 func RedirectTo(route string, w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, route, http.StatusFound)
 }
