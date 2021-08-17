@@ -58,19 +58,22 @@ func ProcessHelp(w http.ResponseWriter, r *http.Request) {
 		ErrorMessage(w, r, err.Error())
 		return
 	}
-	message := strings.TrimSpace(r.PostFormValue("body"))
-	err = ValidateMessage(message)
+	body := strings.TrimSpace(r.PostFormValue("body"))
+	err = ValidateMessage(body)
 	if err != nil {
 		Log("message validation failed--------- :", err)
 		ErrorMessage(w, r, err.Error())
 		return
 	}
 
+	session, _ := Session(w, r)
+
 	help := &HELPStruct{
 		Name:      fullName,
 		Email:     email,
+		UserUuid:  session.UserUuid,
 		Uuid:      CreateUuid(),
-		Message:   EscapeHtml(message),
+		Body:      EscapeHtml(body),
 		CreatedAt: time.Now(),
 	}
 
@@ -80,7 +83,8 @@ func ProcessHelp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	InfoMessage(w, r, "Thank you for contacting us. Our reply is on its way")
+	s := "Thank you for contacting us. Our response is on its way"
+	InfoMessage(w, r, s)
 	return
 }
 
@@ -191,7 +195,7 @@ func ProcessFeedback(w http.ResponseWriter, r *http.Request) {
 		ErrorMessage(w, r, err.Error())
 		return
 	}
-	s := "Thank you for contacting us. Our reply is on its way"
+	s := "Thanks for your feedback. Our response is on its way!"
 	InfoMessage(w, r, s)
 	return
 }

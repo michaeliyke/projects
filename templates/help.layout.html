@@ -19,12 +19,20 @@
             
             <div class="form-control">
                 <label for="fullname" class="lable">Name</label>
+                {{if not .IsLogged}}
                 <input type="text" name="fullname" class="control" placholder="Enter Name" />
+                {{else}}
+                <input value="{{.Session.User.Name}}" type="text" name="fullname" class="control" placholder="Enter Name" />
+                {{end}}
             </div>
 
             <div class="form-control">
                 <label for="email" class="lable">Email address</label>
+                {{if not .IsLogged}}
                 <input type="email" name="email" class="control" paceholder="Enter Email" />
+                {{else}}
+                <input value="{{.Session.User.Email}}" type="email" name="email" class="control" paceholder="Enter Email" />
+                {{end}}
             </div>
 
             <div class="form-control">

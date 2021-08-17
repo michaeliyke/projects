@@ -89,7 +89,6 @@ func ServeLogout(w http.ResponseWriter, r *http.Request) {
 // Serves the comments page
 func ServeComments(w http.ResponseWriter, r *http.Request) {
 	session, err := Session(w, r)
-	// check if user has a sesion set, retrieve if so
 	if err != nil {
 		RedirectWithReferer("/login/", w, r)
 		return
@@ -101,7 +100,7 @@ func ServeComments(w http.ResponseWriter, r *http.Request) {
 	}
 	s := "head, general.header, silent.nav, main.nav, footer, comments.layout"
 	files := ListTemplates(s)
-	GenerateHTML(w, &Payload{}, files...)
+	GenerateHTML(w, InitPayload(&Payload{Session: session}), files...)
 	return
 }
 

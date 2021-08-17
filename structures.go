@@ -39,8 +39,9 @@ type HELPStruct struct {
 	Id        int       `json:"id" validate:"isDefault"`
 	Name      string    `json:"name" validate:"required"`
 	Email     string    `json:"email" validate:"required,email"`
+	UserUuid  string    `json:"user_uuid" validate:"omitempty,uuid"`
 	Uuid      string    `json:"uuid" validate:"omitempty,uuid"`
-	Message   string    `json:"message" validate:"required"`
+	Body      string    `json:"body" validate:"required"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
@@ -62,15 +63,16 @@ type FeedbackStruct struct {
 func (help *HELPStruct) Save() (err error) {
 	// save to the main help table
 	stmt, err := Db.Prepare(
-		`INSERT INTO help(name, email, uuid, message, created_at) 
-		VALUES($1, $2, $3, $4, $5) RETURNING id`,
+		`INSERT INTO help(name, email, user_uuid, uuid, body, created_at) 
+		VALUES($1, $2, $3, $4, $5, $6) RETURNING id`,
 	)
 	if err != nil {
 		return NewError("cannot prepare query")
 	}
 	defer stmt.Close()
 	err = stmt.QueryRow(
-		&help.Name, &help.Email, &help.Uuid, help.Message, &help.CreatedAt,
+		&help.Name, &help.Email, &help.UserUuid, &help.Uuid, help.Body,
+		&help.CreatedAt,
 	).Scan(&help.Id)
 
 	// save to other tables
@@ -81,10 +83,11 @@ func (help *HELPStruct) Save() (err error) {
 func (feedback *FeedbackStruct) Save() (err error) {
 	// save to the main feedback table
 	stmt, err := Db.Prepare(
-		`INSERT INTO feedback(user_uuid, uuid, rating, body, created_at) 
+		`INSERT INTO feedbacks(user_uuid, uuid, rating, body, created_at) 
 		VALUES($1, $2, $3, $4, $5) RETURNING id`,
 	)
 	if err != nil {
+		Log(err)
 		return NewError("cannot prepare query")
 	}
 	defer stmt.Close()
