@@ -106,7 +106,7 @@ func ValidateMessage(text string) (err error) {
 	// screen for aphabets and or numbers only
 	err = v.Var(s, "alphanum")
 	if err != nil {
-		return NewError("NOT ALPHANUM!!!!!!!!!")
+		return NewError("NOT ALPHANUM!")
 	}
 	if v.Var(text, "gte=1") != nil { // use the orginal text here
 		return NewError(msgTooShort)

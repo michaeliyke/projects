@@ -79,10 +79,6 @@ func (help *HELPStruct) Save() (err error) {
 
 // Save to all subscribbing dbs database
 func (feedback *FeedbackStruct) Save() (err error) {
-	if true {
-		Log(Marshal(feedback))
-		return NewError("No way brother")
-	}
 	// save to the main feedback table
 	stmt, err := Db.Prepare(
 		`INSERT INTO feedback(user_uuid, uuid, rating, body, created_at) 
