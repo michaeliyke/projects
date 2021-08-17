@@ -24,16 +24,37 @@ func Error(message string) error {
 	return NewError(message)
 }
 
+type BROADCAST interface {
+	Save() error
+	NotifyAll() error
+	Broadcast() error
+}
+
 //
 // HelpStruct The struct for handling help information from the help page
 //
 // This creates and broadcasts a help message to subscribing dbs and mail
 type HELPStruct struct {
+	BROADCAST
 	Id        int       `json:"id" validate:"isDefault"`
 	Name      string    `json:"name" validate:"required"`
 	Email     string    `json:"email" validate:"required,email"`
 	Uuid      string    `json:"uuid" validate:"omitempty,uuid"`
 	Message   string    `json:"message" validate:"required"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+//
+// HelpStruct The struct for handling help information from the help page
+//
+// This creates and broadcasts a help message to subscribing dbs and mail
+type FeedbackStruct struct {
+	BROADCAST
+	Id        int       `json:"id"`
+	UserUuid  string    `json:"user_uuid"`
+	Uuid      string    `json:"uuid"`
+	Rating    int       `json:"rating"`
+	Body      string    `json:"body"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
@@ -56,8 +77,30 @@ func (help *HELPStruct) Save() (err error) {
 	return
 }
 
+// Save to all subscribbing dbs database
+func (feedback *FeedbackStruct) Save() (err error) {
+	if true {
+		Log(Marshal(feedback))
+		return NewError("No way brother")
+	}
+	// save to the main feedback table
+	stmt, err := Db.Prepare(
+		`INSERT INTO feedback(user_uuid, uuid, rating, body, created_at) 
+		VALUES($1, $2, $3, $4, $5) RETURNING id`,
+	)
+	if err != nil {
+		return NewError("cannot prepare query")
+	}
+	defer stmt.Close()
+	err = stmt.QueryRow(
+		&feedback.UserUuid, &feedback.Uuid, feedback.Rating,
+		&feedback.Body, &feedback.CreatedAt,
+	).Scan(&feedback.Id)
+	return
+}
+
 // notify all subscribing emails about the help raised
-func (help *HELPStruct) NotifyAll() (err error) {
+func NotifyAll(broadcast BROADCAST) (err error) {
 	return
 }
 
@@ -75,6 +118,17 @@ func (help *HELPStruct) Broadcast() (err error) {
 	return
 }
 
+func (feedback *FeedbackStruct) Broadcast() (err error) {
+	// Save to the database
+	err = feedback.Save()
+	if err != nil {
+		return
+	}
+	// Send mail to all subscribers
+	// err = help.NotifyAll()
+	return
+}
+
 //SendHelp is a single place to trigger the help process
 //
 // Simply provide it with the pointer to a *HelpStruct object and
@@ -83,4 +137,14 @@ func (help *HELPStruct) Broadcast() (err error) {
 // Return error message if failed or nil if succeessful
 func SendHelp(help *HELPStruct) (err error) {
 	return help.Broadcast()
+}
+
+//SendHe*lp is a single place to trigger the help process
+//
+// Simply provide it with the pointer to a *HelpStruct object and
+//  listen for response.
+//
+// Return error message if failed or nil if succeessful
+func SendFeedback(feedback *FeedbackStruct) (err error) {
+	return feedback.Broadcast()
 }

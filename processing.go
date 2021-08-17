@@ -58,7 +58,7 @@ func ProcessHelp(w http.ResponseWriter, r *http.Request) {
 		ErrorMessage(w, r, err.Error())
 		return
 	}
-	message := strings.TrimSpace(r.PostFormValue("message"))
+	message := strings.TrimSpace(r.PostFormValue("body"))
 	err = ValidateMessage(message)
 	if err != nil {
 		Log("message validation failed--------- :", err)
@@ -158,33 +158,41 @@ func ProcessSignUp(w http.ResponseWriter, r *http.Request) {
 
 // Processes feedback - /user/feedback/
 func ProcessFeedback(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
+	rating, err := String_2_Int(r.PostFormValue("rating"))
 	if err != nil {
-		ErrorMessage(w, r, msgInvalid)
+		ErrorMessage(w, r, "Invalid rating")
 		return
 	}
-	email := strings.TrimSpace(r.PostFormValue("email"))
-	err = ValidateEmail(email)
+	err = ValidateRating(rating)
 	if err != nil {
-		Log(err)
-		ErrorMessage(w, r, msgInvalid)
+		ErrorMessage(w, r, "Invaid rating")
 		return
 	}
-	fullName := strings.TrimSpace(r.PostFormValue("fullname"))
-	err = ValidateFullName(fullName)
+	body := strings.TrimSpace(r.PostFormValue("body"))
+	err = ValidateMessage(body)
 	if err != nil {
-		Log(err)
-		ErrorMessage(w, r, msgInvalid)
+		ErrorMessage(w, r, err.Error())
 		return
 	}
-	message := strings.TrimSpace(r.PostFormValue("fullname"))
-	err = ValidateMessage(message)
+	session, err := Session(w, r)
 	if err != nil {
-		Log(err)
-		ErrorMessage(w, r, msgInvalid)
+		ErrorMessage(w, r, err.Error())
 		return
 	}
-	err = SendHelp(&HELPStruct{Email: email, Name: fullName, Message: message})
+	feedback := &FeedbackStruct{
+		UserUuid:  session.UserUuid,
+		Uuid:      CreateUuid(),
+		Rating:    rating,
+		Body:      body,
+		CreatedAt: time.Now(),
+	}
+	err = SendFeedback(feedback)
+	if err != nil {
+		ErrorMessage(w, r, err.Error())
+		return
+	}
+	s := "Thank you for contacting us. Our reply is on its way"
+	InfoMessage(w, r, s)
 	return
 }
 

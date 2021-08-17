@@ -4,8 +4,6 @@ import (
 	"html"
 	"strings"
 
-	"github.com/michaeliyke/Golang/log"
-
 	"github.com/go-playground/validator/v10"
 	// "github.com/google/uuid"
 )
@@ -83,8 +81,20 @@ func EscapeHtml(text string) string {
 	return html.EscapeString(text)
 }
 
+// Ensure that a rating is a number between where 1 <= rating <= 5
+func ValidateRating(rating int) (err error) {
+	if !(1 <= rating && rating <= 5) {
+		return NewError("Invalid rating")
+	}
+	return
+}
+
 // ValidateMessage checks a text for presence of bad strings forms
 func ValidateMessage(text string) (err error) {
+	err = v.Var(text, "required")
+	if err != nil {
+		return NewError("Empty input!")
+	}
 	// Disallow --, and __ in name
 	s := RemoveAllSpaces(text)
 	if ContainsSub(s, "--", "__", "..", ".-", "-_", "._") {
@@ -96,8 +106,6 @@ func ValidateMessage(text string) (err error) {
 	// screen for aphabets and or numbers only
 	err = v.Var(s, "alphanum")
 	if err != nil {
-		log.Log(s)
-		// return NewError(msgInvalid)
 		return NewError("NOT ALPHANUM!!!!!!!!!")
 	}
 	if v.Var(text, "gte=1") != nil { // use the orginal text here

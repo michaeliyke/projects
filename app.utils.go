@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"unicode"
 
@@ -46,6 +47,16 @@ func init() {
 		"INFO",
 		log.Ldate|log.Ltime|log.Lshortfile,
 	)
+}
+
+// String_2_Int converts a string to a number (base 10)
+func String_2_Int(s string) (num int, err error) {
+	return strconv.Atoi(s)
+}
+
+// Int_2_String converts an integer (base 10) to a string
+func Int_2_String(num int) (s string) {
+	return strconv.Itoa(num)
 }
 
 func Note(r *http.Request) {
