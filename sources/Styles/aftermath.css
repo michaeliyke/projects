@@ -148,11 +148,10 @@ textarea {
 
 .avatar img {
     border-radius: 50%;
-    background: none;
 }
 
 .comment {
-    background-color: #f2f2f2;
+    background-color: #f2f2f28a;
     padding: 0.7em;
     border-radius: 0 10px 10px 10px;
     margin: 1rem;
@@ -186,4 +185,18 @@ textarea {
     border-radius: 0 15px 15px 15px;
 }
 
+.comment-footer {
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.comment-footer>span{
+    display: inline-block;
+    margin-left: 1rem;
+}
+.stats {
+    margin-right: 1rem;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
 @import url("/sources/Styles/break-points.css");
