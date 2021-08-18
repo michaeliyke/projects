@@ -6,8 +6,7 @@
 {{ $load := . }}
 
 <body class="root-body">
-
-    <div id="main">
+    <div id="main" class="container">
         {{ template "silent_nav" . }}
 
         {{ template "main_nav" . }}
@@ -19,7 +18,7 @@
 
             <div class="form-control">
                 <label for="body" class="lable">Message</label>
-                <textarea autofocus draggable="false" class="control" name="body" cols="20" rows="10"></textarea>
+                <textarea autofocuss draggable="false" class="control" name="body" cols="20" rows="10"></textarea>
             </div>
             <div class="form-control submit-control">
                 <input type="submit" name="submit" class="control" value="Submit" />
@@ -30,7 +29,7 @@
         {{range .Comments}}
         <article class="comment-details">
             <figure class="avatar">
-                <img src="" width="50" height="50" alt="commentor-avatar">
+                <img src="/sources/Images/avatar/a2.png" width="50" height="50" alt="commentor-avatar">
                 <figcaption></figcaption>
             </figure>
             <div class="comment">
