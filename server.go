@@ -101,12 +101,10 @@ func ServeComments(w http.ResponseWriter, r *http.Request) {
 	s := "head, general.header, silent.nav, main.nav, footer, comments.layout"
 	files := ListTemplates(s)
 	comments, err := GetComments()
-	Log("err: ", err)
 	payload := Payload{
 		Session:  session,
 		Comments: comments,
 	}
-	Log(Marshal(comments))
 	GenerateHTML(w, InitPayload(&payload), files...)
 	return
 }

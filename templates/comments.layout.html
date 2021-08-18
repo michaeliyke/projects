@@ -26,11 +26,36 @@
             </div>
         </form>
     </div>
-    <div class="comments">
+    <section class="comments">
         {{range .Comments}}
-        <p>{{.Body}}</p>
+        <article class="comment-details">
+            <figure class="avatar">
+                <img src="" width="50" height="50" alt="commentor-avatar">
+                <figcaption></figcaption>
+            </figure>
+            <div class="comment">
+                <div class="comment-header">
+                    <span class="commentor-name">Michael C. Iyke</span>
+                    <span class="comment-date">2d
+                         <span class="comment-options">...</span>
+                    </span>
+                </div>
+                <div class="comment-text">{{.Body}}</div>
+                <div class="comment-footer">
+                    <span class="c-like">Like
+                        <span class="c-like-stats">28</span> |
+                    </span>
+                    <span class="c-dislike">Dislike
+                        <span class="c-dislike-stats">18</span> |
+                    </span>
+                    <span class="reply"> Reply 
+                        <span class="reply-stats">21</span>
+                    </span>
+                </div>
+            </div>
+        </article>
         {{end}}
-    </div>
+    </section>
     <!-- {{template "footer" . }} -->
 
     <style>

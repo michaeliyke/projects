@@ -130,6 +130,20 @@ textarea {
     background-color: #0025b4;
 }
 
+figure {
+    border: 1px #cccccc solid;
+    padding: 4px;
+    margin: auto;
+}
+
+figcaption {
+    background-color: black;
+    color: white;
+    font-style: italic;
+    padding: 2px;
+    text-align: center;
+}
+
 @media screen and (max-width: 800px) {
     .form.account {
         width: 60%;
