@@ -26,6 +26,11 @@
             </div>
         </form>
     </div>
+    <div class="comments">
+        {{range .Comments}}
+        <p>{{.Body}}</p>
+        {{end}}
+    </div>
     <!-- {{template "footer" . }} -->
 
     <style>

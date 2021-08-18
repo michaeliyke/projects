@@ -193,3 +193,24 @@ func (comment *CommentStruct) Broadcast() (err error) {
 func SendComment(comment *CommentStruct) (err error) {
 	return comment.Broadcast()
 }
+
+func GetComments() (comments []CommentStruct, err error) {
+	query := `SELECT id, user_uuid, uuid, body, created_at FROM comments
+		ORDER BY created_at DESC`
+	rows, err := Db.Query(query)
+	if err != nil {
+		return
+	}
+	for rows.Next() {
+		comment := CommentStruct{}
+		err = rows.Scan(&comment.Id, &comment.UserUuid, &comment.Uuid,
+			&comment.Body, &comment.CreatedAt,
+		)
+		if err != nil {
+			return
+		}
+		comments = append(comments, comment)
+	}
+	rows.Close()
+	return
+}

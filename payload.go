@@ -14,6 +14,7 @@ type Payload struct {
 	privileges     []string
 	authorizations []string
 	Session        Session_
+	Comments       []CommentStruct
 }
 
 // InitPayloadVars initiates the set up of a payload object for delivery
