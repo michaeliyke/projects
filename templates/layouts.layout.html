@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+<body class="root-body">
+
+    <div id="main">
+        <header id="header">
+            {{ template "catalog" . }}
+            <section id="menu-control">        
+            <nav id="silent-nav">
+                <h1></h1>
+                <ul class="quiet"></ul>
+            </nav>
+            <nav id="nav" class="main-nav">
+                <ul></ul>
+            </nav>
+            </section>
+            <div id="main-heading">
+                <h1 id="title">Budget Calculation </h1>
+                <ol></ol>
+            </div>
+        </header>
+        <article id="project-body">
+            <div id="list">
+                <div id="questions-list">
+                    <ul>
+                        <div class="questions-intro-1 heading"></div>
+                        <li class="question"></li>
+                    </ul>
+                </div>
+                <div id="options-list">
+                    <ul>
+                        <div class="questions-intro-2  heading">Are you
+                            <div class="dot dotdot"></div>
+                        </div>
+                        <div class="questions">
+                            <li class="option"> An accountant? </li>
+                        </div>
+                        <div>
+                            <div class="shout  heading">Look no further!</div>
+                            <p class="introducing"></p>
+                        </div>
+                    </ul>
+                </div>
+                <div class="covered comfirm">This budget calculator is for you &nbsp;
+                    <!-- <i class="fas fa-check" style="font-size: 3rem; color: #19C029;"></i> -->
+                    <i class="fas fa-thumbs-up is-for-you"></i>
+                </div>
+        
+                <hr style="opacity: 0;" />
+            </div>
+        </article>
+    <div id="project">
+        <h2 class="calculator-heading heading">Budget Calculator</h2>
+        <form method="post" action="" id="budget" name="budget">
+            <div id="resultsPane">
+                <table id="table" class="table resultsPane" cellspacing="15" cellpadding="11" border="1" id="table"
+                    width="100%">
+                    <tbody></tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+        <footer id="footer"></footer>
+    </div>
+</body>
+
+</html>
