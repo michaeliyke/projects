@@ -3,58 +3,93 @@
 
 {{ $load := . }}
 
-<nav id="silent-nav">
-    <h1>
-        <div class="open-off-canvass unchanged">
-
-            <!-- Three dots html entity = &vellip; -->
-            <div class="swap three-dots-single">&#8942;</div>
-            <div class="swap three-dots-cross">&#8942;</div>
-        </div>
-        <a href="/">PLAYGROUND</a>
+<nav id="silent-nav" class="navbar navbar-light bg-light navbar-expand-sm">
+    <div class="container">
+    <h1 class="m-0">
+       <!-- spot for catalog hamburger menu icon -->
+        <a href="/" class="navbar-brand">PLAYGROUND</a>
     </h1>
-    <ul class="quiet">
+    <!-- spot for button of humburger menu icon -->
+    <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#silent-nav-toggler"
+    >
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="silent-nav-toggler">
+    <ul class="quiet navbar-nav ml-sm-auto">
         {{ if and $load $load.IsAdmin $load.IsUser }}
-        <li>
-            <a href="#">Admin <i class="fas fa-caret-down toggle-sign"></i></a>
-            <div class="drop-down-menu">
-                <ul>
-                    <li><a href="#">Item 1</a></li>
-                    <li><a href="#">Item 2</a></li>
+
+        <div class="dropdown">
+        <li class="nav-item">
+           
+            <a 
+            href="#"
+            class="nav-link dropdown-toggle"
+            data-toggle="dropdown"
+            id="admin-options"
+            aria-haspopup="true"
+            aria-expanded="false"
+            >Admin</a>
+            <ul class="dropdown-menu" aria-labelledby="admin-options">
+                    <li><a class="dropdown-item" href="#">Item 1</a></li>
+                    <li><a class="dropdown-item" href="#">Item 2</a></li>
                     {{ if not $load.IsOwner}}
-                    <li><a href="#">View users</a></li>
+                    <li><a class="dropdown-item" href="#">View users</a></li>
                     {{ end }}
                     {{ if and $load (and .IsUser .IsOwner)}}
-                    <li><a href="#">Manage users</a></li>
-                    <li><a href="#">Grant</a></li>
+                    <li><a class="dropdown-item" href="#">Manage users</a></li>
+                    <li><a class="dropdown-item" href="#">Grant</a></li>
                     {{ end }}
-                </ul>
-            </div>
+            </ul>
         </li>
+        </div>
         {{ end }}
-        <li><a href="/app/manage/" route="manage">Manage</a></li>
-        <li><a href="/user/comments/" route="comments">Comments</a></li>
+        <li class="nav-item">
+            <a href="/app/manage/" class="nav-link" route="manage">Manage</a>
+        </li>
+        <li class="nav-item">
+            <a href="/user/comments/" class="nav-link" route="comments">Comments</a>
+        </li>
         <!-- http://ultimateweb.gear.host/ -->
-        <li><a href="/user/feedback/" route="feedback">Feedback</a></li>
-        <li><a href="/client/chat/" route="chat">CHAT</a></li>
+        <li class="nav-item">
+            <a href="/user/feedback/" class="nav-link" route="feedback">Feedback</a>
+        </li>
+        <li class="nav-item">
+            <a href="/client/chat/" class="nav-link" route="chat">CHAT</a>
+        </li>
 
         {{ if and $load $load.IsUser }}
-        <li>
-            <span>Account <i class="fas fa-caret-down toggle-sign"></i></span>
-            <div class="drop-down-menu">
-                <ul>
-                    <li><a href="#">Item 1</a></li>
-                    <li><a href="#">Item 2</a></li>
-                    <li><a href="/account/update/">Account</a></li>
-                    <li><a href="#">Share</a></li>
-                    <li><a href="/account/logout/">Logout</a></li>
+        <div class="dropdown">
+        <li class="nav-item">
+            <a
+                href="#"
+                class="nav-link dropdown-toggle"
+                data-toggle="dropdown"
+                id="account-options"
+                aria-haspopup="true"
+                aria-expanded="false"
+            >Account
+            </a>
+                <ul aria-labelledby="account-options" class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Item 1</a></li>
+                    <li><a class="dropdown-item" href="#">Item 2</a></li>
+                    <li><a class="dropdown-item" href="/account/update/">Account</a></li>
+                    <li><a class="dropdown-item" href="#">Share</a></li>
+                    <li><a class="dropdown-item" href="/account/logout/">Logout</a></li>
                 </ul>
-            </div>
         </li>
+        </div>
         {{ else }}
-        <li><a href="/account/login/" route="login">Login</a></li>
+        <li class="nav-item">
+            <a href="/account/login/" class="nav-link" route="login">Login</a>
+        </li>
         {{ end }}
         
     </ul>
+    </div>
+    </div>
 </nav>
 {{ end }}
