@@ -1,73 +1,38 @@
 @import url("index.layout.css");
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-a {
-    text-decoration: none;
-}
-
-:root {
-    font-size: 62.5%;
-    /*62.5/100 * 16px = 10px*/
-    --font-size--small: 1.4rem;
-    /*14px*/
-    --font-size--default: 1.6rem;
-    /*16px*/
-    --font-size--large: 2.4rem;
-    /*24px*/
-    --color-deep-blue: #424E82;
-    --color-custom-blue: #1b7aa6;
-    --color-logo-blue: #41A0CC;
-    --color-primary: #0073FF;
-    --color-white: #E9E9E9;
-    --color-black: #141D28;
-    --color-black-1: #212B38;
-}
-
-body {
-    font-weight: lighter;
-    font-size: var(--font-size--default);
-}
-
-.font-size-small {
-    font-size: var(--font-size--small);
-}
-
-.font-size-default {
-    font-size: var(--font-size--default);
-}
-
-.font-size-large {
-    font-size: var(--font-size--large);
-}
-
 header {
     text-align: center;
 }
 
-nav.main-nav ul li:last-of-type {
-    margin-right: 1em;
+#silent-navigation a {
+    color: var(--color-deep-blue);
+    text-transform: uppercase;
+    font-size: var(--font-size--small);
+    font-weight: 400;
 }
 
-nav.main-nav ul li:first-of-type {
-    margin-left: 1em;
+#silent-navigation h1 a {
+    color: var(--color-logo-blue);
+    font-size: var(--font-size--large);
+    font-weight: 600;
 }
 
-nav.main-nav ul li a {
-    color: rgb(255, 255, 255);
-    padding: 4px;
-    border-radius: 2px;
-    display: inline-block;
-    text-align: left;
+.main-navigation {
+    background-color: var(--color-deep-blue) !important;
+    padding: 0;
     text-transform: capitalize;
-    word-break: normal;
+    font-weight: 400;
 }
 
-nav.main-nav ul li a:hover {
-    color: wheat;
+.main-navigation a {
+    color: #ffffff !important;
+}
+
+.main-navigation a:hover, .active, #silent-navigation a:hover {
+    color: var(--color-logo-blue) !important;
+}
+
+.active {
+    cursor: default;
 }
 
 #nav a.current {
@@ -75,10 +40,6 @@ nav.main-nav ul li a:hover {
     border-radius: 1px;
     border-width: 3px;
     color: rgb(44, 49, 64);
-}
-
-li {
-    list-style: none;
 }
 
 nav [data-role="projects-toggler"] {
@@ -95,26 +56,6 @@ nav [data-role="projects-toggler"]:hover {
     background-color: rgb(116, 183, 213);
     color: #000;
     cursor: pointer;
-}
-
-#silent-nav a {
-    text-transform: uppercase;
-   font-family: Arial, Helvetica, sans-serif;
-   font-size: var(--font-size--small);
-   font-weight: 600;
-}
-
-#silent-nav h1 a {
-    color: var(--color-logo-blue);
-    font-size: var(--font-size--large);
-}
-
-.current-page, #silent-nav a:hover {
-    color: darkred !important;
-}
-
-.current-page {
-    cursor: default;
 }
 
 #rate-text {

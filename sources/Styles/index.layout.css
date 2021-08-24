@@ -1,16 +1,6 @@
-
-nav.main-nav {
-    margin: 0 auto;
-    /* width: 95%; */
-}
-
 nav.main-nav ul {
     background-color: var(--color-deep-blue);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
-
 
 div#main-heading {
     background: url("../Images/bg/best/C.jpg"), linear-gradient(to bottom, rgb(187, 217, 251), rgb(153, 191, 234), rgb(120, 166, 217), rgb(84, 141, 201), rgb(38, 117, 184));
@@ -26,4 +16,49 @@ div#main-heading {
 #list ul {
     margin: 0 auto;
     /* width: 85%; */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+}
+
+:root {
+    font-size: 62.5%;
+    /*62.5/100 * 16px = 10px*/
+    --font-size--small: 1.4rem;
+    /*14px*/
+    --font-size--default: 1.6rem;
+    /*16px*/
+    --font-size--large: 2.4rem;
+    /*24px*/
+    --color-deep-blue: #424E82;
+    --color-custom-blue: #1b7aa6;
+    --color-logo-blue: #41A0CC;
+    --color-primary: #0073FF;
+    --color-white: #E9E9E9;
+    --color-black: #141D28;
+    --color-black-1: #212B38;
+}
+
+body {
+    font-weight: lighter;
+    font-size: var(--font-size--default);
+}
+
+.font-size-small {
+    font-size: var(--font-size--small);
+}
+
+.font-size-default {
+    font-size: var(--font-size--default);
+}
+
+.font-size-large {
+    font-size: var(--font-size--large);
 }

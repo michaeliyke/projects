@@ -3,8 +3,8 @@
 
 {{ $load := . }}
 
-<nav id="silent-nav" class="navbar navbar-light bg-light navbar-expand-sm">
-    <div class="container">
+<nav id="silent-navigation" class="navbar navbar-expand-sm px-0">
+    <div class="container-fluid px-0">
     <h1 class="m-0">
        <!-- spot for catalog hamburger menu icon -->
         <a href="/" class="navbar-brand">PLAYGROUND</a>
@@ -15,6 +15,9 @@
         type="button"
         data-toggle="collapse"
         data-target="#silent-nav-toggler"
+        aria-controls="silent-nav-toggler"
+        aria-expanded="false"
+        aria-label="silent navigation"
     >
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -23,7 +26,7 @@
         {{ if and $load $load.IsAdmin $load.IsUser }}
 
         <div class="dropdown">
-        <li class="nav-item">
+        <li class="nav-item mr-4">
            
             <a 
             href="#"
@@ -47,17 +50,17 @@
         </li>
         </div>
         {{ end }}
-        <li class="nav-item">
+        <li class="nav-item mr-4">
             <a href="/app/manage/" class="nav-link" route="manage">Manage</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item mr-4">
             <a href="/user/comments/" class="nav-link" route="comments">Comments</a>
         </li>
         <!-- http://ultimateweb.gear.host/ -->
-        <li class="nav-item">
+        <li class="nav-item mr-4">
             <a href="/user/feedback/" class="nav-link" route="feedback">Feedback</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item mr-4">
             <a href="/client/chat/" class="nav-link" route="chat">CHAT</a>
         </li>
 

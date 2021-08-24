@@ -14,7 +14,6 @@ const log = console.log;
   }
 
   function getcss(css) {
-
     $(w).resize(function (event) {
       console.log(w.innerWidth);
     });
@@ -25,6 +24,7 @@ const log = console.log;
       console.log($(event.target).getStyle(css));
     });
   }
+
   function getRoute() {
     const l = window.location.href;
     const x = l.split("/").reverse();
@@ -63,9 +63,9 @@ const log = console.log;
   }
   
 const route = getRoute();
-  $("#main").Attribute("route", body).each((element, index) => {
+  $("body").Attribute("route", body).each((element, index) => {
     if (element.getAttribute("route") == route) {
-      element.classList.add("current-page");
+      element.classList.add("active");
       element.setAttribute("href", "JavaScript:void(0)");
     }
   });

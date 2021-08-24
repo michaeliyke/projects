@@ -1,22 +1,51 @@
 {{define "main_nav"}}
 {{ $load := . }}
-    <nav id="nav" class="main-nav">
-    
-        <ul>
-    
-            <li class="main-menu"><a href="/">Employment</a></li>
-            <li class="main-menu"><a href="https://michaeliyke.com/about/">About  Playground</a></li>
-            <li class="main-menu"><a href="#">Application</a></li>
-            <li class="main-menu"><a href="#">LinkedIn page</a></li>
-            <li class="main-menu"><a href="https://michaeliyke.com/">Portfolio</a> </li>
-            <li class="main-menu"><a href="#">Blog</a></li>
-            <li class="main-menu"><a href="#">survey app</a></li>
-            <li class="main-menu"><a href="/help/">Help</a></li>
-            {{ if and  $load $load.IsUser $load.IsAdmin}}
-            <li class="main-menu" data-role="projects-menu">
-                <span data-role="projects-toggler" class="projects-toggler slide-open">&#9776;</span>
+    <nav class="main-navigation navbar navbar-expand-sm px-0">
+    <div class="container-fluid">
+        <button 
+            type="button" 
+            class="navbar-toggler"
+            data-toggle="collapse"
+            data-target="#main-nav-toggler"
+            aria-controls="main-nav-toggler"
+            aria-expanded="false"
+            aria-label="Toggle main navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="main-nav-toggler">
+        <ul class="navbar-nav justify-content-between w-100">
+            <li class="nav-item">
+                <a class="nav-link" href="/">Employment</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" route="about" href="/about/">About  Playground</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" route="application" href="/application/">Application</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">LinkedIn page</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="https://michaeliyke.com/">Portfolio</a> 
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Blog</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" route="survey" href="/survey/">survey app</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" route="help" href="/help/">Help</a>
+            </li>
+            {{ if and  $load $load.IsUser $load.IsAdmin}}
+            <!-- <li class="nav-item" data-role="projects-menu">
+                <span data-role="projects-toggler" class="projects-toggler slide-open">&#9776;</span>
+            </li> -->
             {{ end }}
         </ul>
+        </div>
+        </div>
     </nav>
 {{end}}
