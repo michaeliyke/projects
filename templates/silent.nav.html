@@ -3,13 +3,12 @@
 
 {{ $load := . }}
 
-<nav id="silent-navigation" class="navbar navbar-expand-sm px-0">
+<nav id="silent-navigation" class="navbar navbar-expand-sm navbar-light px-0">
     <div class="container-fluid px-0">
     <h1 class="m-0">
-       <!-- spot for catalog hamburger menu icon -->
         <a href="/" class="navbar-brand">PLAYGROUND</a>
     </h1>
-    <!-- spot for button of humburger menu icon -->
+    
     <button
         class="navbar-toggler"
         type="button"
@@ -21,8 +20,9 @@
     >
         <span class="navbar-toggler-icon"></span>
     </button>
+    
     <div class="collapse navbar-collapse" id="silent-nav-toggler">
-    <ul class="quiet navbar-nav ml-sm-auto">
+    <ul class="navbar-nav ml-sm-auto">
         {{ if and $load $load.IsAdmin $load.IsUser }}
 
         <div class="dropdown">

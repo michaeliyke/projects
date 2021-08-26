@@ -3,11 +3,7 @@ nav.main-nav ul {
 }
 
 div#main-heading {
-    background: url("../Images/bg/best/C.jpg"), linear-gradient(to bottom, rgb(187, 217, 251), rgb(153, 191, 234), rgb(120, 166, 217), rgb(84, 141, 201), rgb(38, 117, 184));
-    margin: 0 auto;
-    padding-bottom: 3em;
-    /* width: 95%; */
-    overflow: hidden;
+    /* background: url("../Images/bg/best/C.jpg"), linear-gradient(to bottom, rgb(187, 217, 251), rgb(153, 191, 234), rgb(120, 166, 217), rgb(84, 141, 201), rgb(38, 117, 184)); */
     background-position: center center;
     background-repeat: no-repeat;
     background-size: 119% auto;
@@ -22,10 +18,6 @@ div#main-heading {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-}
-
-a {
-    text-decoration: none;
 }
 
 :root {
