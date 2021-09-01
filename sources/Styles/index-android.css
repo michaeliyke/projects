@@ -1,7 +1,4 @@
 @media screen and (max-width: 599px) {
-  body {
-        font-size: var(--font-size--default);
-    }
 
 section nav#nav ul, section nav#silent-nav ul {
     transition: all 0.5s ease 0s;
@@ -21,20 +18,22 @@ header section nav ul li {
 nav [data-role="projects-toggler"] {
     border-radius: 1px;
     color: rgb(255, 255, 255);
-    display: inline-block;
-    font-size: 1.5em;
     padding-left: 0.19em;
     padding-right: 0.19em;
     padding-top: 0.05em;
-    position: absolute;
     right: 5%;
-    top: 0.5em;
+}
+
+div#main-heading #title {
+    line-height: normal;
+    text-align: center;
 }
 
 div#main-heading ol {
     background-color: rgba(40, 135, 179, 0);
     color: #346a96;
 }
+
 div#main-heading ol li::before {
     background-color: rgba(27, 122, 166, 0.5);
 }
@@ -51,35 +50,19 @@ div#main-heading ol li::before {
 .heading.shout {
     margin-left: 0;
 }
-.calculator-heading {
-    font-size: 1.1em;
-}
 .introducing {
     padding-left: 0;
 }
 .option {
     padding-left: unset;
 }
-#list ul {
-    width: unset;
-}
 .covered {
-    font-size: 1.8em;
     font-weight: 900;
     padding-bottom: 4em;
     padding-left: 0.5em;
     text-align: left;
 }
-.covered img {
-    width: 1.6em;
-}
-#project {
-    width: 100%;
-}
 .dot {
     margin: 2px 2px 2px 0;
-}
-#trigger{
-    width: 100%;
 }
 }

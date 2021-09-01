@@ -4,8 +4,9 @@
 */}}
 {{ $load := . }}
 <header id="header">
-   
+   {{/*
     {{ template "catalog" . }}
+    */}}
 
     <section id="menu-control">
 
@@ -15,11 +16,10 @@
 
     </section>
 
-    {{/*
-        <div id="main-heading">
+        <div id="main-heading" class="row mx-0"> 
         
-            <h1 id="title">Budget Calculation </h1>
-            <ol>
+            <h1 id="title" class="col-12">Budget Calculation </h1>
+            <ol class="col-8 mx-auto">
                 <li class="title-bullets">Calculate easy and simple.</li>
                 <li class="title-bullets shift-right">View result, print, and take with you.</li>
                 <li class="title-bullets-exception">Save and view anytime, on any device.</li>
@@ -27,7 +27,6 @@
             </ol>
         
         </div>
-    */}}
 
 </header>
 

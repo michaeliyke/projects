@@ -1,4 +1,11 @@
 @import url("index.layout.css");
+.app-container {
+    margin-top: 2.5rem;
+}
+
+#silent-navigation {
+    font-family: sans-serif;
+}
 
 #silent-navigation a {
     color: var(--color-deep-blue);
@@ -18,6 +25,11 @@
     padding: 0;
     text-transform: capitalize;
     font-weight: 400;
+}
+
+.nav-justify .nav-item {
+    text-overflow: ellipsis;
+    text-align: left;
 }
 
 .main-navigation a {
@@ -43,7 +55,7 @@ nav [data-role="projects-toggler"] {
     border-radius: 1px;
     color: #ffffff;
     display: inline;
-    font-size: 1.5em;
+    font-size: var(--font-size--big);
     padding-left: 0.19em;
     padding-right: 0.19em;
     padding-top: 0.05em;
@@ -57,7 +69,7 @@ nav [data-role="projects-toggler"]:hover {
 
 #rate-text {
     padding: 1rem;
-    font-size: 1.5rem;
+    font-size: var(--font-size--big);
     text-transform: uppercase;
     letter-spacing: 3px;
     color: #654321;
@@ -126,7 +138,7 @@ nav [data-role="projects-toggler"]:hover {
     background-color: rgb(255, 255, 255, 0.3);
     color: rgb(240, 230, 140);
     cursor: pointer;
-    font-size: 1.2em;
+    font-size: var(--font-size--medium);
     height: 1.5em;
     left: 97.2%;
     padding-left: 11px;
@@ -188,18 +200,29 @@ span.slide-close~div {
     font-weight: bold;
 }
 
+div#main-heading #title {
+    color: #c4a97c;
+    font-size: var(--font-size--largest);
+    font-weight: 900;
+    line-height: 2.5;
+    text-transform: uppercase;
+    word-wrap: break-word;
+    text-align: center;
+}
+
 div#main-heading ol {
     background-color: rgba(40, 135, 179, 0.9);
     color: rgba(255, 255, 255, 1);
     display: inline-block;
     font-family: Segoe UI Symbol;
-    font-size: 1.2em;
+    font-size: var(--font-size--medium);
     line-height: 1.5;
     padding: 2em;
     text-align: left;
     border-radius: 4px;
     font-weight: bold;
 }
+
 div#main-heading ol li::before {
     background-color: rgba(255, 255, 255, 0.05);
     border: 1px solid rgb(255, 255, 255);
@@ -213,7 +236,7 @@ div#main-heading ol li::before {
 
 div#main-heading ol>li:nth-of-type(3) {
     display: block;
-} 
+}
 
 li.title-bullets {
     display: inline-block;
@@ -224,16 +247,8 @@ li.title-bullets-exception {
     margin: 8px 2em;
 }
 
-#title {
-    color: #c4a97c;
-    font-size: 4.8em;
-    font-weight: 900;
-    line-height: 2.5;
-    text-transform: uppercase;
-}
-
 #list {
-    font-size: 1.04em;
+    font-size: var(--font-size--default);
 }
 
 .introducing {
@@ -245,9 +260,10 @@ li.title-bullets-exception {
 }
 
 .covered {
-    font-size: 1.3em;
+    font-size: 2.08rem;
     padding: 2em;
     text-transform: uppercase;
+    font-family: sans-serif;
 }
 
 .try-it {
@@ -322,7 +338,7 @@ input {
 
 .question {
     display: inline-block;
-    font-size: 1.1em;
+    font-size: 1.76rem;
     font-weight: 900;
     width: 24%
 }
@@ -334,14 +350,14 @@ input {
 .question {
     display: inline-block;
     font-family: Segoe UI Symbol;
-    font-size: 1.1em;
+    font-size: 1.76rem;
     font-weight: lighter;
     margin-left: 5%;
     width: unset;
 }
 
 .heading {
-    font-size: 1.1em;
+    font-size: 1.76rem;
     color: #9ee6f5;
     font-weight: 900;
     text-transform: uppercase;
@@ -381,137 +397,118 @@ input {
 #project {
     background-color: rgb(0, 127, 127);
     color: rgb(255, 255, 255);
-    margin: 0 auto;
     padding-bottom: 3em;
     padding-top: 1em;
-    width: 96%;
     background-color: #41A0CC;
     background-image: linear-gradient(to top, #444444, #51525c, #596176, #5c7291, #5785ab, #5195bd, #46a6ce, #36b7dc, #32c8e5, #38d9eb, #48eaef, #5ffbf1);
     background-image: linear-gradient(to top, #4d4e55, #5a6576, #607f98, #5c9bb8, #51b8d3, #51b7d2, #51b7d2, #51b6d1, #5b98b4, #5d7c93, #576170, #494a4e);
-    background-image: url("../Images/bg/best/A3.jpg"), linear-gradient(to top, #1c1e31, #1f2e45, #1e3f59, #17516b, #09647a, #09647a, #09647a, #09647a, #17516b, #1e3f59, #1f2e45, #1c1e31);
+    background-image: url("../Images/C14.jpg"), linear-gradient(to top, #1c1e31, #1f2e45, #1e3f59, #17516b, #09647a, #09647a, #09647a, #09647a, #17516b, #1e3f59, #1f2e45, #1c1e31);
     background-position: center center;
     background-repeat: no-repeat;
-    background-size: 119% auto;
+    background-size: 100% auto;
+    font-family: sans-serif;
 }
 
 #inputs {
-    margin: 0 auto;
-    padding: 0 2% 8%;
     text-align: center;
-}
-
-#trigger {
-    display: flex;
-    justify-content: space-between;
-    margin: 0 auto;
-    width: 80%;
-}
-
-.trigger {
-    background-color: rgba(239, 228, 209, 0.1);
-    border-radius: 2px;
-    cursor: pointer;
-    display: inline-block;
-    padding: 3px 8px;
-}
-
-.trigger:hover:not(#total):not(#current) {
-    color: rgb(163, 254, 176);
-    cursor: pointer;
-}
-
-#item, #amount {
-    font-size: small;
-}
-
-.cell, #total, #submit, #reset {
-    font-stretch: semi-condensed;
-}
-
-#reset, #total, #submit {
-    border-width: medium medium 1px;
-    font-size: 1.2em;
-    text-transform: uppercase;
-}
-
-#manage {
-    background-color: #41A0CC;
-    background-color: #096894;
-    border-radius: 4px;
-    color: rgb(204, 247, 204);
-    left: 2em;
-    padding-bottom: 3em;
-    padding-top: 2em;
-    position: absolute;
-    transition: all 0.3s ease 0s;
-    width: 0;
-    overflow-x: hidden;
-}
-
-#manage>.managed {
-    border-bottom: 0.01em solid;
-    border-top: medium none;
-    cursor: pointer;
-    display: block;
-    font-size: 0.7em;
-    padding: var(--font-size--small);
-    position: relative;
-    text-align: left;
-    text-transform: uppercase;
-}
-
-.managed:hover {
-    background-color: rgba(153, 153, 153, 1);
-    background-color: rgba(118, 144, 255, 0.3);
-    color: rgb(255, 255, 255);
-    cursor: pointer;
-    background-color: rgba(153, 153, 153, 0.5);
-}
-
-.disabled {
-    color: #abc38d;
-    background-color: rgb(153, 153, 153, 0.3);
-}
-
-.disabled:hover {
-    color: #abc38d;
-    background-color: rgb(153, 153, 153, 0.3);
-    cursor: default;
-}
-
-#toggler {
-    background-color: rgba(239, 228, 209, 0.3);
-    border-radius: 3px;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 1.5em;
-    outline: medium none;
-    padding: 0 6px;
-    position: relative;
-}
-
-#toggler:hover {
-    color: rgba(163, 254, 176, 1);
-}
-
-input {
-    border-radius: 20px;
 }
 
 #input {
     margin: 2em;
 }
 
-#total, #current {
-    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+#toggler {
+    /* background-color: rgba(239, 228, 209, 0.3); */
+    border-radius: 3px;
+    font-size: 2.4rem;
+}
+
+.cell, #total, #submit, #reset {
+    font-stretch: semi-condensed;
 }
 
 #reset {
-    left: -30%;
+    cursor: pointer;
 }
 
-#submit {
-    position: relative;
+#reset, #total, #submit {
+    font-size: 1.92rem;
+}
+
+#toggler .mgt-toggle-btn {
+    border: 1px solid #fff !important;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 0;
+    padding-top: 5px;
+}
+
+.mgt-toggle-btn {
+    border: none;
+}
+
+.mgt-toggle-btn .navbar-toggler-icon {
+    background: none !important;
+    background-image: none !important;
+}
+
+.mgt-toggle-btn span {
+    color: #FFF !important;
+    font-size: 1.6rem;
+}
+
+button:focus, button:active {
+    /* border: none !important; */
+    outline: none !important;
+    /* */
+}
+
+.mgt {
+    background-color: #41A0CC;
+    background-color: #096894;
+    border-radius: 4px;
+    background-color: rgba(153, 153, 153, 1);
+    background-color: rgba(153, 153, 153, 0.5);
+    background-color: #CFB39C;
+}
+
+.mgt .text-muted {
+    padding-top: 2rem;
+    padding-left: 1rem;
+    text-align: left;
+    font-size: 2.4rem;
+}
+
+.mgt .text-muted+hr {
+    margin: 0;
+}
+
+.mgt .text-muted+hr+div {
+    padding-top: 2rem;
+}
+
+.mgt>.managed {
+    border-bottom: 0.016rem solid;
+    border-top: medium none;
+    cursor: pointer;
+    font-size: 1.4rem;
+    padding: var(--font-size--small);
+    text-align: left;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.mgt>.managed:hover {
+    background-color: rgba(118, 144, 255, 0.3);
+    background-color: rgba(153, 153, 153, 0.5);
+}
+
+.disabled {
+    cursor: default;
+}
+
+input {
+    border-radius: 20px;
 }
 
 .input {
