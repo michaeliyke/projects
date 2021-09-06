@@ -1,7 +1,7 @@
 {{define "calculator"}}
 {{ $load := . }}
 
-<div class="row">
+<div class="row mx-0">
     <div id="project" class="row col-11 mx-auto">
         <h2 class="calculator-heading heading col-12">Budget Calculator</h2>
         <form id="budget" class="col-12 row mx-0">
@@ -34,7 +34,7 @@
                         </div>
                     </div>
 
-                    <div id="reset" class="trigger reset col-3"> Reset </div>
+                    <div class="col-3"><div id="reset" class="trigger reset"> Reset </div></div>
                     <div id="total" class="trigger total col-3">Total: 0.00</div>
 
                     <div id="submit" class="trigger submit col-3">
@@ -48,9 +48,7 @@
                                 aria-expanded="false" 
                                 aria-label="Tools navigation"
                             >
-                                <span class="dropdown-toggle">
-                                    Save
-                                </span>
+                                <span class="dropdown-toggle">Manage</span>
                             </button>
                         </nav>  
 
