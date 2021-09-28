@@ -1,7 +1,7 @@
 {{ define "layout" }}
 {{ $load := . }}
 {{/*
-    A COMMENT OR TWO CAN BE HERE
+A COMMENT OR TWO CAN BE HERE
 */}}
 <!DOCTYPE html>
 <html>
@@ -10,17 +10,19 @@
 
 <body class="root-body">
 
-    <div class="container-fluid px-0 app-container">
-        <div class="row mx-0">
-            <div class="col-12 col-lg-11 px-0 mx-auto">
-                {{ template "index_header" . }}
-            </div>
-        </div>
-            {{ template "torsor" . }}
-            {{ template "calculator" . }}
-    {{ template "footer" . }}
- 
+  <div class="container-fluid px-0 app-container">
+    <div class="row mx-0">
+      <div class="col-12 col-lg-11 px-0 mx-auto">
+        {{ template "index_header" . }}
+      </div>
     </div>
+    {{/*
+    {{ template "torsor" . }}
+    {{ template "calculator" . }}
+    {{ template "footer" . }}
+  */}}
+
+  </div>
 </body>
 
 </html>

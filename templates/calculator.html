@@ -2,89 +2,78 @@
 {{ $load := . }}
 
 <div class="row mx-0">
-    <div id="project" class="row col-11 mx-auto">
-        <h2 class="calculator-heading heading col-12">Budget Calculator</h2>
-        <form id="budget" class="col-12 row mx-0">
-            <div id="inputs" class="col-12 row mx-0">
-                <div id="trigger" class="col-12 row">
+  <div id="project" class="row col-11 mx-auto">
+    <h2 class="calculator-heading heading col-12">Budget Calculator</h2>
+    <form id="budget" class="col-12 row mx-0">
+      <div id="inputs" class="col-12 row mx-0">
+        <div id="trigger" class="col-12 row">
 
-                    <div id="toggler" class="toggler col-3">
-                        <nav class="navbar navbar-light p-0">
-                            <button 
-                                class="navbar-toggler mb-2 mgt-toggle-btn" 
-                                type="button" 
-                                data-toggle="collapse" 
-                                data-target="#mgt-tools"
-                                aria-controls="manage" 
-                                aria-expanded="false" 
-                                aria-label="Tools navigation"
-                            >
-                                <span class="navbar-toggler-icon">
-                                    <i class="fas fa-bars"></i>
-                                </span>
-                            </button>
-                        </nav>
-                        <div id="mgt-tools" class="collapse mgt">
-                            <div class="text-muted">Management tools</div>
-                            <hr />
-                            <div class="managed converting" id="converting">convert to pdf</div>
-                            <div class="managed disabled saving" id="saving">save as text</div>
-                            <div class="managed disabled managing" id="managing">share</div>
-                            <div class="managed printing" id="printing"> print</div>
-                        </div>
-                    </div>
-
-                    <div class="col-3"><div id="reset" class="trigger reset"> Reset </div></div>
-                    <div id="total" class="trigger total col-3">Total: 0.00</div>
-
-                    <div id="submit" class="trigger submit col-3">
-                        <nav class="navbar navbar-light p-0">
-                            <button 
-                                class="navbar-toggler mb-2 mgt-toggle-btn" 
-                                type="button" 
-                                data-toggle="collapse" 
-                                data-target="#mgt-options" 
-                                aria-controls="mgt-options"
-                                aria-expanded="false" 
-                                aria-label="Tools navigation"
-                            >
-                                <span class="dropdown-toggle">Manage</span>
-                            </button>
-                        </nav>  
-
-                        <div id="mgt-options" class="collapse mgt">
-                            <div class="text-muted">Management tools</div>
-                            <hr />
-                            <div class="managed converting" id="converting">Item 1</div>
-                            <div class="managed disabled saving" id="saving">Item 2</div>
-                            <div class="managed disabled managing" id="managing">Item 3</div>
-                            <div class="managed printing" id="printing"> Item 4</div>
-                        </div>
-                    </div>
-
-
-                </div>
-                <div id="input" class="col-12">
-                    <input type="text" name="item" id="item" class="input type item" placeholder="First Item" />
-                    <input type="digit" name="value" id="amount" class="input type amount" placeholder="value" />
-                </div>
-                <div id="current" class="trigger col-12">
-                    <span id="currentItem">current value</span> <span>:</span> <span id="current"> 0.0</span>
-                </div>
+          <div id="toggler" class="toggler col-3">
+            <nav class="navbar navbar-light p-0">
+              <button class="navbar-toggler mb-2 mgt-toggle-btn" type="button" data-toggle="collapse"
+                data-target="#mgt-tools" aria-controls="manage" aria-expanded="false" aria-label="Tools navigation">
+                <span class="navbar-toggler-icon">
+                  <i class="fas fa-bars"></i>
+                </span>
+              </button>
+            </nav>
+            <div id="mgt-tools" class="collapse mgt">
+              <div class="text-muted">Management tools</div>
+              <hr />
+              <div class="managed converting" id="converting">convert to pdf</div>
+              <div class="managed disabled saving" id="saving">save as text</div>
+              <div class="managed disabled managing" id="managing">share</div>
+              <div class="managed printing" id="printing"> print</div>
             </div>
-            <div id="resultsPane" class="col-12">
-                <table id="table" class="table resultsPane" cellspacing="15" cellpadding="11" border="1" id="table"
-                    width="100%">
+          </div>
 
-                    <tbody>
+          <div class="col-3">
+            <div id="reset" class="trigger reset"> Reset </div>
+          </div>
+          <div id="total" class="trigger total col-3">Total: 0.00</div>
 
-                        <tr style="display: none;">
-                            <td colspan="" rowspan="" headers="">results will be shown here</td>
-                        </tr>
-                    </tbody>
-                </table>
+          <div id="submit" class="trigger submit col-3">
+            <nav class="navbar navbar-light p-0">
+              <button class="navbar-toggler mb-2 mgt-toggle-btn" type="button" data-toggle="collapse"
+                data-target="#mgt-options" aria-controls="mgt-options" aria-expanded="false"
+                aria-label="Tools navigation">
+                <span class="dropdown-toggle">Manage</span>
+              </button>
+            </nav>
+
+            <div id="mgt-options" class="collapse mgt">
+              <div class="text-muted">Management tools</div>
+              <hr />
+              <div class="managed converting" id="converting">Item 1</div>
+              <div class="managed disabled saving" id="saving">Item 2</div>
+              <div class="managed disabled managing" id="managing">Item 3</div>
+              <div class="managed printing" id="printing"> Item 4</div>
             </div>
-        </form>
-    </div>
+          </div>
+
+
+        </div>
+        <div id="input" class="col-12">
+          <input type="text" name="item" id="item" class="input type item" placeholder="First Item" />
+          <input type="digit" name="value" id="amount" class="input type amount" placeholder="value" />
+        </div>
+        <div id="current" class="trigger col-12">
+          <span id="currentItem">current value</span> <span>:</span> <span id="current"> 0.0</span>
+        </div>
+      </div>
+      <div id="resultsPane" class="col-12">
+        <table id="table" class="table resultsPane" cellspacing="15" cellpadding="11" border="1" id="table"
+          width="100%">
+
+          <tbody>
+
+            <tr style="display: none;">
+              <td colspan="" rowspan="" headers="">results will be shown here</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </form>
+  </div>
 </div>
 {{end}}

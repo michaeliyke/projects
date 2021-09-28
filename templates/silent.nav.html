@@ -4,106 +4,81 @@
 {{ $load := . }}
 
 <nav id="silent-navigation" class="navbar navbar-expand-sm navbar-light px-0">
-    <div class="container-fluid px-0">
-     <button 
-            type="button" 
-            class="navbar-toggler"
-            data-toggle="collapse"
-            data-target="#main-nav-toggler"
-            aria-controls="main-nav-toggler"
-            aria-expanded="false"
-            aria-label="Toggle main navigation"
-        >
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <h1 class="m-0">
-        <a href="/" class="navbar-brand">PLAYGROUND</a>
-    </h1>
-    
-    <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#silent-nav-toggler"
-        aria-controls="silent-nav-toggler"
-        aria-expanded="false"
-        aria-label="silent navigation"
-    >
-        <span class="navbar-toggler-icon"></span>
+  <div class="container-fluid px-sm-0 px-3 y-sm-0">
+   
+    <button type="button" class="navbar-toggler b-none" data-toggle="collapse" data-target="#main-nav-toggler"
+      aria-controls="main-nav-toggler" aria-expanded="false" aria-label="Toggle main navigation">
+      <i class="fas fa-ellipsis-v"></i>
     </button>
-    
+    <h1 class="m-0 px-sm-0">
+      <a href="/" class="navbar-brand">PLAYGROUND</a>
+    </h1>
+
+    <button class="navbar-toggler b-none" type="button" data-toggle="collapse" data-target="#silent-nav-toggler"
+      aria-controls="silent-nav-toggler" aria-expanded="false" aria-label="silent navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
     <div class="collapse navbar-collapse" id="silent-nav-toggler">
-    <ul class="navbar-nav ml-sm-auto">
+      <ul class="navbar-nav ml-sm-auto">
         {{ if and $load $load.IsAdmin $load.IsUser }}
 
         <div class="dropdown">
-        <li class="nav-item mr-4">
-           
-            <a 
-            href="#"
-            class="nav-link dropdown-toggle"
-            data-toggle="dropdown"
-            id="admin-options"
-            aria-haspopup="true"
-            aria-expanded="false"
-            >Admin</a>
+          <li class="nav-item mr-4">
+
+            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" id="admin-options" aria-haspopup="true"
+              aria-expanded="false">Admin</a>
             <ul class="dropdown-menu" aria-labelledby="admin-options">
-                    <li><a class="dropdown-item" href="#">Item 1</a></li>
-                    <li><a class="dropdown-item" href="#">Item 2</a></li>
-                    {{ if not $load.IsOwner}}
-                    <li><a class="dropdown-item" href="#">View users</a></li>
-                    {{ end }}
-                    {{ if and $load (and .IsUser .IsOwner)}}
-                    <li><a class="dropdown-item" href="#">Manage users</a></li>
-                    <li><a class="dropdown-item" href="#">Grant</a></li>
-                    {{ end }}
+              <li><a class="dropdown-item" href="#">Item 1</a></li>
+              <li><a class="dropdown-item" href="#">Item 2</a></li>
+              {{ if not $load.IsOwner}}
+              <li><a class="dropdown-item" href="#">View users</a></li>
+              {{ end }}
+              {{ if and $load (and .IsUser .IsOwner)}}
+              <li><a class="dropdown-item" href="#">Manage users</a></li>
+              <li><a class="dropdown-item" href="#">Grant</a></li>
+              {{ end }}
             </ul>
-        </li>
+          </li>
         </div>
         {{ end }}
         <li class="nav-item mr-4">
-            <a href="/app/manage/" class="nav-link" route="manage">Manage</a>
+          <a href="/app/manage/" class="nav-link" route="manage">Manage</a>
         </li>
         <li class="nav-item mr-4">
-            <a href="/user/comments/" class="nav-link" route="comments">Comments</a>
+          <a href="/user/comments/" class="nav-link" route="comments">Comments</a>
         </li>
         <!-- http://ultimateweb.gear.host/ -->
         <li class="nav-item mr-4">
-            <a href="/user/feedback/" class="nav-link" route="feedback">Feedback</a>
+          <a href="/user/feedback/" class="nav-link" route="feedback">Feedback</a>
         </li>
         <li class="nav-item mr-4">
-            <a href="/client/chat/" class="nav-link" route="chat">CHAT</a>
+          <a href="/client/chat/" class="nav-link" route="chat">CHAT</a>
         </li>
 
         {{ if and $load $load.IsUser }}
         <div class="dropdown">
-        <li class="nav-item">
-            <a
-                href="#"
-                class="nav-link dropdown-toggle"
-                data-toggle="dropdown"
-                id="account-options"
-                aria-haspopup="true"
-                aria-expanded="false"
-            >Account
+          <li class="nav-item">
+            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" id="account-options"
+              aria-haspopup="true" aria-expanded="false">Account
             </a>
-                <ul aria-labelledby="account-options" class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Item 1</a></li>
-                    <li><a class="dropdown-item" href="#">Item 2</a></li>
-                    <li><a class="dropdown-item" href="/account/update/">Account</a></li>
-                    <li><a class="dropdown-item" href="#">Share</a></li>
-                    <li><a class="dropdown-item" href="/account/logout/">Logout</a></li>
-                </ul>
-        </li>
+            <ul aria-labelledby="account-options" class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Item 1</a></li>
+              <li><a class="dropdown-item" href="#">Item 2</a></li>
+              <li><a class="dropdown-item" href="/account/update/">Account</a></li>
+              <li><a class="dropdown-item" href="#">Share</a></li>
+              <li><a class="dropdown-item" href="/account/logout/">Logout</a></li>
+            </ul>
+          </li>
         </div>
         {{ else }}
         <li class="nav-item">
-            <a href="/account/login/" class="nav-link" route="login">Login</a>
+          <a href="/account/login/" class="nav-link" route="login">Login</a>
         </li>
         {{ end }}
-        
-    </ul>
+
+      </ul>
     </div>
-    </div>
+  </div>
 </nav>
 {{ end }}
