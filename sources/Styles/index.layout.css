@@ -1,95 +1,95 @@
 nav.main-nav ul {
-    background-color: var(--color-deep-blue);
+  background-color: var(--color-deep-blue);
 }
 
 div#main-heading {
-    background: url("../Images/bg/best/C.jpg"), linear-gradient(to bottom, rgb(187, 217, 251), rgb(153, 191, 234), rgb(120, 166, 217), rgb(84, 141, 201), rgb(38, 117, 184));
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: 119% auto;
+  background: url("../Images/bg/best/C.jpg"), linear-gradient(to bottom, rgb(187, 217, 251), rgb(153, 191, 234), rgb(120, 166, 217), rgb(84, 141, 201), rgb(38, 117, 184));
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: 119% auto;
 }
 
 #list ul {
-    margin: 0 auto;
-    /* width: 85%; */
+  margin: 0 auto;
+  /* width: 85%; */
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 :root {
-    --color-deep-blue: #424E82;
-    --color-custom-blue: #1b7aa6;
-    --color-logo-blue: #41A0CC;
-    --color-primary: #0073FF;
-    --color-white: #E9E9E9;
-    --color-black: #141D28;
-    --color-black-1: #212B38;
-    font-size: 62.5%;
-    /*62.5/100 * 16px = 10px*/
-    --font-size--small: 1.4rem;
-    /*1 4px, 0.875em */
-    --font-size--default: 1.6rem;
-    /* 16px, 1em*/
-    --font-size--medium: 1.92rem;
-    /* 19.2px, 1.2em */
-    --font-size--big: 2.4rem;
-    /* 24px, 1.5em */
-    --font-size--large: 2.4rem;
-    /* 24px, 1.5em */
-    --font-size--larger: 4.8rem;
-    /* 48px, 3em */
-    --font-size--largest: 7.68rem;
-    /* 76.8px, 4.8em */
+  --color-deep-blue: #424E82;
+  --color-custom-blue: #1b7aa6;
+  --color-logo-blue: #41A0CC;
+  --color-primary: #0073FF;
+  --color-white: #E9E9E9;
+  --color-black: #141D28;
+  --color-black-1: #212B38;
+  font-size: 62.5%;
+  /*62.5/100 * 16px = 10px*/
+  --font-size--small: 1.4rem;
+  /*1 4px, 0.875em */
+  --font-size--default: 1.6rem;
+  /* 16px, 1em*/
+  --font-size--medium: 1.92rem;
+  /* 19.2px, 1.2em */
+  --font-size--big: 2.4rem;
+  /* 24px, 1.5em */
+  --font-size--large: 2.4rem;
+  /* 24px, 1.5em */
+  --font-size--larger: 4.8rem;
+  /* 48px, 3em */
+  --font-size--largest: 7.68rem;
+  /* 76.8px, 4.8em */
 }
 
 @media (max-width: 768px) {
-    :root {
-        /* --font-size--largest: 2.5rem; */
-        --font-size--largest: 4rem;
-    }
+  :root {
+    /* --font-size--largest: 2.5rem; */
+    --font-size--largest: 2.7rem;
+  }
 }
 
 @media (min-width: 576px) {
-    html {
-        font-size: 62.5%;
-    }
+  html {
+    font-size: 62.5%;
+  }
 }
 
 @media (min-width: 768px) {
-    html {
-        font-size: 62.5%;
-    }
+  html {
+    font-size: 62.5%;
+  }
 }
 
 @media (min-width: 992px) {
-    html {
-        font-size: 62.5%;
-    }
+  html {
+    font-size: 62.5%;
+  }
 }
 
 @media (min-width: 1200px) {
-    html {
-        font-size: 62.5%;
-    }
+  html {
+    font-size: 62.5%;
+  }
 }
 
 body {
-    font-weight: lighter;
-    font-size: var(--font-size--default);
+  font-weight: lighter;
+  font-size: var(--font-size--default);
 }
 
 .font-size-small {
-    font-size: var(--font-size--small);
+  font-size: var(--font-size--small);
 }
 
 .font-size-default {
-    font-size: var(--font-size--default);
+  font-size: var(--font-size--default);
 }
 
 .font-size-large {
-    font-size: var(--font-size--large);
+  font-size: var(--font-size--large);
 }
