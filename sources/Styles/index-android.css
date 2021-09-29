@@ -37,13 +37,6 @@ div#main-heading ol {
     border-radius: unset;
 }
 
-li.title-bullets:first-of-type {
-  margin-top: unset;
-}
-
-li.title-bullets:last-of-type {
-  margin-bottom: unset;
-}
 
 div#main-heading ol li::before {
     background-color: rgba(27, 122, 166, 0.5);

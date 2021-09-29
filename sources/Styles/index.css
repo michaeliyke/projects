@@ -225,7 +225,7 @@ div#main-heading ol {
   display: inline-block;
   font-size: var(--font-size--medium);
   line-height: 1.5;
-  /* padding: 3.2rem; */
+  padding: 3.2rem;
   text-align: left;
   border-radius: 4px;
   font-weight: 600;
@@ -253,11 +253,7 @@ li.title-bullets {
 }
 
 li.title-bullets:first-of-type {
-  margin-top: 3.8rem;
-}
-
-li.title-bullets:last-of-type {
-  margin-bottom: 3.8rem;
+  margin-top: unset;
 }
 
 #list {
