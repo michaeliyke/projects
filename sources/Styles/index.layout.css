@@ -50,6 +50,7 @@ div#main-heading {
   :root {
     /* --font-size--largest: 2.5rem; */
     --font-size--largest: 2.7rem;
+    --font-size--medium:1.7rem;
   }
 }
 

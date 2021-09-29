@@ -30,13 +30,33 @@ div#main-heading #title {
 }
 
 div#main-heading ol {
-    background-color: rgba(40, 135, 179, 0);
-    color: #346a96;
+    /* background-color: rgba(40, 135, 179, 0); */
+    /* color: #346a96; */
+    font-size: unset;
+    font-weight: unset;
+    border-radius: unset;
+}
+
+li.title-bullets:first-of-type {
+  margin-top: unset;
+}
+
+li.title-bullets:last-of-type {
+  margin-bottom: unset;
 }
 
 div#main-heading ol li::before {
     background-color: rgba(27, 122, 166, 0.5);
+    border: none;
+    width: 1rem;
+    height: 1rem;
+    border: 0.1rem solid #fff;
 }
+
+li.title-bullets {
+  margin-left: unset;
+}
+
 #questions-list {
     margin: 3em 0 2em; 
 }
