@@ -3,7 +3,7 @@
 CLS
 
 ECHO. Executing . . .
-ECHO. ^gbuild.bat ^& ^hrun.bat
+ECHO. ^gbuild ^&& ^hrun
 
- gbuild.bat && hrun.bat
+ gbuild && hrun
  ECHO.

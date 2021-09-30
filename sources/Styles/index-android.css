@@ -30,11 +30,12 @@ div#main-heading #title {
 }
 
 div#main-heading ol {
-    /* background-color: rgba(40, 135, 179, 0); */
-    /* color: #346a96; */
     font-size: unset;
     font-weight: unset;
     border-radius: unset;
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+    margin-top: 3rem !important;
 }
 
 
