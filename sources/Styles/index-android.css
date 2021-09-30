@@ -72,9 +72,11 @@ li.title-bullets {
 }
 .covered {
     font-weight: 900;
-    padding-bottom: 4em;
-    padding-left: 0.5em;
-    text-align: left;
+    text-align: center;
+    font-size: 1.6rem;
+}
+i.is-for-you {
+  font-size: 1.6rem !important;
 }
 .dot {
     margin: 2px 2px 2px 0;
