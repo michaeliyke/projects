@@ -93,4 +93,23 @@
   font-size: 2.1rem;
   text-decoration: none;
 }
+.cell, #total, #submit, #reset {
+  font-size: 1.6rem;
+}
+span.dropdown-toggle.right {
+  font-size: 1.5rem;
+}
+span.navbar-toggler-icon .left {
+  font-size: 1.3rem;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-bottom: 0;
+  padding-top: 5px;
+}
+#toggler .mgt-toggle-btn {
+  padding: 0;
+}
+#trigger.bg-dark{
+  background-color: rgba(52, 58, 64, 0.1) !important;
+}
 }
