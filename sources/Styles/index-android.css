@@ -1,85 +1,88 @@
 @media screen and (max-width: 599px) {
-
-section nav#nav ul, section nav#silent-nav ul {
+  section nav#nav ul, section nav#silent-nav ul {
     transition: all 0.5s ease 0s;
-}
-header section nav ul li {
+  }
+  header section nav ul li {
     transition: all 0.3s ease 0s;
     border-bottom: 0.128em solid #565656;
     padding: 0.6em;
-}
-
-
-#silent-nav h1 a {
+  }
+  #silent-nav h1 a {
     color: #11709c;
-}
-
-
-nav [data-role="projects-toggler"] {
+  }
+  nav [data-role="projects-toggler"] {
     border-radius: 1px;
     color: rgb(255, 255, 255);
     padding-left: 0.19em;
     padding-right: 0.19em;
     padding-top: 0.05em;
     right: 5%;
-}
-
-div#main-heading #title {
+  }
+  div#main-heading #title {
     line-height: normal;
     text-align: center;
-}
-
-div#main-heading ol {
+  }
+  div#main-heading ol {
     font-size: unset;
     font-weight: unset;
     border-radius: unset;
     padding-bottom: 1rem;
     padding-top: 1rem;
     margin-top: 3rem !important;
-}
-
-
-div#main-heading ol li::before {
+  }
+  div#main-heading ol li::before {
     background-color: rgba(27, 122, 166, 0.5);
     border: none;
     width: 1rem;
     height: 1rem;
     border: 0.1rem solid #fff;
-}
-
-li.title-bullets {
-  margin-left: unset;
-}
-
-#questions-list {
-    margin: 3em 0 2em; 
-}
-#options-list{
+  }
+  li.title-bullets {
+    margin-left: unset;
+  }
+  #questions-list {
+    margin: 3em 0 2em;
+  }
+  #options-list {
     margin: 2em 0;
     padding: 2em 0em;
-}
-.questions-intro-1.heading{
+  }
+  .questions-intro-1.heading {
     padding-left: 1em;
-}
-.heading.shout {
+  }
+  .heading.shout {
     margin-left: 0;
-}
-.introducing {
+  }
+  .introducing {
     padding-left: 0;
-}
-.option {
+  }
+  .option {
     padding-left: unset;
-}
-.covered {
+  }
+  .covered {
     font-weight: 900;
     text-align: center;
     font-size: 1.6rem;
-}
-i.is-for-you {
-  font-size: 1.6rem !important;
-}
-.dot {
+  }
+  i.is-for-you {
+    font-size: 1.6rem !important;
+  }
+  .dot {
     margin: 2px 2px 2px 0;
+  }
+  
+  #input {
+    display: flex;
+  }
+  
+  #project {
+    background-position: unset;
+    background-size: auto 100%;
+  }
+  
+  .calculator-heading {
+    color: #424E82;
+  font-size: unset;
+  text-decoration: none;
 }
 }
-

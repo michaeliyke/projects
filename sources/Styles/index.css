@@ -3,6 +3,17 @@
   margin-top: 2.5rem;
 }
 
+/* Contain floats and margins. */
+/* ClearFix */
+.cfm:before, .cfm:after {
+  content: ' ';
+  display: table;
+}
+
+.cfm:after {
+  clear: both;
+}
+
 #silent-navigation {
   font-family: sans-serif;
 }
@@ -404,16 +415,12 @@ input {
 }
 
 #project {
-  background-color: rgb(0, 127, 127);
   color: rgb(255, 255, 255);
   padding-bottom: 3em;
   padding-top: 1em;
   background-color: #41A0CC;
-  background-image: linear-gradient(to top, #444444, #51525c, #596176, #5c7291, #5785ab, #5195bd, #46a6ce, #36b7dc, #32c8e5, #38d9eb, #48eaef, #5ffbf1);
-  background-image: linear-gradient(to top, #4d4e55, #5a6576, #607f98, #5c9bb8, #51b8d3, #51b7d2, #51b7d2, #51b6d1, #5b98b4, #5d7c93, #576170, #494a4e);
   background-image: url("../Images/C14.jpg"), linear-gradient(to top, #1c1e31, #1f2e45, #1e3f59, #17516b, #09647a, #09647a, #09647a, #09647a, #17516b, #1e3f59, #1f2e45, #1c1e31);
   background-position: center center;
-  background-position-y: top;
   background-repeat: no-repeat;
   background-size: 100% auto;
   font-family: sans-serif;
