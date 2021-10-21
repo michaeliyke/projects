@@ -70,9 +70,17 @@
   .dot {
     margin: 2px 2px 2px 0;
   }
-  
-  #input {
-    display: flex;
+
+  #input{
+    justify-content: center;
+  }
+  #input > .item{
+    margin-right:1rem;
+  }
+
+  #input > input {
+    border-radius: 15px;
+    padding: 0.5rem 1.1rem;
   }
   
   #project {
@@ -82,7 +90,7 @@
   
   .calculator-heading {
     color: #424E82;
-  font-size: unset;
+  font-size: 2.1rem;
   text-decoration: none;
 }
 }
