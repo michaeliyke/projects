@@ -83,7 +83,7 @@
     padding: 0.5rem 1.1rem;
   }
   
-  #project {
+  #project, #project-body+.row{
     background-position: unset;
     background-size: auto 100%;
   }
@@ -109,7 +109,5 @@ span.navbar-toggler-icon .left {
 #toggler .mgt-toggle-btn {
   padding: 0;
 }
-#trigger.bg-dark{
-  background-color: rgba(52, 58, 64, 0.1) !important;
-}
+
 }
