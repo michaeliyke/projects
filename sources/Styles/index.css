@@ -422,19 +422,18 @@ input {
   background-position: center center;
   background-repeat: no-repeat;
   background-size: 100% auto;
-  background-attachment: scroll, fixed;
+  background-attachment: fixed;
+}
+
+#project-wrapper {
+  background-color: rgba(52, 58, 64, 0.1) !important;
+  background-size: cover;
 }
 
 #project {
   color: rgb(255, 255, 255);
   padding-bottom: 3em;
   padding-top: 1em;
-  /* background-color: #41A0CC; */
-  background-color: rgba(52, 58, 64, 0.2) !important;
-  /* background-image: url("../Images/C14.jpg"), linear-gradient(to top, #1c1e31, #1f2e45, #1e3f59, #17516b, #09647a, #09647a, #09647a, #09647a, #17516b, #1e3f59, #1f2e45, #1c1e31); */
-  /* background-position: center center; */
-  /* background-repeat: no-repeat; */
-  background-size: 100% auto;
   font-family: sans-serif;
 }
 
