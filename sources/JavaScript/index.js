@@ -167,13 +167,29 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
     return typeof index === "number" ? list[index]: list;
 }
 
-    var d = document, getId = this.Id, Total = 0, v1 = "Next item",v2 = '0.00',amount = getId("amount"),
-    total = getId("total"), submit = getId("submit"), item = inputItem = getId("item"),
-    reset = getId("reset"),  currentV = $("#current > #current"), currentItem =  $("#current > #currentItem"),
-    manage = getId("managing"), printing = getId("printing"), saving = getId("saving"), _techie = this,
-    table = getId("table");
-    mobile_menu = getByClass("open-off-canvass");
-    section_lists = query("header section nav ul");
+var d = document, getId = this.Id, Total = 0, v1 = "Next item",v2 = '0.00',amount = getId("amount"),
+total = getId("total"), submit = getId("submit"), item = inputItem = getId("item"),
+reset = getId("reset"),  currentV = $("#current > #current"), currentItem =  $("#current > #currentItem"),
+manage = getId("managing"), printing = getId("printing"), saving = getId("saving"), _techie = this,
+table = getId("table");
+mobile_menu = getByClass("open-off-canvass");
+section_lists = query("header section nav ul");
+
+const vars = {};
+
+const grab = sapi.querySelector.bind(sapi);
+$("input[name='item']").on("input", function(e){
+  item = e.target;
+  if (item.value.length > 0) {
+    if (!vars.item) {
+      
+    }
+    // Add a row
+  } else {
+    // remove row
+  }
+  
+});
 
 mobile_menu_open.dumming = false;
 function mobile_menu_open(){

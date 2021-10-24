@@ -416,16 +416,18 @@ input {
   text-transform: uppercase;
 }
 
-#project-body+.row {
+#project-wrapper {
   background-color: #41A0CC;
-  background-image: url("../Images/C14.jpg"), linear-gradient(to top, #1c1e31, #1f2e45, #1e3f59, #17516b, #09647a, #09647a, #09647a, #09647a, #17516b, #1e3f59, #1f2e45, #1c1e31);
+  background-image: url("../Images/C14.jpg");
+  background-color: rgba(52, 58, 64, 0.1);
+  /* background-image: url("../Images/C14.jpg"), linear-gradient(to top, #1c1e31, #1f2e45, #1e3f59, #17516b, #09647a, #09647a, #09647a, #09647a, #17516b, #1e3f59, #1f2e45, #1c1e31); */
   background-position: center center;
   background-repeat: no-repeat;
   background-size: 100% auto;
-  background-attachment: fixed;
+  background-attachment: scroll;
 }
 
-#project-wrapper {
+#inner-wrapper {
   background-color: rgba(52, 58, 64, 0.1) !important;
   background-size: cover;
 }
@@ -576,7 +578,6 @@ input {
 }
 
 .del1 {
-  color: rgb(144, 138, 100);
   font-weight: bold;
   margin-top: 0.6em;
   position: absolute;
@@ -584,11 +585,16 @@ input {
   text-align: center;
   width: 1em;
   cursor: pointer;
+  color: #f0e68b;
 }
 
 .del1:hover {
-  color: #f0e68b;
+  color: rgb(144, 138, 100);
   cursor: pointer;
+}
+
+div#resultsPane {
+  background-color: #E1C3A6;
 }
 
 table {
