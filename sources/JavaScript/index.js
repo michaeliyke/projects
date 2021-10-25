@@ -168,27 +168,66 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
 }
 
 var d = document, getId = this.Id, Total = 0, v1 = "Next item",v2 = '0.00',amount = getId("amount"),
-total = getId("total"), submit = getId("submit"), item = inputItem = getId("item"),
+total = getId("total"), submit = getId("submit"), input = inputItem = getId("item"),
 reset = getId("reset"),  currentV = $("#current > #current"), currentItem =  $("#current > #currentItem"),
 manage = getId("managing"), printing = getId("printing"), saving = getId("saving"), _techie = this,
 table = getId("table");
 mobile_menu = getByClass("open-off-canvass");
 section_lists = query("header section nav ul");
 
-const vars = {};
-
-const grab = sapi.querySelector.bind(sapi);
-$("input[name='item']").on("input", function(e){
-  item = e.target;
-  if (item.value.length > 0) {
-    if (!vars.item) {
-      
+// Get all data
+function getData(){
+  const table = grab("table tbody");
+  const data = [];
+  Array.forEach.call(table.children, (ch) => {
+    if (ch && ch.nodeName === "ROW") {
+      const item = grab.call(ch, "#cell0");
+      const amount = grab.call(ch, "#cell1");
+      data.push({ item: item.textContent, amount: amount.textContent});
     }
-    // Add a row
-  } else {
-    // remove row
+  });
+  return JSON.stringify(data);
+}
+
+const vars = {};
+const grab = sapi.querySelector.bind(sapi);
+$("input[name='item'], input[name='amount']").on("input", function(e){
+  const rowMap = {};
+  const input = e.target;
+  if (input.value.length > 0) {
+    if (!vars.activeRow) {
+      // Add a row for the first add
+      const row = createRow(input.value, "");
+      const table = grab("table tbody");
+      table.insertBefore(row, table.firstChild);
+      vars.activeRow = grab.call(table, "tr");
+    }
+    
+      const cell0 = grab("#cell0");
+      const cell1 = grab("#cell1");
+    // fill row text
+    if (input.id === "item") {
+      cell0.textContent = ucWord(input.value);
+      return
+    }
+    cell1.textContent = input;
+    return
   }
-  
+  // remove row if value is empty
+  if (!vars.activeRow) {
+    return
+  }
+  const cell0 = grab("#cell0");
+  const cell1 = grab("#cell1");
+  const amount = grab.call(vars.activeRow.parentNode, "#amount");
+  const item = grab.call(vars.activeRow.parentNode, "#item");
+  console.log();
+  if (item.value.trim() || amount.value.trim()) {
+    return
+  }
+  cell0.textContent = "";
+  vars.activeRow.parentNode.removeChild(vars.activeRow);
+  vars.activeRow = null;
 });
 
 mobile_menu_open.dumming = false;
@@ -234,10 +273,10 @@ function del(e, btn){
 
     function Clean(){ 
         //reset all fields here
-        item.value = amount.value = "";
-            item.placeholder = "New item";
+        input.value = amount.value = "";
+            input.placeholder = "New item";
             amount.placeholder = "New vlaue";
-            item.focus(); Total = 0;
+            input.focus(); Total = 0;
              total.textContent = "Total: 0";
             $("table tbody").empty(); 
     }
@@ -249,7 +288,7 @@ function del(e, btn){
       function HandleEnter(e){
          var evnt = e || global.event;
          if(evnt.keyCode == 13){
-            Foo.call(null, null, item, amount);
+            Foo.call(null, null, input, amount);
          }
     }
 
@@ -354,20 +393,20 @@ function added() {
         }
     
   function Foo(){
-    if (!validate(item, amount)) {
+    if (!validate(input, amount)) {
       return;
     }
 
-   _techie.grab("table tbody").prependChild( createRow(item.value, amount.value) );
+   _techie.grab("table tbody").prependChild( createRow(input.value, amount.value) );
     updateUI( extractNumbers(amount.value) );
   }
 
   function updateUI(num){
-    item.value = amount.value = "";
-    item.placeholder = "New item";
+    input.value = amount.value = "";
+    input.placeholder = "New item";
     amount.placeholder = "New value";
     currentItem.text(v1); currentV.text(v2);
-    item.focus(); 
+    input.focus(); 
     Total += num; //The elusive counter engine
     if(Total != +Total) {
       return //reset();
@@ -395,7 +434,7 @@ var number =  -1, length = arguments.length, stack = [], args = arguments, txt,
 row =  sapi.createElement("tr"), cell = sapi.createElement("td"); 
 while(++number < 2) { 
     txt = " <td class='cell' id='cell" + number + "'> </td> <span class='del del" + number +
-     "' title='Delete this row'>x</span>"
+     "' title='Remove record'>x</span>"
     stack.push( txt );
 }
 // a(stack)
