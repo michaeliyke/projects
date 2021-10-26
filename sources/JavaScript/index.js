@@ -27,120 +27,120 @@
       });
  */
 
-Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
-    
-    var context = null;
+Techie(function ($, body, head, sapi, _, global, Log, stringify, stringifyAll, a) {
 
-    // Abstract all event binding using delegation
-    $(body).click(Subscriptions).input(HandleTyping).keydown(HandlerKeyPress, $(sapi));
+  var context = null;
 
-    // Key press events group handler
-      function HandlerKeyPress(event, obj) {
-      // obj - the target element say it's tabbing functionality targeted
-      [HandleEnter, EscapeKeyHandler, MainEscapeKeyHandler].forEach(function(handler) {
-        handler(event, obj);
-      });
+  // Abstract all event binding using delegation
+  $(body).click(Subscriptions).input(HandleTyping).keydown(HandlerKeyPress, $(sapi));
 
-    }
+  // Key press events group handler
+  function HandlerKeyPress(event, obj) {
+    // obj - the target element say it's tabbing functionality targeted
+    [HandleEnter, EscapeKeyHandler, MainEscapeKeyHandler].forEach(function (handler) {
+      handler(event, obj);
+    });
+
+  }
 
 
 
-    function Subscriptions(event, obj) {
+  function Subscriptions(event, obj) {
 
-      subscriptions = { 
-        //Subscription is purely by criterion -: id, class, name, data-set etc
-        "default_handlers": [CloseHandler], //Default handlers will always execute
-        "grouped_subscribers": [
-          {
-            "names": ["toggler", "equiv"], 
-            "handlers": [ActionsMenuToggle]
-          }
-        ],
-        "subscribers": [
-          //subscribers -> classes or ids subscribing to the click (event) bubble
-          {"name": "toggle-sign", "handlers": [DropdownMenus]},
-          {"name":"del", "handlers": [del]}, // .del
-          {"name":"submit", "handlers": [Foo]}, //.submit
-          {"name": "projects-toggler", "handlers": [init]}, // .projects-toggler
-          {"name":"reset", "handlers": [Clean]}, // .reset
-          {"name":"converting", "handlers": [ConvertToPDF]}, // .converting
-          {"name":"swap", "handlers": [mobile_menu_open, toggleChange]}, // .swap
-          {"name":"open-off-canvass", "handlers": [mobile_menu_open, toggleChange]} // .open-off-canvass
-        ],
-        "subscriber": event.target,
-        "activate": function activator(event, subscriberString, actions) {
-          if (actions.length < 1) {
-            console.warn("You have not specified any actions for subscriber:", subscriberString);
-          }
-          actions.forEach(function launch(action) {
-            action.call(obj, event, subscriptions.subscriber, obj);
-          });
+    subscriptions = {
+      //Subscription is purely by criterion -: id, class, name, data-set etc
+      "default_handlers": [CloseHandler], //Default handlers will always execute
+      "grouped_subscribers": [
+        {
+          "names": ["toggler", "equiv"],
+          "handlers": [ActionsMenuToggle]
         }
-      };
-
-      filter = ActivationHandler;
-      subscriptions.default_handlers.forEach(function(handler) {
-        handler.call(obj, event, subscriptions.subscriber, obj);
-      });
-      // subscriptions.subscribers.forEach(filter);
-      HandlerGroup(filter);
-      HandleSingle(filter);
-      function HandlerGroup(handler){
-           subscriptions.grouped_subscribers.forEach(function handleSubscription(group) {
-             group.names.forEach(function subscriber(subscriberString) {
-                 handler(subscriberString, group); 
-             });
-           });
-      }
-
-      function HandleSingle(handler) {
-        subscriptions.subscribers.forEach(function handleSubscription(subscriber) {
-          handler(subscriber.name)
+      ],
+      "subscribers": [
+        //subscribers -> classes or ids subscribing to the click (event) bubble
+        { "name": "toggle-sign", "handlers": [DropdownMenus] },
+        { "name": "del", "handlers": [del] }, // .del
+        { "name": "submit", "handlers": [Foo] }, //.submit
+        { "name": "projects-toggler", "handlers": [init] }, // .projects-toggler
+        { "name": "reset", "handlers": [Clean] }, // .reset
+        { "name": "converting", "handlers": [ConvertToPDF] }, // .converting
+        { "name": "swap", "handlers": [mobile_menu_open, toggleChange] }, // .swap
+        { "name": "open-off-canvass", "handlers": [mobile_menu_open, toggleChange] } // .open-off-canvass
+      ],
+      "subscriber": event.target,
+      "activate": function activator(event, subscriberString, actions) {
+        if (actions.length < 1) {
+          console.warn("You have not specified any actions for subscriber:", subscriberString);
+        }
+        actions.forEach(function launch(action) {
+          action.call(obj, event, subscriptions.subscriber, obj);
         });
       }
+    };
 
-      function ActivationHandler(subscriberString, group){
-        if (subscriptions.subscriber.classList.contains(subscriberString)) {
+    filter = ActivationHandler;
+    subscriptions.default_handlers.forEach(function (handler) {
+      handler.call(obj, event, subscriptions.subscriber, obj);
+    });
+    // subscriptions.subscribers.forEach(filter);
+    HandlerGroup(filter);
+    HandleSingle(filter);
+    function HandlerGroup(handler) {
+      subscriptions.grouped_subscribers.forEach(function handleSubscription(group) {
+        group.names.forEach(function subscriber(subscriberString) {
+          handler(subscriberString, group);
+        });
+      });
+    }
+
+    function HandleSingle(handler) {
+      subscriptions.subscribers.forEach(function handleSubscription(subscriber) {
+        handler(subscriber.name)
+      });
+    }
+
+    function ActivationHandler(subscriberString, group) {
+      if (subscriptions.subscriber.classList.contains(subscriberString)) {
         if (Object.prototype.toString.call(group) == "[object Object]") {
           actions = group.handlers;
         } else {
-            subscriptions.subscribers.forEach(function handleSubscription(subscriber) {
+          subscriptions.subscribers.forEach(function handleSubscription(subscriber) {
             if (subscriberString == subscriber.name) {
               actions = subscriber.handlers;
-          }
-        });
-          }
-          subscriptions.activate(event, subscriberString, actions);
+            }
+          });
         }
+        subscriptions.activate(event, subscriberString, actions);
       }
-
     }
 
+  }
 
-    function DropdownMenus(e, target) {
-       if (target && target.nodeType == 1 && target.classList.contains("toggle-sign")) {
+
+  function DropdownMenus(e, target) {
+    if (target && target.nodeType == 1 && target.classList.contains("toggle-sign")) {
       parent = traverseUp(target, (e) => e.querySelector(".drop-down-menu") != null);
       dropdown = parent.querySelector(".drop-down-menu");
       Techie.dropdownTarget = dropdown;
       toggleDropdown(dropdown, "show-block", target);
       return
     }
-      toggleDropdown(Techie.dropdownTarget, "show-block");
+    toggleDropdown(Techie.dropdownTarget, "show-block");
+  }
+
+
+
+  function traverseUp(e, test) {
+    if (e && e.tagName != "BODY") {
+      return test(e) ? e : traverseUp(e.parentNode, test);
     }
+    return null;
+  }
 
-
-
-    function traverseUp(e, test) {
-      if (e && e.tagName != "BODY") {
-        return test(e) ? e : traverseUp(e.parentNode, test);
-      }
-      return null;
+  function toggleDropdown(element, name, eventTarget) {
+    if (!element) {
+      return
     }
-
-    function toggleDropdown(element, name, eventTarget) {
-      if (!element) {
-        return
-      }
     if (!(eventTarget && eventTarget.classList.contains("toggle-sign"))) {
       element.classList.remove(name);
       return
@@ -153,363 +153,290 @@ Techie(function($, body, head, sapi, _, global, Log,stringify, stringifyAll, a){
   }
 
 
-    function getByClass(name, index) {
-     if (arguments.length > 1 && +index != index) {
-         return console.error(`Ensure ${index} is an integer number.`);
-     }
-    return typeof index === "number" ? query(`.${name}`, index): query(name);
-}
-    function query(selector, index) {
-     if (arguments.length > 1 && +index != index) {
-         return console.error(`Ensure ${index} is an integer number.`);
-     }
+  function getByClass(name, index) {
+    if (arguments.length > 1 && +index != index) {
+      return console.error(`Ensure ${index} is an integer number.`);
+    }
+    return typeof index === "number" ? query(`.${name}`, index) : query(name);
+  }
+  function query(selector, index) {
+    if (arguments.length > 1 && +index != index) {
+      return console.error(`Ensure ${index} is an integer number.`);
+    }
     list = [].slice.call(document.querySelectorAll(selector));
-    return typeof index === "number" ? list[index]: list;
-}
+    return typeof index === "number" ? list[index] : list;
+  }
 
-var d = document, getId = this.Id, Total = 0, v1 = "Next item",v2 = '0.00',amount = getId("amount"),
-total = getId("total"), submit = getId("submit"), input = inputItem = getId("item"),
-reset = getId("reset"),  currentV = $("#current > #current"), currentItem =  $("#current > #currentItem"),
-manage = getId("managing"), printing = getId("printing"), saving = getId("saving"), _techie = this,
-table = getId("table");
-mobile_menu = getByClass("open-off-canvass");
-section_lists = query("header section nav ul");
+  var d = document, getId = this.Id, Total = 0, v1 = "Next item", v2 = '0.00', amount = getId("amount"),
+    total = getId("total"), submit = getId("submit"), input = inputItem = getId("item"),
+    reset = getId("reset"), currentV = $("#current > #current"), currentItem = $("#current > #currentItem"),
+    manage = getId("managing"), printing = getId("printing"), saving = getId("saving"), _techie = this,
+    table = getId("table");
+  mobile_menu = getByClass("open-off-canvass");
+  section_lists = query("header section nav ul");
 
-// Get all data
-function getData(){
-  const table = grab("table tbody");
-  const data = [];
-  Array.forEach.call(table.children, (ch) => {
-    if (ch && ch.nodeName === "ROW") {
-      const item = grab.call(ch, "#cell0");
-      const amount = grab.call(ch, "#cell1");
-      data.push({ item: item.textContent, amount: amount.textContent});
-    }
-  });
-  return JSON.stringify(data);
-}
+  // Get all data
+  inputItem.focus();
 
-const vars = {};
-const grab = sapi.querySelector.bind(sapi);
-$("input[name='item'], input[name='amount']").on("input", function(e){
-  const rowMap = {};
-  const input = e.target;
-  if (input.value.length > 0) {
-    if (!vars.activeRow) {
-      // Add a row for the first add
-      const row = createRow(input.value, "");
-      const table = grab("table tbody");
-      table.insertBefore(row, table.firstChild);
-      vars.activeRow = grab.call(table, "tr");
-    }
-    
-      const cell0 = grab("#cell0");
-      const cell1 = grab("#cell1");
-    // fill row text
-    if (input.id === "item") {
-      cell0.textContent = ucWord(input.value);
+  mobile_menu_open.dumming = false;
+  function mobile_menu_open() {
+    if (mobile_menu_open.dumming) {
+      mobile_menu_open.dumming = false;
+      section_lists[0].style.width = 0;
+      section_lists[1].style.width = 0;
       return
     }
-    cell1.textContent = input;
-    return
+    mobile_menu_open.dumming = true;
+    section_lists[0].style.width = "14em";// "50%";
+    section_lists[1].style.width = "14em";// "50%";
   }
-  // remove row if value is empty
-  if (!vars.activeRow) {
-    return
+
+  function mobile_menu_close() {
+    section.style.width = 0;
   }
-  const cell0 = grab("#cell0");
-  const cell1 = grab("#cell1");
-  const amount = grab.call(vars.activeRow.parentNode, "#amount");
-  const item = grab.call(vars.activeRow.parentNode, "#item");
-  console.log();
-  if (item.value.trim() || amount.value.trim()) {
-    return
+  function del(e, btn) {
+    if (a("Do you want to delete this row?")) {
+      new Promise(function (resolve, reject) {
+        row = $(btn.parentNode)
+        value_cell = row[0].querySelector(".cell ~ .cell");
+        num = "-" + value_cell.textContent.replace(/[^\d]+/g);
+        updateUI(parseFloat(num, 10));
+        row.hideFX();
+        setTimeout(function () {
+          row.remove()
+        }, 1000);
+        resolve(row);
+      }).then(function (row) {
+        console.log("Row deleted");
+        return row
+      }).catch(function (error) {
+        console.error(error);
+      });
+    }
   }
-  cell0.textContent = "";
-  vars.activeRow.parentNode.removeChild(vars.activeRow);
-  vars.activeRow = null;
-});
 
-mobile_menu_open.dumming = false;
-function mobile_menu_open(){
-  if (mobile_menu_open.dumming) {
-    mobile_menu_open.dumming = false;
-    section_lists[0].style.width =  0;
-    section_lists[1].style.width =  0;
-    return 
+  function updateCount(number) {
+    $("#total").text(`Total: ${number}`)
   }
-  mobile_menu_open.dumming = true;
-  section_lists[0].style.width = "14em";// "50%";
-  section_lists[1].style.width = "14em";// "50%";
-}
 
-function mobile_menu_close(){
-  section.style.width = 0;
-}
-function del(e, btn){
-  if (a("Do you want to delete this row?")) {
-    new Promise(function(resolve, reject) {
-      row = $(btn.parentNode)
-      value_cell = row[0].querySelector(".cell ~ .cell");
-      num = "-" + value_cell.textContent.replace(/[^\d]+/g) ;
-      updateUI(parseFloat(num, 10));
-      row.hideFX();
-       setTimeout(function(){
-        row.remove()
-      }, 1000);
-      resolve(row);
-    }).then(function(row) {
-    console.log("Row deleted");
-    return row
-    }).catch(function(error){
-      console.error(error);
-    });
-  } 
+  function Clean() {
+    //reset all fields here
+    input.value = amount.value = "";
+    input.placeholder = "New item";
+    amount.placeholder = "New vlaue";
+    input.focus(); Total = 0;
+    total.textContent = "Total: 0";
+    $("table tbody").empty();
+    vars = {};
+  }
+
+
+  //Hooks an event on the document
+  this.text("Total: 0", total);
+
+  function HandleEnter(e) {
+    var evnt = e || global.event;
+    if (evnt.keyCode == 13) {
+      Foo.call(null, null, input, amount);
     }
+  }
 
-    function updateCount(number) {
-      $("#total").text(`Total: ${number}`)
+  function HandleTyping(e) {
+    var target = this.getTarget(e);
+    if (target.id == "item") {
+      currentItem.text(target.value);
+    } else if (target.id == "amount") {
+      currentV.text(target.value);
     }
-
-    function Clean(){ 
-        //reset all fields here
-        input.value = amount.value = "";
-            input.placeholder = "New item";
-            amount.placeholder = "New vlaue";
-            input.focus(); Total = 0;
-             total.textContent = "Total: 0";
-            $("table tbody").empty(); 
-    }
-
-    
-    //Hooks an event on the document
-    this.text("Total: 0", total);
-
-      function HandleEnter(e){
-         var evnt = e || global.event;
-         if(evnt.keyCode == 13){
-            Foo.call(null, null, input, amount);
-         }
-    }
-
-      function HandleTyping(e) {
-      var target = this.getTarget(e);
-      if (target.id == "item") {
-        currentItem.text(target.value);
-      } else if (target.id == "amount") {
-        currentV.text(target.value);
-      }
-    }
-    // PDF plug
-    function ConvertToPDF(){
+  }
+  
+  // PDF plug
+  function ConvertToPDF() {
     if (added()) {
       printsBlob();
     }
-    }
+  }
 
-// item.focus();
-/*#2876a8*/
-function added() {
+  // item.focus();
+  /*#2876a8*/
+  function added() {
     var ret = false;
-          $("td").once(function(){ 
-           if (this.text()) {
-            ret = true;
-           }
-          })
-          return ret;
-        }
-
+    $("td").once(function () {
+      if (this.text()) {
+        ret = true;
+      }
+    })
+    return ret;
+  }
 
   function ActionsMenuToggle(event, dom, techie) {
     var width, pane;
-      $("#manage").toggleClass(function(){
-        pane = this;
-        context = this;
-        this.pane = this;
-        width = this.computedStyle()["width"].replace(/[A-z]+/i, "");
-        context.width = width;
-        if (context.width == 0) {
-          this.css({
-            border: "0.01em solid",
-            width: "250px", opacity: 1
-          }); /*#equiv  &#9661;*/
-          $("#equiv").html("&#120169;");
-          context.width = 250;
-        }else{
-          closePane.call(this, event, ActionsMenuToggle, this);
-        }
-      });
-      this.pane = pane;
-    }
-      // _techie.grab("body").addHandler("keypress", EscapeKeyHandler);
+    $("#manage").toggleClass(function () {
+      pane = this;
+      context = this;
+      this.pane = this;
+      width = this.computedStyle()["width"].replace(/[A-z]+/i, "");
+      context.width = width;
+      if (context.width == 0) {
+        this.css({
+          border: "0.01em solid",
+          width: "250px", opacity: 1
+        }); /*#equiv  &#9661;*/
+        $("#equiv").html("&#120169;");
+        context.width = 250;
+      } else {
+        closePane.call(this, event, ActionsMenuToggle, this);
+      }
+    });
+    this.pane = pane;
+  }
+  // _techie.grab("body").addHandler("keypress", EscapeKeyHandler);
 
-      function EscapeKeyHandler(event, obj){
-      if(event.keyCode == 27){ //escape key
-        DropdownMenus(event)
+  function EscapeKeyHandler(event, obj) {
+    if (event.keyCode == 27) { //escape key
+      DropdownMenus(event)
       if (context && context.width && context.width > 0) {
         closePane.call(context, event, EscapeKeyHandler, context);
 
       }
     }
+  }
+
+  function CloseHandler(event, dom, techie) {
+    var target = this.getTarget(event);
+    if ((target.id == "equiv" || target.id == "manage") || (target.id == "equiv" || target.parentNode.id == "manage")) {
+      return false;
     }
-
-
-
-     function CloseHandler(event, dom, techie){
-      var target = this.getTarget(event);
-      if ((target.id == "equiv" || target.id == "manage") || (target.id == "equiv" || target.parentNode.id == "manage")) {
-        return false;
-      }
-      switch(target.id){
-        case "main":
-        // case "nav":
-        case "header":
-        case "project":
-        case "project-body":
-        case "trigger":
-        case "inputs":
-        case "input": 
+    switch (target.id) {
+      case "main":
+      // case "nav":
+      case "header":
+      case "project":
+      case "project-body":
+      case "trigger":
+      case "inputs":
+      case "input":
         if (this.pane) {
           closePane.call(this, event, CloseHandler, this);
           this.type_ = "click";
         }
         break
-        default: 
-        // console.info("Delegation no match! id -", target.id);
-      }
+      default:
+      // console.info("Delegation no match! id -", target.id);
     }
+  }
 
-    function closePane(event, handler, pane){
-          this.pane.css({
-            "width": "0px", opacity: 0
-          });
-          $("#equiv").html("&#9776;"/*"&#9776;"*/);
-          width = 0; 
-          if (context) {
-            context.width = 0;
-          }
-          this.pane = null;
-          context = null;
-        }
-    
-  function Foo(){
+  function closePane(event, handler, pane) {
+    this.pane.css({
+      "width": "0px", opacity: 0
+    });
+    $("#equiv").html("&#9776;"/*"&#9776;"*/);
+    width = 0;
+    if (context) {
+      context.width = 0;
+    }
+    this.pane = null;
+    context = null;
+  }
+
+  function Foo() {
     if (!validate(input, amount)) {
       return;
     }
 
-   _techie.grab("table tbody").prependChild( createRow(input.value, amount.value) );
-    updateUI( extractNumbers(amount.value) );
+    // _techie.grab("table tbody").prependChild(createRow(input.value, amount.value));
+    updateUI(extractNumbers(amount.value));
   }
 
-  function updateUI(num){
+  function updateUI(num) {
     input.value = amount.value = "";
     input.placeholder = "New item";
     amount.placeholder = "New value";
     currentItem.text(v1); currentV.text(v2);
-    input.focus(); 
+    input.focus();
     Total += num; //The elusive counter engine
-    if(Total != +Total) {
+    vars.activeRow = null;
+    if (Total != +Total) {
       return //reset();
     }
     $("#total").text(`Total: ${Total}`);
-}
-
-
-function validate(item, amount) {
-  var test = /^((\w*|\W*)*[\w\s-]*)+$/.test(item.value);
-  if (!(test && amount.value)) {
-    console.warn("Warning::   Make sure you are inputing the right values.");
-    return false; 
-  }
-  return true
-}
-
-function extractNumbers(string){
-    return parseFloat( String(string).replace(/[^\d]/g, ""), 10);
   }
 
 
-function createRow( item, value){
-var number =  -1, length = arguments.length, stack = [], args = arguments, txt,
-row =  sapi.createElement("tr"), cell = sapi.createElement("td"); 
-while(++number < 2) { 
-    txt = " <td class='cell' id='cell" + number + "'> </td> <span class='del del" + number +
-     "' title='Remove record'>x</span>"
-    stack.push( txt );
-}
-// a(stack)
-row.innerHTML = stack.join(' ');
-row.querySelector("#cell0").textContent = ucWord(item);
-row.querySelector("#cell1").textContent = value;
-return row;
-}
-
-function ucWord(str){
-if (Object.prototype.toString.call( str ) !== "[object String]") {
-    return null;
-}
-return str.charAt(0).toUpperCase().concat(str.substr(1, str.length - 1).toLowerCase());
-}
-
-
-function printsBlob() {
-        var pdf = new jsPDF('p', 'pt', 'letter');
-        source =  $('.resultsPane').html();
-        specialElementHandlers = {
-            '#bypassme': function (element, renderer) {
-                return true
-            }
-        };
-        margins = { top: 80, bottom: 60,left: 40,width: 522 };
-        var Obj = { 'width': margins.width,'elementHandlers': specialElementHandlers};
-        pdf.fromHTML( source, margins.left, margins.top, Obj, function (dispose) {
-              var d = new Date(), t = d.getTime();
-          pdf.save(   ( d + "" + t ).replace(/[A-z\s\W]/gi, "") + '.pdf'    );
-            }, margins );
+  function validate(item, amount) {
+    var test = /^((\w*|\W*)*[\w\s-]*)+$/.test(item.value);
+    if (!(test && amount.value)) {
+      console.warn("Warning::   Make sure you are inputing the right values.");
+      return false;
     }
+    return true
+  }
 
-function toggleChange(e) {
-  
-  var target = this.getTarget(e);
+  function extractNumbers(string) {
+    return parseFloat(String(string).replace(/[^\d]/g, ""), 10);
+  }
 
-  $(target.classList.contains("swap") ? target.parentNode: target, function(k){
-    this.toggleClass("unchanged", "changed");
-  });
-}       
-        
-        function toggleClass(object) { //toggle({"div": ["red", "blue"]})
-            var selector;
-            for( selector in object) {
-                if(selector && object.hasOwnProperty(selector) && Array.isArray(object[selector])) {
-                    var current = object[selector][0], replacement = object[selector][1];
-                    if(typeof current !== "string" && typeof replacement !== "string") {
-                        return
-                    }
-                    $(selector).toggleClass(current, replacement);
-                }
-            }
-        }
-        
-        function init(){
-                obj = {
-                  "#menu-container": ["hide-view", "show-view"],
-                    "#menus": ["hide-view", "show-view"],
-                    "#body-cover": ["body-cover"],
-                    ".wrapper": ["wrapper-show"],
-                    "body": ["fix"]                    
-                };
-          new Promise(function foo(resolve, reject) {
-            resolve(toggleClass(obj));
-          }).then(function bar(obj) {
-            setTimeout(function(){
-              toggleClass({".menu": ["menu-tile"]});
-            }, 500);
-          }).catch((error) => console.log(error));
-        }
 
-          function MainEscapeKeyHandler(){
-          if (document.body.classList.contains("fix")) {
-            init();
-          }
+ 
+
+  function printsBlob() {
+    var pdf = new jsPDF('p', 'pt', 'letter');
+    source = $('.resultsPane').html();
+    specialElementHandlers = {
+      '#bypassme': function (element, renderer) {
+        return true
+      }
+    };
+    margins = { top: 80, bottom: 60, left: 40, width: 522 };
+    var Obj = { 'width': margins.width, 'elementHandlers': specialElementHandlers };
+    pdf.fromHTML(source, margins.left, margins.top, Obj, function (dispose) {
+      var d = new Date(), t = d.getTime();
+      pdf.save((d + "" + t).replace(/[A-z\s\W]/gi, "") + '.pdf');
+    }, margins);
+  }
+
+  function toggleChange(e) {
+
+    var target = this.getTarget(e);
+
+    $(target.classList.contains("swap") ? target.parentNode : target, function (k) {
+      this.toggleClass("unchanged", "changed");
+    });
+  }
+
+  function toggleClass(object) { //toggle({"div": ["red", "blue"]})
+    var selector;
+    for (selector in object) {
+      if (selector && object.hasOwnProperty(selector) && Array.isArray(object[selector])) {
+        var current = object[selector][0], replacement = object[selector][1];
+        if (typeof current !== "string" && typeof replacement !== "string") {
+          return
         }
+        $(selector).toggleClass(current, replacement);
+      }
+    }
+  }
+
+  function init() {
+    obj = {
+      "#menu-container": ["hide-view", "show-view"],
+      "#menus": ["hide-view", "show-view"],
+      "#body-cover": ["body-cover"],
+      ".wrapper": ["wrapper-show"],
+      "body": ["fix"]
+    };
+    new Promise(function foo(resolve, reject) {
+      resolve(toggleClass(obj));
+    }).then(function bar(obj) {
+      setTimeout(function () {
+        toggleClass({ ".menu": ["menu-tile"] });
+      }, 500);
+    }).catch((error) => console.log(error));
+  }
+
+  function MainEscapeKeyHandler() {
+    if (document.body.classList.contains("fix")) {
+      init();
+    }
+  }
 });
