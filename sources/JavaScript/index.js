@@ -34,139 +34,6 @@ Techie(function ($, body, head, sapi, _, global, Log, stringify, stringifyAll, a
   // Abstract all event binding using delegation
   $(body).click(Subscriptions).input(HandleTyping).keydown(HandlerKeyPress, $(sapi));
 
-  // Key press events group handler
-  function HandlerKeyPress(event, obj) {
-    // obj - the target element say it's tabbing functionality targeted
-    [HandleEnter, EscapeKeyHandler, MainEscapeKeyHandler].forEach(function (handler) {
-      handler(event, obj);
-    });
-
-  }
-
-
-
-  function Subscriptions(event, obj) {
-
-    subscriptions = {
-      //Subscription is purely by criterion -: id, class, name, data-set etc
-      "default_handlers": [CloseHandler], //Default handlers will always execute
-      "grouped_subscribers": [
-        {
-          "names": ["toggler", "equiv"],
-          "handlers": [ActionsMenuToggle]
-        }
-      ],
-      "subscribers": [
-        //subscribers -> classes or ids subscribing to the click (event) bubble
-        { "name": "toggle-sign", "handlers": [DropdownMenus] },
-        { "name": "del", "handlers": [del] }, // .del
-        { "name": "submit", "handlers": [Foo] }, //.submit
-        { "name": "projects-toggler", "handlers": [init] }, // .projects-toggler
-        { "name": "reset", "handlers": [Clean] }, // .reset
-        { "name": "converting", "handlers": [ConvertToPDF] }, // .converting
-        { "name": "swap", "handlers": [mobile_menu_open, toggleChange] }, // .swap
-        { "name": "open-off-canvass", "handlers": [mobile_menu_open, toggleChange] } // .open-off-canvass
-      ],
-      "subscriber": event.target,
-      "activate": function activator(event, subscriberString, actions) {
-        if (actions.length < 1) {
-          console.warn("You have not specified any actions for subscriber:", subscriberString);
-        }
-        actions.forEach(function launch(action) {
-          action.call(obj, event, subscriptions.subscriber, obj);
-        });
-      }
-    };
-
-    filter = ActivationHandler;
-    subscriptions.default_handlers.forEach(function (handler) {
-      handler.call(obj, event, subscriptions.subscriber, obj);
-    });
-    // subscriptions.subscribers.forEach(filter);
-    HandlerGroup(filter);
-    HandleSingle(filter);
-    function HandlerGroup(handler) {
-      subscriptions.grouped_subscribers.forEach(function handleSubscription(group) {
-        group.names.forEach(function subscriber(subscriberString) {
-          handler(subscriberString, group);
-        });
-      });
-    }
-
-    function HandleSingle(handler) {
-      subscriptions.subscribers.forEach(function handleSubscription(subscriber) {
-        handler(subscriber.name)
-      });
-    }
-
-    function ActivationHandler(subscriberString, group) {
-      if (subscriptions.subscriber.classList.contains(subscriberString)) {
-        if (Object.prototype.toString.call(group) == "[object Object]") {
-          actions = group.handlers;
-        } else {
-          subscriptions.subscribers.forEach(function handleSubscription(subscriber) {
-            if (subscriberString == subscriber.name) {
-              actions = subscriber.handlers;
-            }
-          });
-        }
-        subscriptions.activate(event, subscriberString, actions);
-      }
-    }
-
-  }
-
-
-  function DropdownMenus(e, target) {
-    if (target && target.nodeType == 1 && target.classList.contains("toggle-sign")) {
-      parent = traverseUp(target, (e) => e.querySelector(".drop-down-menu") != null);
-      dropdown = parent.querySelector(".drop-down-menu");
-      Techie.dropdownTarget = dropdown;
-      toggleDropdown(dropdown, "show-block", target);
-      return
-    }
-    toggleDropdown(Techie.dropdownTarget, "show-block");
-  }
-
-
-
-  function traverseUp(e, test) {
-    if (e && e.tagName != "BODY") {
-      return test(e) ? e : traverseUp(e.parentNode, test);
-    }
-    return null;
-  }
-
-  function toggleDropdown(element, name, eventTarget) {
-    if (!element) {
-      return
-    }
-    if (!(eventTarget && eventTarget.classList.contains("toggle-sign"))) {
-      element.classList.remove(name);
-      return
-    }
-    if (element.classList.contains(name)) {
-      element.classList.remove(name);
-    } else {
-      element.classList.add(name);
-    }
-  }
-
-
-  function getByClass(name, index) {
-    if (arguments.length > 1 && +index != index) {
-      return console.error(`Ensure ${index} is an integer number.`);
-    }
-    return typeof index === "number" ? query(`.${name}`, index) : query(name);
-  }
-  function query(selector, index) {
-    if (arguments.length > 1 && +index != index) {
-      return console.error(`Ensure ${index} is an integer number.`);
-    }
-    list = [].slice.call(document.querySelectorAll(selector));
-    return typeof index === "number" ? list[index] : list;
-  }
-
   var d = document, getId = this.Id, Total = 0, v1 = "Next item", v2 = '0.00', amount = getId("amount"),
     total = getId("total"), submit = getId("submit"), input = inputItem = getId("item"),
     reset = getId("reset"), currentV = $("#current > #current"), currentItem = $("#current > #currentItem"),
@@ -230,7 +97,6 @@ Techie(function ($, body, head, sapi, _, global, Log, stringify, stringifyAll, a
     vars = {};
   }
 
-
   //Hooks an event on the document
   this.text("Total: 0", total);
 
@@ -249,25 +115,6 @@ Techie(function ($, body, head, sapi, _, global, Log, stringify, stringifyAll, a
       currentV.text(target.value);
     }
   }
-  
-  // PDF plug
-  function ConvertToPDF() {
-    if (added()) {
-      printsBlob();
-    }
-  }
-
-  // item.focus();
-  /*#2876a8*/
-  function added() {
-    var ret = false;
-    $("td").once(function () {
-      if (this.text()) {
-        ret = true;
-      }
-    })
-    return ret;
-  }
 
   function ActionsMenuToggle(event, dom, techie) {
     var width, pane;
@@ -275,7 +122,7 @@ Techie(function ($, body, head, sapi, _, global, Log, stringify, stringifyAll, a
       pane = this;
       context = this;
       this.pane = this;
-      width = this.computedStyle()["width"].replace(/[A-z]+/i, "");
+      width = this.computedStyle().width.replace(/[A-z]+/i, "");
       context.width = width;
       if (context.width == 0) {
         this.css({
@@ -290,41 +137,8 @@ Techie(function ($, body, head, sapi, _, global, Log, stringify, stringifyAll, a
     });
     this.pane = pane;
   }
-  // _techie.grab("body").addHandler("keypress", EscapeKeyHandler);
 
-  function EscapeKeyHandler(event, obj) {
-    if (event.keyCode == 27) { //escape key
-      DropdownMenus(event)
-      if (context && context.width && context.width > 0) {
-        closePane.call(context, event, EscapeKeyHandler, context);
-
-      }
-    }
-  }
-
-  function CloseHandler(event, dom, techie) {
-    var target = this.getTarget(event);
-    if ((target.id == "equiv" || target.id == "manage") || (target.id == "equiv" || target.parentNode.id == "manage")) {
-      return false;
-    }
-    switch (target.id) {
-      case "main":
-      // case "nav":
-      case "header":
-      case "project":
-      case "project-body":
-      case "trigger":
-      case "inputs":
-      case "input":
-        if (this.pane) {
-          closePane.call(this, event, CloseHandler, this);
-          this.type_ = "click";
-        }
-        break
-      default:
-      // console.info("Delegation no match! id -", target.id);
-    }
-  }
+  
 
   function closePane(event, handler, pane) {
     this.pane.css({
@@ -339,15 +153,6 @@ Techie(function ($, body, head, sapi, _, global, Log, stringify, stringifyAll, a
     context = null;
   }
 
-  function Foo() {
-    if (!validate(input, amount)) {
-      return;
-    }
-
-    // _techie.grab("table tbody").prependChild(createRow(input.value, amount.value));
-    updateUI(extractNumbers(amount.value));
-  }
-
   function updateUI(num) {
     input.value = amount.value = "";
     input.placeholder = "New item";
@@ -360,83 +165,5 @@ Techie(function ($, body, head, sapi, _, global, Log, stringify, stringifyAll, a
       return //reset();
     }
     $("#total").text(`Total: ${Total}`);
-  }
-
-
-  function validate(item, amount) {
-    var test = /^((\w*|\W*)*[\w\s-]*)+$/.test(item.value);
-    if (!(test && amount.value)) {
-      console.warn("Warning::   Make sure you are inputing the right values.");
-      return false;
-    }
-    return true
-  }
-
-  function extractNumbers(string) {
-    return parseFloat(String(string).replace(/[^\d]/g, ""), 10);
-  }
-
-
- 
-
-  function printsBlob() {
-    var pdf = new jsPDF('p', 'pt', 'letter');
-    source = $('.resultsPane').html();
-    specialElementHandlers = {
-      '#bypassme': function (element, renderer) {
-        return true
-      }
-    };
-    margins = { top: 80, bottom: 60, left: 40, width: 522 };
-    var Obj = { 'width': margins.width, 'elementHandlers': specialElementHandlers };
-    pdf.fromHTML(source, margins.left, margins.top, Obj, function (dispose) {
-      var d = new Date(), t = d.getTime();
-      pdf.save((d + "" + t).replace(/[A-z\s\W]/gi, "") + '.pdf');
-    }, margins);
-  }
-
-  function toggleChange(e) {
-
-    var target = this.getTarget(e);
-
-    $(target.classList.contains("swap") ? target.parentNode : target, function (k) {
-      this.toggleClass("unchanged", "changed");
-    });
-  }
-
-  function toggleClass(object) { //toggle({"div": ["red", "blue"]})
-    var selector;
-    for (selector in object) {
-      if (selector && object.hasOwnProperty(selector) && Array.isArray(object[selector])) {
-        var current = object[selector][0], replacement = object[selector][1];
-        if (typeof current !== "string" && typeof replacement !== "string") {
-          return
-        }
-        $(selector).toggleClass(current, replacement);
-      }
-    }
-  }
-
-  function init() {
-    obj = {
-      "#menu-container": ["hide-view", "show-view"],
-      "#menus": ["hide-view", "show-view"],
-      "#body-cover": ["body-cover"],
-      ".wrapper": ["wrapper-show"],
-      "body": ["fix"]
-    };
-    new Promise(function foo(resolve, reject) {
-      resolve(toggleClass(obj));
-    }).then(function bar(obj) {
-      setTimeout(function () {
-        toggleClass({ ".menu": ["menu-tile"] });
-      }, 500);
-    }).catch((error) => console.log(error));
-  }
-
-  function MainEscapeKeyHandler() {
-    if (document.body.classList.contains("fix")) {
-      init();
-    }
   }
 });

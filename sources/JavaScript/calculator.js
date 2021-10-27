@@ -4,7 +4,7 @@ Techie(function ($, body, head, sapi, _, global, Log, stringify, stringifyAll, a
   $("input[name='item'], input[name='value']").on("input", function (e) {
     const rowMap = {};
     const input = e.target;
-    if (input.value.length > 0) {
+    if (input.value.trim().length > 0) {
       if (!vars.activeRow) {
         // Add a row for the first add
         const row = createRow("", "");
@@ -17,7 +17,6 @@ Techie(function ($, body, head, sapi, _, global, Log, stringify, stringifyAll, a
       const cell1 = grab("#cell1");
       // fill row text
       if (input.id === "item") {
-        console.log(false);
         cell0.textContent = ucWord(input.value);
         return
       }
