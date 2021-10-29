@@ -1,6 +1,69 @@
-const globals = {
-  sapi: document,
-  vars: {},
+
+const grab = document.querySelector.bind(document);
+
+const util = {
+  grab,
+  vars: {
+    Total: 0,
+    activeRow: null,
+    mobile_menu_open: {
+      dumming: false
+    }
+  },
+
+  mobile_menu_open() {
+    if (mobile_menu_open.dumming) {
+      mobile_menu_open.dumming = false;
+      section_lists[0].style.width = 0;
+      section_lists[1].style.width = 0;
+      return
+    }
+    mobile_menu_open.dumming = true;
+    section_lists[0].style.width = "14em";// "50%";
+    section_lists[1].style.width = "14em";// "50%";
+  },
+
+  mobile_menu_close() {
+    section.style.width = 0;
+  },
+
+  del(e, btn) {
+    if (a("Do you want to delete this row?")) {
+      new Promise(function (resolve, reject) {
+        row = $(btn.parentNode)
+        value_cell = row[0].querySelector(".cell ~ .cell");
+        num = "-" + value_cell.textContent.replace(/[^\d]+/g);
+        updateUI(parseFloat(num, 10));
+        row.hideFX();
+        setTimeout(function () {
+          row.remove()
+        }, 1000);
+        resolve(row);
+      }).then(function (row) {
+        console.log("Row deleted");
+        return row
+      }).catch(function (error) {
+        console.error(error);
+      });
+    }
+  },
+
+  updateCount() {
+    $("#total").text(`Total: ${util.vars.Total}`);
+  },
+
+  Clean() {
+    //reset all fields here
+    const item = grab("#item"), amount = grab("#amount"), total = grab("#total");
+    item.value = amount.value = "";
+    item.placeholder = "New item";
+    amount.placeholder = "New vlaue";
+    item.focus(); 
+    util.vars.Total = 0;
+    total.textContent = "Total: 0";
+    $("table tbody").empty();
+    vars = {};
+  },
 
   ucWord(str) {
     if (Object.prototype.toString.call(str) !== "[object String]") {
@@ -10,8 +73,9 @@ const globals = {
   },
 
   createRow(item, value) {
-    var number = -1, length = arguments.length, stack = [], args = arguments, txt,
-      row = sapi.createElement("tr"), cell = sapi.createElement("td");
+    var number = -1, length = arguments.length;
+    var stack = [], args = arguments, txt,
+      row = document.createElement("tr"), cell = document.createElement("td");
     while (++number < 2) {
       txt = " <td class='cell' id='cell" + number + "'> </td> <span class='del del" + number +
         "' title='Remove record'>x</span>"
@@ -19,7 +83,7 @@ const globals = {
     }
     // a(stack)
     row.innerHTML = stack.join(' ');
-    row.querySelector("#cell0").textContent = ucWord(item);
+    row.querySelector("#cell0").textContent = util.ucWord(item);
     row.querySelector("#cell1").textContent = value;
     return row;
   },
@@ -98,7 +162,7 @@ const globals = {
   HandlerKeyPress(event, obj) {
     // obj - the target element say it's tabbing functionality targeted
     [
-      this.HandleEnter, this.EscapeKeyHandler, this.MainEscapeKeyHandler
+      util.HandleEnter, util.EscapeKeyHandler, util.MainEscapeKeyHandler
     ].forEach(function (handler) {
       handler(event, obj);
     });
@@ -107,24 +171,37 @@ const globals = {
 
   MainEscapeKeyHandler() {
     if (document.body.classList.contains("fix")) {
-      this.init();
+      util.init();
     }
   },
 
   // PDF plug
   ConvertToPDF() {
-    if (this.added()) {
-      this.printsBlob();
+    if (util.added()) {
+      util.printsBlob();
     }
   },
 
   toggleChange(e) {
 
-    var target = this.getTarget(e);
+    var target = util.getTarget(e);
 
     $(target.classList.contains("swap") ? target.parentNode : target, function (k) {
-      this.toggleClass("unchanged", "changed");
+      util.toggleClass("unchanged", "changed");
     });
+  },
+
+  updateUI(item, amount) {
+    util.vars.Total += util.extractNumbers(amount.value); //The elusive counter engine
+    item.value = amount.value = "";
+    item.placeholder = "New item";
+    amount.placeholder = "New value";
+    item.focus();
+    util.vars.activeRow = null;
+    if (util.vars.Total != +util.vars.Total) {
+      return //reset();
+    }
+    $("#total").text(`Total: ${util.vars.Total}`);
   },
 
   init() {
@@ -136,12 +213,12 @@ const globals = {
       "body": ["fix"]
     };
     new Promise(function foo(resolve, reject) {
-      resolve(this.toggleClass(obj));
-    }.bind(this)).then(function bar(obj) {
+      resolve(util.toggleClass(obj));
+    }).then(function bar(obj) {
       setTimeout(function () {
-        this.toggleClass({ ".menu": ["menu-tile"] });
+        util.toggleClass({ ".menu": ["menu-tile"] });
       }, 500);
-    }.bind(this)).catch((error) => console.log(error));
+    }).catch((error) => console.log(error));
   },
 
   added() {
@@ -156,21 +233,22 @@ const globals = {
 
   EscapeKeyHandler(event, obj) {
     if (event.keyCode == 27) { //escape key
-      this.DropdownMenus(event);
+      util.DropdownMenus(event);
       if (context && context.width && context.width > 0) {
-        this.closePane.call(context, event, EscapeKeyHandler, context);
+        util.closePane.call(context, event, EscapeKeyHandler, context);
 
       }
     }
   },
 
   Foo() {
-    if (!validate(input, amount)) {
+    const item = grab("#item"), amount = grab("#amount");
+    if (!util.validate(item, amount)) {
       return;
     }
 
     // _techie.grab("table tbody").prependChild(createRow(input.value, amount.value));
-    updateUI(extractNumbers(amount.value));
+    util.updateUI(item, amount);
   },
 
   extractNumbers(string) {
@@ -207,50 +285,95 @@ const globals = {
   },
 
   CloseHandler(event, dom, techie) {
-    var target = event.getTarget;
-if ((target.id == "equiv" || target.id == "manage") || (target.id == "equiv" || target.parentNode.id == "manage")) {
-  return false;
-}
-switch (target.id) {
-  case "main":
-  // case "nav":
-  case "header":
-  case "project":
-  case "project-body":
-  case "trigger":
-  case "inputs":
-  case "input":
-    if (this.pane) {
-      closePane.call(this, event, CloseHandler, this);
-      this.type_ = "click";
+    if (event) {
+      return true;
     }
-    break
-  default:
-  // console.info("Delegation no match! id -", target.id);
-}
+    var target = event.getTarget;
+    if ((target.id == "equiv" || target.id == "manage") || (target.id == "equiv" || target.parentNode.id == "manage")) {
+      return false;
+    }
+    switch (target.id) {
+      case "main":
+      // case "nav":
+      case "header":
+      case "project":
+      case "project-body":
+      case "trigger":
+      case "inputs":
+      case "input":
+        if (util.pane) {
+          util.closePane.call(this, event, CloseHandler, this);
+          util.type_ = "click";
+        }
+        break
+      default:
+      // console.info("Delegation no match! id -", target.id);
+    }
+  },
+
+  closePane(event, handler, pane) {
+    util.pane.css({
+      "width": "0px", opacity: 0
+    });
+    $("#equiv").html("&#9776;"/*"&#9776;"*/);
+    width = 0;
+    if (context) {
+      context.width = 0;
+    }
+    util.pane = null;
+    context = null;
+  },
+
+  HandleEnter(e) {
+    var evnt = e || global.event;
+    if (evnt.keyCode == 13) {
+      util.Foo.call(null, null, input, amount);
+    }
+  },
+
+  ActionsMenuToggle(event, dom, techie) {
+    var width, pane;
+    $("#manage").toggleClass(function () {
+      pane = this;
+      context = this;
+      this.pane = this;
+      width = this.computedStyle().width.replace(/[A-z]+/i, "");
+      context.width = width;
+      if (context.width == 0) {
+        this.css({
+          border: "0.01em solid",
+          width: "250px", opacity: 1
+        }); /*#equiv  &#9661;*/
+        $("#equiv").html("&#120169;");
+        context.width = 250;
+      } else {
+        util.closePane.call(this, event, util.ActionsMenuToggle, this);
+      }
+    });
+    util.pane = pane;
   },
 
   Subscriptions(event, obj) {
 
     subscriptions = {
       //Subscription is purely by criterion -: id, class, name, data-set etc
-      "default_handlers": [CloseHandler], //Default handlers will always execute
+      "default_handlers": [util.CloseHandler], //Default handlers will always execute
       "grouped_subscribers": [
         {
           "names": ["toggler", "equiv"],
-          "handlers": [ActionsMenuToggle]
+          "handlers": [util.ActionsMenuToggle]
         }
       ],
       "subscribers": [
         //subscribers -> classes or ids subscribing to the click (event) bubble
-        { "name": "toggle-sign", "handlers": [DropdownMenus] },
-        { "name": "del", "handlers": [del] }, // .del
-        { "name": "submit", "handlers": [Foo] }, //.submit
-        { "name": "projects-toggler", "handlers": [init] }, // .projects-toggler
-        { "name": "reset", "handlers": [Clean] }, // .reset
-        { "name": "converting", "handlers": [ConvertToPDF] }, // .converting
-        { "name": "swap", "handlers": [mobile_menu_open, toggleChange] }, // .swap
-        { "name": "open-off-canvass", "handlers": [mobile_menu_open, toggleChange] } // .open-off-canvass
+        { "name": "toggle-sign", "handlers": [util.DropdownMenus] },
+        { "name": "del", "handlers": [util.del] }, // .del
+        { "name": "submit", "handlers": [util.Foo] }, //.submit
+        { "name": "projects-toggler", "handlers": [util.init] }, // .projects-toggler
+        { "name": "reset", "handlers": [util.Clean] }, // .reset
+        { "name": "converting", "handlers": [util.ConvertToPDF] }, // .converting
+        { "name": "swap", "handlers": [util.mobile_menu_open, util.toggleChange] }, // .swap
+        { "name": "open-off-canvass", "handlers": [util.mobile_menu_open, util.toggleChange] } // .open-off-canvass
       ],
       "subscriber": event.target,
       "activate": function activator(event, subscriberString, actions) {

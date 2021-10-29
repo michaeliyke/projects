@@ -1,8 +1,9 @@
-Techie(function ($, body, head, sapi, _, global, Log, stringify, stringifyAll, a) {
-  
-  const grab = sapi.querySelector.bind(sapi);
+Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAll, a) {
+  const {
+    vars, createRow, ucWord
+  } = util;
+ 
   $("input[name='item'], input[name='value']").on("input", function (e) {
-    const rowMap = {};
     const input = e.target;
     if (input.value.trim().length > 0) {
       if (!vars.activeRow) {

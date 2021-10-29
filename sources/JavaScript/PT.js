@@ -1981,25 +1981,37 @@ var contextRange = document.createRange();
 contextRange.setStart(document.body, 0);
 return contextRange.createContextualFragment(str);
 },
-load: function loadScripts(urls, yeyCallback, neyCallback) {
-var count = urls.length;
+loadScript: function loadScripts(urls, successCb, failCb) {
+  if (typeof urls === "string") {
+    urls = [urls];
+  }
+  var count = urls.length;
 var errored = false;
 
-if (urls.length == 0) return yeyCallback();
+if (urls.length == 0) {
+  return successCb();
+}
 
 urls.forEach(function(url) {
-var script = document.createElement('script');
+  var script = document.createElement("script");
 script.onload = function() {
-if (errored) return;
-if (!--count) yeyCallback();
+if (errored) {
+  return
+}
+if (!--count) {
+  successCb();
+}
 };
 script.onerror = function() {
-if (errored) return;
-neyCallback();
-errored = true;
+if (errored) {
+  return
+}
+failCb();
+  errored = true;
 };
 script.src = url;
-document.head.insertBefore(script, document.head.firstChild);
+  // document.head.insertBefore(script, document.head.firstChild);
+  document.head.appendChild(script);
 });
 },
 
