@@ -28,15 +28,15 @@ const util = {
   },
 
   del(e, btn) {
-    if (a("Do you want to delete this row?")) {
-      new Promise(function (resolve, reject) {
-        row = $(btn.parentNode)
-        value_cell = row[0].querySelector(".cell ~ .cell");
-        num = "-" + value_cell.textContent.replace(/[^\d]+/g);
-        updateUI(parseFloat(num, 10));
+    if (confirm("Do you want to delete this row?")) {
+      new Promise(function (resolve) {
+        const row = $(e.target.parentNode);
+        const amountValue = row.find(".cell ~ .cell");
+        // var num = "-" + value_cell.textContent.replace(/[^\d]+/g);
+        util.updateUI();
         row.hideFX();
         setTimeout(function () {
-          row.remove()
+          row.remove();
         }, 1000);
         resolve(row);
       }).then(function (row) {

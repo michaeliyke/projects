@@ -31,9 +31,7 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
 
   var context = null;
 
-  const {
-    Subscriptions, HandlerKeyPress, vars
-  } = util;
+  const {vars} = util;
   
     var d = document, getId = this.Id, v1 = "Next item", v2 = '0.00';
     var amount = getId("amount"), total = getId("total"), submit = getId("submit");
@@ -48,9 +46,47 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
 
 
   // Abstract all event binding using delegation
-  $(body).click(Subscriptions).input(HandleTyping).keydown(HandlerKeyPress, $(document));  
-  function HandleTyping() {}
+  $(body).click(util.Subscriptions).keydown(util.HandlerKeyPress, $(document)); 
+  $("input[name='item'], input[name='value']").on("input", Calculator);
+
   //Hooks an event on the document
   this.text("Total: 0", total);
 
+
+  function Calculator (e) {
+    const input = e.target;
+    if (input.value.trim().length > 0) {
+      if (!vars.activeRow) {
+        // Add a row for the first add
+        const row = util.createRow("", "");
+        const table = grab("table tbody");
+        table.insertBefore(row, table.firstChild);
+        vars.activeRow = grab.call(table, "tr");
+      }
+
+      const cell0 = grab("#cell0");
+      const cell1 = grab("#cell1");
+      // fill row text
+      if (input.id === "item") {
+        cell0.textContent = util.ucWord(input.value);
+        return
+      }
+      cell1.textContent = input.value;
+      return
+    }
+    // remove row if value is empty
+    if (!vars.activeRow) {
+      return
+    }
+    const cell0 = grab("#cell0");
+    const cell1 = grab("#cell1");
+    const amount = grab.call(vars.activeRow.parentNode, "#amount");
+    const item = grab.call(vars.activeRow.parentNode, "#item");
+    if (item.value.trim() || amount.value.trim()) {
+      return
+    }
+    cell0.textContent = "";
+    vars.activeRow.parentNode.removeChild(vars.activeRow);
+    vars.activeRow = null;
+  }
 });
