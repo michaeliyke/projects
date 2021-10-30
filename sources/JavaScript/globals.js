@@ -31,9 +31,13 @@ const util = {
     if (confirm("Do you want to delete this row?")) {
       new Promise(function (resolve) {
         const row = $(e.target.parentNode);
-        const amountValue = row.find(".cell ~ .cell");
-        // var num = "-" + value_cell.textContent.replace(/[^\d]+/g);
-        util.updateUI();
+        console.log(row.hideFX);
+        const amountValue = $(".cell ~ .cell", row);
+        // Negative number facilitates subtraction
+        var value = "-" + amountValue.text().replace(/[^\d]+/g);
+        const amount = grab("#amount");
+        amount.value = value;
+        util.updateUI(grab("#item"), amount);
         row.hideFX();
         setTimeout(function () {
           row.remove();

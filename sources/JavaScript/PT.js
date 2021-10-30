@@ -1042,7 +1042,7 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
       return is.list(dada) ? dada : [dada];
     }
     function entechie(d) {
-      return d ? d.techieString ? d : Techie.PT._(d) : error(d + " is not a valid object", null, nl());
+      return d ? d.techieString ? d : Techie(d) : error(d + " is not a valid object", null, nl());
     }
     function pluralize(d) {
       return is.list(d) ? d : [d];
@@ -2425,7 +2425,7 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
       return fn[fn.length - 1] == "{" ? fn : fn + " {";
     };
     var match = this.match = function match(pattern, string) {
-      var regexp = new RegExp("\\ b(" + pattern + ")\\b", "gi");
+      var regexp = new RegExp("\\b(" + pattern + ")\\b", "gi");
       return regexp.match(string);
     };
 
@@ -2742,7 +2742,9 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
           others = slice.call(arguments); length = others.length; Techie.PT.DefineProperty(this, "length", length, false);
           while (length) { this[index] = others[index]; length--; index++; } index = 0; return this;
         }
-        if (!(nodes[0] && nodes[0].nodeType) && Object.prototype.toString.call(selector) != "[object String]") { return this; }
+        if (!(nodes[0] && nodes[0].nodeType) && Object.prototype.toString.call(selector) != "[object String]") { 
+          return this; 
+        }
         var That = this
         forEach(function (node, index, object) {
           this[index] = node;
