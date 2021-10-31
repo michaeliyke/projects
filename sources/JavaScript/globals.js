@@ -33,7 +33,7 @@ const util = {
     if (confirm("Do you want to delete this row?")) {
       new Promise(function (resolve) {
         const row = Techie(e.target.parentNode);
-        const amountValue = Techie(".cell ~ .cell", row);
+        const amountValue = Techie(grab.call(row, ".cell ~ .cell"));
         // Negative number facilitates subtraction
         var value = "-" + amountValue.text().replace(/[^\d]+/g);
         const amount = grab("#amount");
