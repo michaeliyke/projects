@@ -1,8 +1,10 @@
 
 const grab = document.querySelector.bind(document);
+const grabAll = document.querySelectorAll.bind(document);
 
 const util = {
   grab,
+  grabAll,
   vars: {
     Total: 0,
     activeRow: null,
@@ -30,9 +32,8 @@ const util = {
   del(e, btn) {
     if (confirm("Do you want to delete this row?")) {
       new Promise(function (resolve) {
-        const row = $(e.target.parentNode);
-        console.log(row.hideFX);
-        const amountValue = $(".cell ~ .cell", row);
+        const row = Techie(e.target.parentNode);
+        const amountValue = Techie(".cell ~ .cell", row);
         // Negative number facilitates subtraction
         var value = "-" + amountValue.text().replace(/[^\d]+/g);
         const amount = grab("#amount");
@@ -92,16 +93,12 @@ const util = {
     return row;
   },
 
-  getData() {
-    const table = grab("table tbody");
-    const data = [];
-    Array.forEach.call(table.children, (ch) => {
-      if (ch && ch.nodeName === "ROW") {
-        const item = grab.call(ch, "#cell0");
-        const amount = grab.call(ch, "#cell1");
-        data.push({ item: item.textContent, amount: amount.textContent });
-      }
-    });
+  // Get json format of table data
+  getData(table) {
+    const data = Array.prototype.map.call(grabAll.call(table, "tr"), (row) => {
+      const [item, amount] = row.getElementsByTagName("td");
+      return item && amount ? { item: item.textContent, amount: amount.textContent } : null;
+    }).filter(row => row != null);
     return JSON.stringify(data);
   },
 

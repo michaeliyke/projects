@@ -2815,16 +2815,42 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
       hasNodes: function hasNodes(element) {//(element || this) is a HTMLCollection or a nodeList
         if (!element) { element = this; } return (typeof element === "object" && isNode(element[0]));
       },
-      concat: function (array) {
-        var This = this;
-        this.each.call(array, function (element) {
-          var length = This.length;
-          This[length] = element; This.length++;
+
+      // .concat([]), .concat("a", "b", ["c", "d"]), .concat([1, 2,3], [4, 5, 6], 8)
+      concat: function concat() {
+       const copy = Techie();
+        [].slice.call(arguments).forEach(function(arg) {
+          if(typeof arg === "object" && "length" in arg){
+            copy.push.apply(copy, [].slice.call(arg));
+          } else{
+            copy.push(arg);
+          }
         });
-        return this;
+        return copy;
       },
-      push: function (item) {
-        this[this.length++] = item;
+
+
+      join: function join(token) {
+        const arr = this.map((e) => {
+          if(typeof e === "string") {
+            return e;
+          }
+          if (e.nodeType == 1){
+            return e.textContent;
+          }
+        });
+        return [].join.call(arr, token);
+      },
+
+      map: function map(action) {
+        return [].map.call(this, action);
+      },
+      
+      // .push(x, y, z, ..N)
+      push: function () {
+        [].slice.call(arguments).forEach(function(item) {
+          this[this.length++] = item;
+        }, this);
         return this;
       },
 
@@ -3872,12 +3898,14 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         return this;
       },
 
-      getText: function getText(e) {
-        if (e && e.nodeType && e.nodeType == 1) {
-          return (typeof e.textContent === "string") ? e.textContent : e.innerText;
-        }
-        return this.techieString ? getText(this[0]) : null;
+      getText: function getText() {
+        return this.join("");
       },
+
+      text: function text() {
+        return this.join("");
+      },
+
       nthChild: function nthChild(parent, child) { //nthChild(body, 6)
         if (!(parent.nodeType && parent.nodeType == 1) && typeof child === "number") {
           throw new Error("Techie: Usage: nthChild(body, 3) //The 3rd element in the parentElement");
