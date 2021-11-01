@@ -2239,10 +2239,10 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         return this;
       },
 
-      eachElement: function(action) {
-        if(this.length > 0) {
+      eachElement: function (action) {
+        if (this.length > 0) {
           let index = 0;
-          for(const element of this) {
+          for (const element of this) {
             action.call(this, element, index++, this);
           }
         }
@@ -2742,8 +2742,8 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
           others = slice.call(arguments); length = others.length; Techie.PT.DefineProperty(this, "length", length, false);
           while (length) { this[index] = others[index]; length--; index++; } index = 0; return this;
         }
-        if (!(nodes[0] && nodes[0].nodeType) && Object.prototype.toString.call(selector) != "[object String]") { 
-          return this; 
+        if (!(nodes[0] && nodes[0].nodeType) && Object.prototype.toString.call(selector) != "[object String]") {
+          return this;
         }
         var That = this
         forEach(function (node, index, object) {
@@ -2818,11 +2818,11 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
 
       // .concat([]), .concat("a", "b", ["c", "d"]), .concat([1, 2,3], [4, 5, 6], 8)
       concat: function concat() {
-       const copy = Techie();
-        [].slice.call(arguments).forEach(function(arg) {
-          if(typeof arg === "object" && "length" in arg){
+        const copy = Techie();
+        [].slice.call(arguments).forEach(function (arg) {
+          if (typeof arg === "object" && "length" in arg) {
             copy.push.apply(copy, [].slice.call(arg));
-          } else{
+          } else {
             copy.push(arg);
           }
         });
@@ -2848,10 +2848,21 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
       map: function map(action) {
         return [].map.call(this, action);
       },
-      
+
+      // .filter(x => x.classList.includes("hide"))
+      filter: function filter(action) {
+        var it, filter = Techie();
+        for(it = 0; it < this.length; it++) {
+          if(action(this[it], it, this)) {
+            filter.push(this[it]);
+          }
+        }
+        return filter;
+      },
+
       // .push(x, y, z, ..N)
-      push: function () {
-        [].slice.call(arguments).forEach(function(item) {
+      push: function push() {
+        [].slice.call(arguments).forEach(function (item) {
           this[this.length++] = item;
         }, this);
         return this;
@@ -3118,6 +3129,82 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
       },
 
 
+      // Aliase to .Attr() method
+      Attribute: function Attribute(att, value) { // .Attribute("data-set");
+       return this.Attr(att, value);
+      },
+
+      // Aliase to .Attr() method
+      attr: function attr(att, value){
+        return this.Attr(att, value);
+      },
+
+      // Get all attributes of the elements in a set
+      attrs: function attrs(){},
+
+      // Toggle an attribute's value for a matching set
+      // If value not specified, empty string is used
+      toggleAttribute: function toggleAttribute(att, value) {
+        value = value || "";
+        if(!att) {
+          return this;
+        }
+        this.eachElement(function(node) {
+          node.setAttribute(att, value);
+        });
+        return this
+      },
+
+      // Aliase to toggleAttribute
+      toggleAttr: function toggleAttr(att, value) {
+        return this.toggleAttribute(att, value);
+      },
+
+      // .attr("data-hide"), .attr("data-hide", true)
+      Attr: function Attr(att, value) {//element = element/nodeList
+        if (att && value) {
+          return this.setAttr(att, value);
+        }
+        if(att) {
+          return this.getAttr(att);
+        }
+        return this;
+      },
+
+      hasAttr: function hasAttr(att) {
+        var filter = this.filter(function (e) {
+          if (e && (e.hasAttribute || e.attributes)) {
+            return e.hasAttribute(att) || e.attributes[att] && e.attributes[att].specified;
+          }
+          return false;
+        });
+        return filter.length > 0;
+      },
+
+      setAttr: function setAttr(att, value) {
+        this.eachElement(function(node) {
+          node.setAttribute(att, value);
+        });
+        return this;
+      },
+
+      getAttr: function getAttr(att) {
+        var vals = this.map(function (node) {
+          if (node && node.getAttribute) {
+            return node.getAttribute(att);
+          }
+        });
+        return vals.join(" ");
+      },
+
+      removeAttr: function removeAttr(att) {
+        this.eachElement(function (node) {
+            node.removeAttribute(att)
+        });
+        return this;
+      },
+
+
       attrHooks: function attrHooks(element, attr, value) {
         if (element.setAttribute) {
           element.setAttribute(attr, value || "");
@@ -3128,31 +3215,38 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         }
       },
 
-      getElementsByAttribute: function getElementsByAttribute(att, value) { //plural
-        var results = [];
-        walk_the_DOM(document.body, function (node) {
-          var actual = node.nodeType === 1 && node.getAttribute(att);
-          if (typeof actual === 'string' &&
-            (actual === value || typeof value !== 'string')) {
-            results.push(node);
-          }
+      // .getElementsByAttribute("state", "plause"); .getElementsByAttribute("group");
+      getElementsByAttribute: function getElementsByAttribute(att, value) {
+        var results = Techie();
+        this.eachElement(function (e) {
+          walk_the_DOM(e, function (node) {
+            if (node && node.hasAttribute && node.hasAttribute(att)) {
+              if (node.getAttribute(att) == value) {
+                results.push(node); // .getElementsByAttribute("group", "setA");
+              } else if(args.length < 2){
+                results.push(node); // .getElementsByAttribute("group");
+            }
+            }
+          });
         });
         return results;
       },
 
-      getElementByAttribute: function getElementByAttribute(att, value) { //singular
-        var attribute;
-        return walk(document, function () {
-          if (this.getAttribute && (attribute = this.getAttribute(att))) {
-            if (value) {
-              if (attribute == value.trim()) {
-                return this;
-              }
-            } else {
-              return this;
-            }
-          }
+      getElementByAttribute: function getElementByAttribute(att, value) {
+        return this.getElementsByAttribute(att, value);
+      },
+
+      attributesTransfer: function attributesTransfer(old_e, new_e) {
+        var o = old_e, n = new_e;
+        if (arguments.length == 1) {
+          o = this; n = old_e;
+        }
+        o = isCollection(o) ? o[o] : o; n = isCollection(n) ? n[0] : n;
+        Techie.PT.errors(isHTML(o) && isHTML(n), ln());
+        forEach.call(o.attributes, function (attribute) {
+          n.setAttribute(attribute.name, attribute.value);
         });
+        return this;
       },
 
 
@@ -3184,18 +3278,7 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         return isIsogramme;
       },
 
-      attributesTransfer: function attributesTransfer(old_e, new_e) {
-        var o = old_e, n = new_e;
-        if (arguments.length == 1) {
-          o = this; n = old_e;
-        }
-        o = isCollection(o) ? o[o] : o; n = isCollection(n) ? n[0] : n;
-        Techie.PT.errors(isHTML(o) && isHTML(n), ln());
-        forEach.call(o.attributes, function (attribute) {
-          n.setAttribute(attribute.name, attribute.value);
-        });
-        return this;
-      },
+
       hide: function hide() {
         this.each(function (node) {
           node.style.cssText += "display: none;";
@@ -3251,91 +3334,6 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         return this.isHidden() ? this.showFX(state) : this.hideFX();
       },
 
-      Attr: function Attr(element, attr, value) {//element = element/nodeList
-        /*Attr(ele,"title", " ")--empty; elem.Attr("id", 'clicked') --remove/add if found/not found
-        Attr(div, 'data-cardboard', "Shelf_One")--remove/add if found/not found
-        */
-        if (!element) { return; } var counter = 0, attributes, stack = [], attributesString,
-          thisOption = isCollection(this) || isHTML(this), isAttrSet, ret, noNode, attrHooks;
-        value = value || ((thisOption && typeof attr !== "undefined") ? attr : value);
-        attr = (!attr || value == attr) ? element : attr;//rebasing accordingly
-        element = (element == attr) ? this : element; attrHooks = Techie.PT.attrHooks;
-        if (!isCollection(element)) { element = [element]; }
-        var count = 0; var valueAdded;
-        forEach(function each(element, index) {
-          noNode = !isNode(element);
-          error("html", typeof attr === "string" || noNode, ln());
-          isAttrSet = element.getAttribute(attr) ? true : false;//is attr existing
-          if (!isAttrSet) { attrHooks(element, attr); }//set attr if it not existing
-          if (count == 0) {
-            count++;
-            attributesString = element.getAttribute(attr);
-            if (typeof attributesString !== "string") { return; }
-            attributes = attributesString.split(/\s+/);
-            valueAdded = attributesString ? attributesString.concat(" " + value) : value;
-
-          }
-          attributes.forEach(function (attribute) {
-            if (attribute == value) { counter++; } else { stack.push(attribute); }//The subtle job
-          });
-          if (typeof value === "undefined") {//there is no value at all, just get
-            ret = attributesString;
-          }
-          if (typeof value == "string") {
-            if (!value.length || value == attributesString) {//empty
-              if (element.setAttribute) { element.setAttribute(attr, ""); }
-              else { element.getAttributeNode(attr).value = ""; }
-              ret = this;
-            }
-          }
-          if (counter > 0) {//there is  match, therefore remove it ..stack..
-            if (element.setAttribute) { element.setAttribute(attr, stack.join(" ")); }
-            else { element.getAttributeNode(attr).value = stack.join(" "); }
-            ret = this;
-          }
-          if (counter == 0 && value) {//there is a different value, so add it
-
-            if (element.setAttribute) { element.setAttribute(attr, valueAdded); }
-            else { element.getAttributeNode(attr).value = valueAdded; }
-            ret = this;
-          }
-        }, element, this);
-        return ret;
-      },
-
-      removeAttr: function removeAttr(element, attr, value) {//element = element/nodeList
-        if (!element) { return; }
-        var thisOption = isCollection(this) || isHTML(this); value =
-          value || ((thisOption && typeof attr !== "undefined") ? attr : "");
-        attr = (!attr || value == attr) ? element : attr;
-        element = (element == attr) ? this : element;
-        if (!isCollection(element)) { element = [element]; }
-        forEach(function (element, index) {
-          var noNode = !isNode(element); var counter = 0;
-          if (typeof attr !== "string" || typeof value !== "string" || noNode) {
-            throw new Error('Techie.removeAttr(elem, "id", "show")');
-          }
-          var attributesString = element.getAttribute(attr), stack = [];
-          if (typeof attributesString !== "string") { return; }
-          var attributes = attributesString.split(/\s+/);
-          attributes.forEach(function (each) {
-            if (each == value) { counter++; } else { stack.push(each); }
-          });
-          if (value == "" || value == attributesString) {
-            if (element.setAttribute) { element.setAttribute(attr, ""); }
-            else { element.getAttributeNode(attr).value = ""; }
-          } else {
-            if (element.setAttribute) { element.setAttribute(attr, stack.join(" ")); }
-            else { element.getAttributeNode(attr).value = stack.join(" "); }
-          }
-          if (counter == 0 && value) {
-            console.log(attr + " " + value + " was not found.")
-          }
-
-        }, element);
-
-        return this;
-      },
 
       removeClass: function removeClass(context, classname) {
         var throwError = "Techie.removeClass:--pt.removeClass(elemObj, 'className')";
@@ -4038,21 +4036,7 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         }
         return this.stack;
       },
-      removeAttr: function removeAttr(attr) {
-        this.each(function (node) {
-          node.removeAttribute(attr);
-        });
-        return this;
-      },
-      getAttr: function getAttr(attribute) {
-        var val;
-        this.once(function (element) {
-          if (element && element.getAttribute) {
-            val = element.getAttribute(attribute) || null;
-          }
-        });
-        return val;
-      },
+
       parent: function parent(e) {
         return (e || this[0]).parentNode;
       },
@@ -4460,23 +4444,7 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         return nodes[1] ? Techie.PT._(nodes) : nodes[0];
       },
 
-      hasAttr: function hasAttr(attribute) {
-        var has = false;
-        this.each(function (element) {
-          if (element && element.hasAttribute) {
-            (has = element.hasAttribute(attribute));
-          } else if (element && element.attributes && element.attributes[attribute]) {
-            return (has = element.attributes[attribute].specified);
-          }
-        });
-        return has;
-      },
-      setAttr: function setAttr(element, attribute, value) {
-        this.Attr(element, attribute, value);
-        return this;
-      },
-
-
+     
       setPreviousSibling: function setPreviousSibling(element, nxsb) {//used to create previousSibling
         nxsb = cast(this, nxsb, false);
         element = curry(element, pt.createFrag, !contains.invalidChars(element));
@@ -4632,7 +4600,7 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         return this;
       },
 
-     
+
       before: function before() { },//Used to create previous sibling
       // pt(div).before("<h3>stopped</h3>").after().text("started")        
       after: function () { },//Used to create next sibling
@@ -4893,22 +4861,7 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         });
         return all;
       },
-      Attribute: function Attribute(attr, context) { //.Attribute("prize"); .Attribute("data-set");
-        var nodes = _techie.emptyPT();
-        delta(context || is.dom(this) ? this : document, function () {
-          this.each(function (context) {
-            error("html", is.node(context), ln());
-            walk_the_DOM(context, function (element) {
-              if (element && element.attributes) {
-                if (element.hasAttribute(attr.toLowerCase()) || element.attributes[attr.toLowerCase()]) {
-                  nodes.push(element);
-                }
-              }
-            });
-          });
-        });
-        return nodes;
-      },
+
 
       Class: function Class(className, context) {
         var nodes = _techie.emptyPT();

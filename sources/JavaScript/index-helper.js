@@ -63,12 +63,7 @@ const log = console.log;
   }
   
 const route = getRoute();
-  $("body").Attribute("route", body).each((element, index) => {
-    if (element.getAttribute("route") == route) {
-      element.classList.add("active");
-      element.setAttribute("href", "JavaScript:void(0)");
-    }
-  });
+ 
 
   // log("here", route)
   

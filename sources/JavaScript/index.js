@@ -49,9 +49,6 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
   $(body).click(util.Subscriptions).keydown(util.HandlerKeyPress, $(document)); 
   $("input[name='item'], input[name='value']").on("input", Calculator);
 
-  //Hooks an event on the document
-  this.text("Total: 0", total);
-
 
   function Calculator (e) {
     const input = e.target;

@@ -139,7 +139,7 @@ const util = {
       toggleDropdown(dropdown, "show-block", target);
       return
     }
-    toggleDropdown(Techie.dropdownTarget, "show-block");
+    this.toggleDropdown(Techie.dropdownTarget, "show-block");
   },
 
   traverseUp(e, test) {
