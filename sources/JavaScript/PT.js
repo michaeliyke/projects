@@ -2832,14 +2832,17 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
 
       join: function join(token) {
         const arr = this.map((e) => {
-          if(typeof e === "string") {
+          if (typeof e === "string") {
             return e;
           }
-          if (e.nodeType == 1){
+          if (e.tagName == "INPUT") {
+            return e.value;
+          }
+          if (e.nodeType == 1) {
             return e.textContent;
           }
         });
-        return [].join.call(arr, token);
+        return [].join.call(arr, token || "");
       },
 
       map: function map(action) {
@@ -3887,14 +3890,17 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         return this;
       },
 
-      setText: function setText(text, parent) {//.setText("No")..setText("yoh", div)
-        parent = cast(this, parent);
-        delta(cast(this, parent), function () {
-          this.each(function (p) {
-            if (!is.html(p)) { return; }
-            typeof p.textContent === "string" ? p.textContent = text : p.innerText = text;
-          });
-        })
+      setText: function setText(str) {//.setText("No")
+        this.each((e) => {
+          if (e.tagName == "INPUT") {
+            e.value = str;
+            return
+          }
+          if (e.nodeType == 1) {
+            e.textContent = str;
+            return
+          }
+        });
         return this;
       },
 
@@ -3902,8 +3908,11 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         return this.join("");
       },
 
-      text: function text() {
-        return this.join("");
+      text: function text(str) {
+        if (str) {
+          return this.setText(str);
+        }
+        return this.getText();
       },
 
       nthChild: function nthChild(parent, child) { //nthChild(body, 6)
@@ -4623,23 +4632,7 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         return this;
       },
 
-      text: function text(str, element) {//.text().text("meat").text("egg", div)
-        var e = str, txt;
-        element = cast(this, element);
-        if (!is.dom(element) && is.dom(str)) {//pt.text(pt.Id("message-body"))
-          element = str; str = null;
-        }
-        if (!arguments.length || !str) { // pt("div").text().text(null, div) gets text at this[0]
-          element = cast(element, element[0]);
-          return _techie.getText(element);
-        }
-        forEach.call(pluralize(element), function (element) {
-          if (!is.dom(element)) { return; }
-          curry(str, _techie.setText.bind(this), !is.string(str));
-        });
-
-        return this;
-      },
+     
       before: function before() { },//Used to create previous sibling
       // pt(div).before("<h3>stopped</h3>").after().text("started")        
       after: function () { },//Used to create next sibling

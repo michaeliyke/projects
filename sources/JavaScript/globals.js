@@ -1,4 +1,4 @@
-
+let $ = Techie;
 const grab = document.querySelector.bind(document);
 const grabAll = document.querySelectorAll.bind(document);
 
@@ -29,17 +29,31 @@ const util = {
     section.style.width = 0;
   },
 
+  updateUI(item, amount) {
+    util.vars.Total += util.extractNumbers(amount.value); //The elusive counter engine
+    item.value = amount.value = "";
+    item.placeholder = "New item";
+    amount.placeholder = "New value";
+    item.focus();
+    util.vars.activeRow = null;
+    if (util.vars.Total != +util.vars.Total) {
+      return //reset();
+    }
+    $("#total").text(`Total: ${util.vars.Total}`);
+  },
+
   del(e, btn) {
     if (confirm("Do you want to delete this row?")) {
       new Promise(function (resolve) {
-        const row = Techie(e.target.parentNode);
-        const amountValue = Techie(grab.call(row, ".cell ~ .cell"));
+        const row = $(e.target.parentNode);
+        const amountCell = $(grab.call(row, ".cell ~ .cell"));
         // Negative number facilitates subtraction
-        var value = "-" + amountValue.text().replace(/[^\d]+/g);
+        var value = "----" + amountCell.text().replace(/[^\d]+/g);
         const amount = grab("#amount");
         amount.value = value;
         util.updateUI(grab("#item"), amount);
         row.hideFX();
+        console.log(amount);
         setTimeout(function () {
           row.remove();
         }, 1000);
@@ -190,19 +204,6 @@ const util = {
     $(target.classList.contains("swap") ? target.parentNode : target, function (k) {
       util.toggleClass("unchanged", "changed");
     });
-  },
-
-  updateUI(item, amount) {
-    util.vars.Total += util.extractNumbers(amount.value); //The elusive counter engine
-    item.value = amount.value = "";
-    item.placeholder = "New item";
-    amount.placeholder = "New value";
-    item.focus();
-    util.vars.activeRow = null;
-    if (util.vars.Total != +util.vars.Total) {
-      return //reset();
-    }
-    $("#total").text(`Total: ${util.vars.Total}`);
   },
 
   init() {
