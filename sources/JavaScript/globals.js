@@ -30,10 +30,16 @@ const util = {
   },
 
   updateUI(item, amount) {
-    util.vars.Total += util.extractNumbers(amount.value); //The elusive counter engine
+    if (amount.dataset.operation == "delete") {
+      amount.dataset.operation = "";
+      util.vars.Total -= util.extractNumbers(amount.value);
+    } else{
+      util.vars.Total += util.extractNumbers(amount.value);
+    }
+     //The elusive counter engine
     item.value = amount.value = "";
-    item.placeholder = "New item";
-    amount.placeholder = "New value";
+    // item.placeholder = "New item";
+    // amount.placeholder = "New value";
     item.focus();
     util.vars.activeRow = null;
     if (util.vars.Total != +util.vars.Total) {
@@ -48,12 +54,13 @@ const util = {
         const row = $(e.target.parentNode);
         const amountCell = $(grab.call(row, ".cell ~ .cell"));
         // Negative number facilitates subtraction
-        var value = "----" + amountCell.text().replace(/[^\d]+/g);
+        var value = util.extractNumbers(`-${amountCell.text()}`);
         const amount = grab("#amount");
         amount.value = value;
+        amount.dataset.operation = "delete";
+        console.log(value);
         util.updateUI(grab("#item"), amount);
         row.hideFX();
-        console.log(amount);
         setTimeout(function () {
           row.remove();
         }, 1000);
