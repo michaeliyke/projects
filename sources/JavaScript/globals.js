@@ -30,6 +30,7 @@ const util = {
   },
 
   updateUI(item, amount) {
+    console.log(util.vars.activeRow);
     if (amount.dataset.operation == "delete") {
       amount.dataset.operation = "";
       util.vars.Total -= util.extractNumbers(amount.value);

@@ -42,7 +42,9 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
     // var section_lists = query("header section nav ul");
   
     // Get all data
-    input.focus();
+    if (input) {
+      input.focus();
+    }
 
 
   // Abstract all event binding using delegation

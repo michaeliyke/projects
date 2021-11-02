@@ -63,7 +63,7 @@ const log = console.log;
   }
   
 const route = getRoute();
-  $("body").getByAttribute("route").each((element, index) => {
+  $("body").getByAttribute("route").eachElement((element) => {
     console.log(element);
     if (element.getAttribute("route") == route) {
       element.classList.add("active");

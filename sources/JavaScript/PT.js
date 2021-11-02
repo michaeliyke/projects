@@ -2219,7 +2219,7 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
           for (; index < length; index++) {
             if (action && action.call && action.call(This || Techie.PT.emptyPT().push(object[index]), object[index], index, object) === false) { break; }
           }
-        } else {
+        }  else {
           for (index in object) {
             if (action && action.call && object.hasOwnProperty(index)) {
               if (action.call(This || Techie.PT.emptyPT().push(object[index]), object[index], index, object) === false) { break; }
@@ -2239,13 +2239,33 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         return this;
       },
 
-      eachElement: function (action) {
-        if (this.length > 0) {
-          let index = 0;
-          for (const element of this) {
-            action.call(this, element, index++, this);
+      eachChild: function eachChild(fn, element, Thisarg) {
+        element = Techie.PT.Children((element || this));
+        for (var index in element) {
+          if (element[index].nodeType && fn.call) {
+            fn.call(Thisarg || element[index], element[index], index, element);
+
           }
         }
+        return this;
+      },
+
+
+
+      eachElement: function (action) {
+        if (isNaN(this.length)) {
+          return this;
+        }
+          var item, it = 0;
+          for (; it < this.length; it++) {
+            item = this[it];
+            if (!(item && item.nodeType == 1)) {
+              continue;
+            }
+            if (action.call(this, item, it, this)) {
+              return this;
+            }
+          }
         return this;
       },
 
@@ -2268,6 +2288,7 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         }
         return object;
       },
+
       index: function index(array, item, start) {
         if (Object.prototype.toString.call(item) == "[object String]"
           && Object.prototype.toString.call(array) == "[object String]") {
@@ -2868,6 +2889,20 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         return this;
       },
 
+      // Check if a matching set contains an element or item
+      contains: function contains(item) {
+        if (isNaN(this.length)) {
+          return false;
+        }
+        var it, cont = false;
+        for (it = 0; it < this.length; it++) {
+          if (this[it] == item) {
+            cont = true;
+            break;
+          }
+        }
+        return cont;
+      },
 
       shift: function (item) {
         this.splice(0, 0, item);
@@ -2888,11 +2923,15 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         this.splice(0, 1);
         return this;
       },
-      pop: function () {//remove one item at the end of this
+
+      //remove one item at the end of this
+      pop: function () {
         this.splice(this.length - 1, 1);
         return this;
       },
-      chop: function () { //remove one item at the begining of this
+
+      //remove one item at the begining of this
+      chop: function () { 
         this.splice(0, 1);
         return this;
       },
@@ -3219,6 +3258,7 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
       // .getElementsByAttribute("state", "plause"); .getElementsByAttribute("group");
       getElementsByAttribute: function getElementsByAttribute(att, value) {
         var results = Techie();
+        var args = arguments;
         this.eachElement(function (e) {
           walk_the_DOM(e, function (node) {
             if (node && node.hasAttribute && node.hasAttribute(att)) {
@@ -3877,29 +3917,6 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         });
         return this;
       },
-      eachChild: function eachChild(fn, element, Thisarg) {
-        element = Techie.PT.Children((element || this));
-        for (var index in element) {
-          if (element[index].nodeType && fn.call) {
-            fn.call(Thisarg || element[index], element[index], index, element);
-
-          }
-        }
-        return this;
-      },
-
-
-      eachElement: function each(fn, element, Thisarg) {
-        element = Techie.PT.Children(element || this);
-        for (var index in element) {
-          if (element[index].nodeType && fn.call) {
-            fn.call(Thisarg || element[index], element[index], index, element);
-
-          }
-        }
-        return this;
-      },
-
       setText: function setText(str) {//.setText("No")
         this.each((e) => {
           if (e.tagName == "INPUT") {
@@ -4049,23 +4066,33 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         return this.stack;
       },
 
-      parent: function parent(e) {
-        return (e || this[0]).parentNode;
+      //give us the parent of each of this filtered by selector optional selector
+      parent: function parent() {
+        var t = Techie();
+        this.eachElement(function(e) {
+          if(!t.contains(e.parentNode)) {
+            t.push(e.parentNode);
+          }
+        });
+        return t;
       },
-      getParent: function getParent(e) {
-        this.paren = this.paren ? this.paren : pt.parentNode; if (!(this.paren && this.paren.nodeType)) { return; }
-        if (this.paren.nodeType != 1) { this.paren = this.paren.previousSibling; this.getParent(this.paren); }
-        return this.paren;
+
+      // Get all children of a matching set in order
+      children: function children(){
+        var nodes = Techie();
+        this.eachElement(function(e) {
+          var chil = [].filter.call(e.childNodes, (node) => node.nodeType == 1);
+          nodes.push.apply(nodes, chil);
+        });
+        return nodes;
       },
+      
+      getParent: function getParent() {
+        return this.parent();
+      },
+      
       getChildren: function getChildren(e) {
-        var childNodes = [];
-        !e ? e = this : isHTML(e) ? e = [e] : error("html", isCollection(e), ln());
-        e.forEach(function (e) {
-          slice.call(e.childNodes).forEach(function (n) {
-            if (n.nodeType == 1) { childNodes.push(n); }
-          })
-        })
-        return childNodes;
+        return this.children();
       },
 
       // TraceDept gives us the deepest dept
@@ -4164,9 +4191,7 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
       wrapper: function (fn) {
         //produces string we can use as above. this points to element.
       },
-      parent: function (selector) {
-        //give us the parent of each of this filtered by selector optional selector
-      },
+      
       parents: function (selector) {
         //ancestors of each element of matched elements, optionally filtered
       },
@@ -4265,14 +4290,6 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         });
       },
 
-      contains: function contains(node, child) { //https://dzone.com/articles/angular-5-material-design-login-application
-        if (!child) { child = node; node = this[0]; }
-        if (!(child.nodeType && node.nodeType)) { throw new Error("Usage: $(\"div\").contains(childNode)"); }
-
-        return node.contains ?
-          node != child && node.contains(child) : !!(node.compareDocumentPosition(child) & 16);
-      },
-
       getOffset: function offset(node) {
         var clientRect = (node || this[0]).getBoundingClientRect(), cordinates = {};
         cordinates["left"] = clientRect.left + (window.pageXOffset || document.documentElement.scrollLeft);
@@ -4320,169 +4337,6 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
           }
         });
         return val;
-      },
-      prevAll: function (selector) {
-        //Get all preceding siblings of each element in the set filtered
-      },
-      nextAll: function (selector) {
-        //Get all following siblings of each element in the set filtered
-      },
-      siblings: function (selector) {
-        //Get the siblings of each element in the set filtered
-      },
-      next: function next(selector) {//.next(); .next(  "span" );
-        if (is.dom(this) == false) { //pt.next(node)
-          if (is.dom(selector)) {
-            return next.call(selector);
-          }
-        }
-        var method = String(arguments.callee.caller).match(/[\w\s]+\s*(\s+\w+){0,1}\(([\w\s\W].)+/)[0].trim();
-        if (selector) {
-          if (is.dom(selector)) { //pt().next(node); find next for node not for this
-            return next.call(selector);
-          }
-          if (is.dom(this) && is.string(selector)) {
-            return (this.tagName ? this : this[0]).querySelectorAll(selector)[0];
-          }
-          throw new Error(".next(selector) called on non string type from " + arguments.callee.caller);
-        }
-        var ret, found, dom = Object(null);//Techie("nav").next(); Alright pull up the next sibling for him
-        if (!(dom = is.collection(this) ? this[0] : is.element(this) ? this : null)) {
-          a(this)
-          throw new Error(".next(string) called on non DOM object at " + method);
-        }
-        run_the_DOM(dom, function (e) { //once this one is working, port it to Techie(div).next
-          if (e.parentNode == dom.parentNode && e != dom) {
-            if (is.html(e) && !found) { //Do this only once and run through since we can't stop it
-              ret = found = e;
-            }
-          }
-        });
-        return ret;
-      },
-
-      getNextSibling: function getNextSibling(element) {
-        var original, sib;
-        entechie(cast(this, element)).each(function (dom) {
-          return run_the_DOM(dom, function (node) {
-            if (counter == 0) { counter++; return false; }
-            sib = node;
-            return true;
-          });
-        });
-        return sib;
-      },
-
-      previous: function previous(e) {
-        this.previousSib = (typeof this.previousSib !== "undefined") ? this.previousSib : e.previousSibling;
-        if (this.previousSib && this.previousSib.nodeType && this.previousSib.nodeType != 1) {
-          this.previousSib = this.previousSib.previousSibling; this.previous(this.previousSib);
-        }
-        return this.previousSib;
-      },
-      prev: function prev(selector) {//.next(); .next(  "span" );
-        if (is.dom(this) == false) { //pt.next(node)
-          if (is.dom(selector)) {
-            return next.call(selector);
-          }
-        }
-        var method = String(arguments.callee.caller).match(/[\w\s]+\s*(\s+\w+){0,1}\(([\w\s\W].)+/)[0].trim();
-        if (selector) {
-          if (is.dom(selector)) { //pt().next(node); find next for node not for this
-            return next.call(selector);
-          }
-          // Modify Here
-          if (is.dom(this) && is.string(selector)) {
-            return (this.nodeType ? this : this[0]).querySelectorAll(selector)[0];
-          }
-          throw new Error(".next(selector) called on non string type from " + arguments.callee.caller);
-        }
-        var ret, found, dom = Object(null);//Techie("nav").next(); Alright pull up the next sibling for him
-        if (!(dom = is.collection(this) ? this[0] : is.element(this) ? this : null)) {
-          throw new Error(".next(string) called on non DOM object at " + method);
-        }
-        // Modify Here!
-        run_the_DOM(dom, function (e) { //once this one is working, port it to Techie(div).next
-          if (e.parentNode == dom.parentNode && e != dom) {
-            if (is.html(e) && !found) { //Do this only once and run through since we can't stop it
-              ret = found = e;
-            }
-          }
-        });
-        return ret;
-      },
-
-      getNextSibling: function getNextSibling(element) {
-        var original, sib;
-        entechie(cast(this, element)).each(function (elem) {
-          original = elem.parentNode;
-          return walk_the_DOM(elem, function (node) {
-            a(node)
-          });
-        });
-        return sib;
-      },
-
-      getLastChild: function getLastChild(element) {
-        var nodes = [], node = null;
-        delta(cast(this, element), function () {
-          this.each(function (e) {
-            var P = this;
-            walk(e, function (e) {
-              if (e.parentNode == P && is.html(e)) {
-                node = e;
-              }
-            }); nodes.push(node);
-          });
-        });
-        return nodes[1] ? Techie.PT.grab(nodes) : nodes[0];
-      },
-
-      getFirstChild: function getFirstChild(element) {
-        var nodes = [], node = null;
-        delta(cast(this, element), function () {
-          this.each(function (e) {
-            var P = e;
-            walk(e, function (e, firstChild, lastChild, parent) {
-              if (e.parentNode == P) {
-                if (e.nodeType == 1) {
-                  return (node = e); //It will always catch the last one
-                }
-              }
-
-            }); nodes.push(node);
-          });
-        });
-        return nodes[1] ? Techie.PT._(nodes) : nodes[0];
-      },
-
-     
-      setPreviousSibling: function setPreviousSibling(element, nxsb) {//used to create previousSibling
-        nxsb = cast(this, nxsb, false);
-        element = curry(element, pt.createFrag, !contains.invalidChars(element));
-        element = curry(element, pt.create, !plain.text(element));
-        is.techie(nxsb) ? ( //used to create previousSibling
-          nxsb.each(function prepend_each(nxsb) {
-            error("html", is.html(nxsb), ln());
-            error("The element is not in the document", is.html(nxsb.parentNode), ln())
-            nxsb.parentNode.insertBefore(element, nxsb);
-          })
-        ) : setPreviousSibling.call(Techie.PT._(nxsb), element);
-        return this;
-      },
-      setNextSibling: function setNextSibling(element, nxsb) {//Used to create nextSibling
-        nxsb = cast(this, nxsb, false);//Use nxsb || this
-        element = curry(element, pt.createFrag, !contains.invalidChars(element));
-        element = curry(element, sapi.createElement.bind(sapi), !plain.text(element));
-        is.techie(nxsb) ? ( //used to create previousSibling
-          nxsb.each(function prepend_each(nxsb) {
-            error("html", is.html(nxsb), ln());
-            error("The element should be in the document", is.html(nxsb.parentNode), ln());
-            (plain.text(element))
-            nxsb.parentNode.insertBefore(element, nxsb.nextSibling);
-          })
-        ) : setNextSibling.call(Techie.PT._(nxsb), element);
-        return this;
       },
 
       appendTo: function appendTo(parent, child) { //pt("h2").appendTo(body)
@@ -4778,23 +4632,168 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         return false;
       },
 
-      contains: function (refNode, otherNode) {
-        if (typeof refNode.contains === "function" &&
-          (!client.engine.webkit || client.engine.webkit >= 522)) {
-          return refNode.contains(otherNode);
-        } else if (typeof refNode.compareDocumentPosition === "function") {
-          return !!(refNode.compareDocumentPosition(otherNode) & 16);
-        } else {
-          var node = otherNode.parentNode;
-          do {
-            if (node === refNode) {
-              return true;
-            } else {
-              node = node.parentNode;
-            }
-          } while (node != null);
-          return false;
+      prevAll: function (selector) {
+        //Get all preceding siblings of each element in the set filtered
+      },
+      nextAll: function (selector) {
+        //Get all following siblings of each element in the set filtered
+      },
+      siblings: function (selector) {
+        //Get the siblings of each element in the set filtered
+      },
+      next: function next(selector) {//.next(); .next(  "span" );
+        if (is.dom(this) == false) { //pt.next(node)
+          if (is.dom(selector)) {
+            return next.call(selector);
+          }
         }
+        var method = String(arguments.callee.caller).match(/[\w\s]+\s*(\s+\w+){0,1}\(([\w\s\W].)+/)[0].trim();
+        if (selector) {
+          if (is.dom(selector)) { //pt().next(node); find next for node not for this
+            return next.call(selector);
+          }
+          if (is.dom(this) && is.string(selector)) {
+            return (this.tagName ? this : this[0]).querySelectorAll(selector)[0];
+          }
+          throw new Error(".next(selector) called on non string type from " + arguments.callee.caller);
+        }
+        var ret, found, dom = Object(null);//Techie("nav").next(); Alright pull up the next sibling for him
+        if (!(dom = is.collection(this) ? this[0] : is.element(this) ? this : null)) {
+          a(this)
+          throw new Error(".next(string) called on non DOM object at " + method);
+        }
+        run_the_DOM(dom, function (e) { //once this one is working, port it to Techie(div).next
+          if (e.parentNode == dom.parentNode && e != dom) {
+            if (is.html(e) && !found) { //Do this only once and run through since we can't stop it
+              ret = found = e;
+            }
+          }
+        });
+        return ret;
+      },
+
+      getNextSibling: function getNextSibling(element) {
+        var original, sib;
+        entechie(cast(this, element)).each(function (dom) {
+          return run_the_DOM(dom, function (node) {
+            if (counter == 0) { counter++; return false; }
+            sib = node;
+            return true;
+          });
+        });
+        return sib;
+      },
+
+      previous: function previous(e) {
+        this.previousSib = (typeof this.previousSib !== "undefined") ? this.previousSib : e.previousSibling;
+        if (this.previousSib && this.previousSib.nodeType && this.previousSib.nodeType != 1) {
+          this.previousSib = this.previousSib.previousSibling; this.previous(this.previousSib);
+        }
+        return this.previousSib;
+      },
+      prev: function prev(selector) {//.next(); .next(  "span" );
+        if (is.dom(this) == false) { //pt.next(node)
+          if (is.dom(selector)) {
+            return next.call(selector);
+          }
+        }
+        var method = String(arguments.callee.caller).match(/[\w\s]+\s*(\s+\w+){0,1}\(([\w\s\W].)+/)[0].trim();
+        if (selector) {
+          if (is.dom(selector)) { //pt().next(node); find next for node not for this
+            return next.call(selector);
+          }
+          // Modify Here
+          if (is.dom(this) && is.string(selector)) {
+            return (this.nodeType ? this : this[0]).querySelectorAll(selector)[0];
+          }
+          throw new Error(".next(selector) called on non string type from " + arguments.callee.caller);
+        }
+        var ret, found, dom = Object(null);//Techie("nav").next(); Alright pull up the next sibling for him
+        if (!(dom = is.collection(this) ? this[0] : is.element(this) ? this : null)) {
+          throw new Error(".next(string) called on non DOM object at " + method);
+        }
+        // Modify Here!
+        run_the_DOM(dom, function (e) { //once this one is working, port it to Techie(div).next
+          if (e.parentNode == dom.parentNode && e != dom) {
+            if (is.html(e) && !found) { //Do this only once and run through since we can't stop it
+              ret = found = e;
+            }
+          }
+        });
+        return ret;
+      },
+
+      getNextSibling: function getNextSibling(element) {
+        var original, sib;
+        entechie(cast(this, element)).each(function (elem) {
+          original = elem.parentNode;
+          return walk_the_DOM(elem, function (node) {
+            a(node)
+          });
+        });
+        return sib;
+      },
+
+      getLastChild: function getLastChild(element) {
+        var nodes = [], node = null;
+        delta(cast(this, element), function () {
+          this.each(function (e) {
+            var P = this;
+            walk(e, function (e) {
+              if (e.parentNode == P && is.html(e)) {
+                node = e;
+              }
+            }); nodes.push(node);
+          });
+        });
+        return nodes[1] ? Techie.PT.grab(nodes) : nodes[0];
+      },
+
+      getFirstChild: function getFirstChild(element) {
+        var nodes = [], node = null;
+        delta(cast(this, element), function () {
+          this.each(function (e) {
+            var P = e;
+            walk(e, function (e, firstChild, lastChild, parent) {
+              if (e.parentNode == P) {
+                if (e.nodeType == 1) {
+                  return (node = e); //It will always catch the last one
+                }
+              }
+
+            }); nodes.push(node);
+          });
+        });
+        return nodes[1] ? Techie.PT._(nodes) : nodes[0];
+      },
+
+
+      setPreviousSibling: function setPreviousSibling(element, nxsb) {//used to create previousSibling
+        nxsb = cast(this, nxsb, false);
+        element = curry(element, pt.createFrag, !contains.invalidChars(element));
+        element = curry(element, pt.create, !plain.text(element));
+        is.techie(nxsb) ? ( //used to create previousSibling
+          nxsb.each(function prepend_each(nxsb) {
+            error("html", is.html(nxsb), ln());
+            error("The element is not in the document", is.html(nxsb.parentNode), ln())
+            nxsb.parentNode.insertBefore(element, nxsb);
+          })
+        ) : setPreviousSibling.call(Techie.PT._(nxsb), element);
+        return this;
+      },
+      setNextSibling: function setNextSibling(element, nxsb) {//Used to create nextSibling
+        nxsb = cast(this, nxsb, false);//Use nxsb || this
+        element = curry(element, pt.createFrag, !contains.invalidChars(element));
+        element = curry(element, sapi.createElement.bind(sapi), !plain.text(element));
+        is.techie(nxsb) ? ( //used to create previousSibling
+          nxsb.each(function prepend_each(nxsb) {
+            error("html", is.html(nxsb), ln());
+            error("The element should be in the document", is.html(nxsb.parentNode), ln());
+            (plain.text(element))
+            nxsb.parentNode.insertBefore(element, nxsb.nextSibling);
+          })
+        ) : setNextSibling.call(Techie.PT._(nxsb), element);
+        return this;
       },
 
       matchesSelector: function matchesSelector(element, selector) {
@@ -4891,6 +4890,7 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         });
         return nodes;
       },
+
       Id: function id(id, context) {
         var e, grab;
         delta(context || is.dom(this) ? this : document, function () {
@@ -4959,6 +4959,7 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         }
         return crank;
       },
+
       containsString: function containsString(string) {
         return this.indexOf(string.trim() != -1);
       },
