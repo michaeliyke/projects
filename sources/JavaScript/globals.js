@@ -8,6 +8,7 @@ const util = {
   vars: {
     Total: 0,
     activeRow: null,
+    pos: 0,
     mobile_menu_open: {
       dumming: false
     }
@@ -29,24 +30,35 @@ const util = {
     section.style.width = 0;
   },
 
+  // Reset row props upwards
+  resetPropsUp(node) {},
+
+  // setup row props
+  setDataProps(node){
+    const {vars} = util;
+    node.dataset.pos = vars.pos++;
+    node.dataset.prev = vars.pos;
+  },
+  
   updateUI(item, amount) {
-    console.log(util.vars.activeRow);
+    console.log(vars.activeRow);
+    util.setDataProps(item.parentNode);
     if (amount.dataset.operation == "delete") {
       amount.dataset.operation = "";
-      util.vars.Total -= util.extractNumbers(amount.value);
+      vars.Total -= util.extractNumbers(amount.value);
     } else{
-      util.vars.Total += util.extractNumbers(amount.value);
+      vars.Total += util.extractNumbers(amount.value);
     }
      //The elusive counter engine
     item.value = amount.value = "";
     // item.placeholder = "New item";
     // amount.placeholder = "New value";
     item.focus();
-    util.vars.activeRow = null;
-    if (util.vars.Total != +util.vars.Total) {
+    vars.activeRow = null;
+    if (vars.Total != +vars.Total) {
       return //reset();
     }
-    $("#total").text(`Total: ${util.vars.Total}`);
+    $("#total").text(`Total: ${vars.Total}`);
   },
 
   del(e, btn) {
@@ -76,7 +88,7 @@ const util = {
   },
 
   updateCount() {
-    $("#total").text(`Total: ${util.vars.Total}`);
+    $("#total").text(`Total: ${vars.Total}`);
   },
 
   Clean() {
@@ -86,10 +98,9 @@ const util = {
     item.placeholder = "New item";
     amount.placeholder = "New vlaue";
     item.focus(); 
-    util.vars.Total = 0;
+    vars.Total = 0;
     total.textContent = "Total: 0";
     $("table tbody").empty();
-    vars = {};
   },
 
   ucWord(str) {
@@ -175,7 +186,7 @@ const util = {
   validate(item, amount) {
     var test = /^((\w*|\W*)*[\w\s-]*)+$/.test(item.value.trim());
     if (!(test && amount.value.trim())) {
-      console.warn("Warning::   Make sure you are inputing the right values.");
+      console.warn("Warning:-   Make sure you are inputing the right values.");
       return false;
     }
     return true
@@ -251,7 +262,7 @@ const util = {
     }
   },
 
-  Foo() {
+  Foo(evnt) {
     const item = grab("#item"), amount = grab("#amount");
     if (!util.validate(item, amount)) {
       return;
@@ -334,10 +345,9 @@ const util = {
     context = null;
   },
 
-  HandleEnter(e) {
-    var evnt = e || global.event;
+  HandleEnter(evnt) {
     if (evnt.keyCode == 13) {
-      util.Foo.call(null, null, input, amount);
+      util.Foo.call(null, evnt);
     }
   },
 
@@ -435,3 +445,5 @@ const util = {
   }
 
 };
+
+const {vars} = util;

@@ -31,28 +31,28 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
 
   var context = null;
 
-  const {vars} = util;
-  
-    var d = document, getId = this.Id, v1 = "Next item", v2 = '0.00';
-    var amount = getId("amount"), total = getId("total"), submit = getId("submit");
-    var input = getId("item"), reset = getId("reset"), currentV = $("#current > #current");
-    var  manage = getId("managing");
-    var  printing = getId("printing"), saving = getId("saving"), _techie = this;
-    // var  table = getId("table"), mobile_menu = getByClass("open-off-canvass");
-    // var section_lists = query("header section nav ul");
-  
-    // Get all data
-    if (input) {
-      input.focus();
-    }
+  const { vars } = util;
+
+  var d = document, getId = this.Id, v1 = "Next item", v2 = '0.00';
+  var amount = getId("amount"), total = getId("total"), submit = getId("submit");
+  var input = getId("item"), reset = getId("reset"), currentV = $("#current > #current");
+  var manage = getId("managing");
+  var printing = getId("printing"), saving = getId("saving"), _techie = this;
+  // var  table = getId("table"), mobile_menu = getByClass("open-off-canvass");
+  // var section_lists = query("header section nav ul");
+
+  // Get all data
+  if (input) {
+    input.focus();
+  }
 
 
   // Abstract all event binding using delegation
-  $(body).click(util.Subscriptions).keydown(util.HandlerKeyPress, $(document)); 
+  $(body).click(util.Subscriptions).keydown(util.HandlerKeyPress, $(document));
   $("input[name='item'], input[name='value']").on("input", Calculator);
 
 
-  function Calculator (e) {
+  function Calculator(e) {
     const input = e.target;
     if (input.value.trim().length > 0) {
       if (!vars.activeRow) {
