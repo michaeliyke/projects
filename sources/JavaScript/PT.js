@@ -3205,6 +3205,7 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
       },
 
 
+      // Unuseful and will be removed
       attrHooks: function attrHooks(element, attr, value) {
         if (element.setAttribute) {
           element.setAttribute(attr, value || "");
@@ -3232,6 +3233,17 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
         return results;
       },
 
+      // Alias to .getElementsByAttribute()
+      getByAttribute: function getByAttribute(att, value) {
+        return this.getElementsByAttribute(att, value);
+      },
+
+      // Alias to .getElementsByAttribute()
+      getByAttr: function getByAttr(att, value) {
+        return this.getElementsByAttribute(att, value);
+      },
+
+      // Alias to .getElementsByAttribute()
       getElementByAttribute: function getElementByAttribute(att, value) {
         return this.getElementsByAttribute(att, value);
       },
