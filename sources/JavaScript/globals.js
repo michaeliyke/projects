@@ -42,8 +42,14 @@ const util = {
       },
 
       // Simply load given data into vars.tableData
-      loadJSONData(dataArray) {
-        vars.tableData = dataArray;
+      loadJSONData(object) {
+        if (Array.isArray(object) || typeof object !== "object") {
+          return
+        }
+        vars.tableData = Object.keys(object).map((key) => {
+          const item = key, value = object[key];
+          return {item, value};
+        });
       },
 
       // text format is x = y one for each line. No comma or required
@@ -80,7 +86,12 @@ const util = {
   // populate HTML table body with properly formatted table data
   // Automatically include values into calculation totals
   fillTableData(){
-    console.log("fillTableData()");
+    vars.tableData.forEach((data) => {
+      const row = util.createRow(util.ucWord(data.item), data.value || "");
+      const table = grab("table tbody");
+      table.insertBefore(row, table.firstChild);
+      vars.activeRow = grab.call(table, "tr");
+    });
   },
   
   uploadFileData(e){
