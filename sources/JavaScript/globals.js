@@ -9,6 +9,7 @@ const util = {
     Total: 0,
     activeRow: null,
     fileOpenActive: false,
+    tableData: [],
     pos: 0,
     prev: 1,
     mobile_menu_open: {
@@ -16,31 +17,88 @@ const util = {
     }
   },
 
+  // Create Table data from disc uploads - application/json, text/plain
+  createDataFromDisc(data) {
+    const info = {
+      data, //Result dump from reading a file from disc
+      createData() {
+        const {data} = this;
+        let dataArray, text;
+        if (typeof data !== "string" ) {
+          return
+        }
+        // detect if it's json, fall back is text
+        try {
+          dataArray = JSON.parse(data); 
+        } catch (error) {
+          text = data;
+        }
+        if (dataArray) {
+          this.loadJSONData(dataArray);
+          return
+        }
+        // Falling back to text
+        this.loadTextData(text);
+      },
+
+      // Simply load given data into vars.tableData
+      loadJSONData(dataArray) {
+        vars.tableData = dataArray;
+      },
+
+      // text format is x = y one for each line. No comma or required
+      loadTextData(string) {
+        vars.tableData = string.split("\n").map((line) => {
+          let item, value, unit = line.split("=");
+          if (unit[0] && unit[0].trim()) {
+            item = unit[0].trim();
+          }
+          if (unit[1] && unit[1].trim()) {
+            value = unit[1].trim();
+          }
+          return {item, value};
+        }).filter(e => e.item != null);
+      },
+
+      // populate vars.tableData with valid data information
+      // invoke util.fillDataTable() - this uses info from vars.tableData and empties it
+      fillTableData() {
+        this.createData();
+        util.fillTableData();
+      }
+    }
+    return info;
+  },
+  
+  createDataFromDownload() {
+    const info = {
+      fillTableData() { },
+    };
+    return info;
+  },
+
+  // populate HTML table body with properly formatted table data
+  // Automatically include values into calculation totals
+  fillTableData(){
+    console.log("fillTableData()");
+  },
+  
   uploadFileData(e){
     vars.fileOpenActive = false;
     const {files} = e.target;
-    if (!files || !("length" in files)) {
-      console.warn("Invalid event data.");
-      return
-    }
-    if (files.length < 1) {
-      console.warn("No files selected");
+    const accepts = ["application/json", "text/plain"];
+    if (!files || !("length" in files) || files.length < 1) {
       return;
     }
-    const f = files[0];
-    const accepts = ["application/json", "text/plain"];
-    if (!accepts.includes(f.type)) {
-      console.warn("invalid file");
-      return 
-    }
-    if (!util.sizeIsAllowable(util.getFileSize(f))) {
-      console.warn("File too large");
-      return 
+    const [f] = files;
+    if (!accepts.includes(f.type) || !util.sizeIsAllowable(util.getFileSize(f))) {
+      return;
     }
     // f.length, f.name, f.size, f.type i.e mime type
     const reader = new FileReader();
     reader.addEventListener("load", function() {
-      console.log(this.result);
+      const data = util.createDataFromDisc(this.result);
+      data.fillTableData();
     });
     reader.readAsText(f, "UTF-8");
   },

@@ -1091,7 +1091,7 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
       },
       hook: function (dom, event, handler) {
         this["details"]["handlers"] = this["details"]["handlers"] || [];
-        this["details"]["elements"] = this["details"]["elements"] || [];
+        this["details"]["elements"] = this["details"]-["elements"] || [];
         this["details"]["events"] = this["details"]["events"] || [];
         this["details"]["handlers"].push(handler);
         this["details"]["events"].push(event);
