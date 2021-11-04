@@ -51,6 +51,8 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
   $(body).click(util.Subscriptions).keydown(util.HandlerKeyPress, $(document));
   $("input[name='item'], input[name='value']").on("input", Calculator);
 
+  $(".file-data input").change(util.uploadFileData);
+  $(".file-data").click(util.processDataUpload);
 
   function Calculator(e) {
     const input = e.target;

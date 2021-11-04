@@ -8,9 +8,73 @@ const util = {
   vars: {
     Total: 0,
     activeRow: null,
+    fileOpenActive: false,
     pos: 0,
+    prev: 1,
     mobile_menu_open: {
       dumming: false
+    }
+  },
+
+  uploadFileData(e){
+    vars.fileOpenActive = false;
+    const {files} = e.target;
+    if (!files || !("length" in files)) {
+      console.warn("Invalid event data.");
+      return
+    }
+    if (files.length < 1) {
+      console.warn("No files selected");
+      return;
+    }
+    const f = files[0];
+    const accepts = ["application/json", "text/plain"];
+    if (!accepts.includes(f.type)) {
+      console.warn("invalid file");
+      return 
+    }
+    if (!util.sizeIsAllowable(util.getFileSize(f))) {
+      console.warn("File too large");
+      return 
+    }
+    // f.length, f.name, f.size, f.type i.e mime type
+    const reader = new FileReader();
+    reader.addEventListener("load", function() {
+      console.log(this.result);
+    });
+    reader.readAsText(f, "UTF-8");
+  },
+
+  processDataUpload() {
+    if (vars.fileOpenActive) {
+      return;
+    }
+    vars.fileOpenActive = true;
+    const input = grab(".file-data input");
+    input.click();
+  },
+
+  sizeIsAllowable(size){
+    const num = size.replace(/[^\d.]/g, "");
+    const unit = size.replace(/[\d.]/g, "");
+    if (unit.toUpperCase() == "MB") {
+      return num < 3;
+    }
+    if (unit == "BYTES" || unit == "KB") {
+      return true;
+    }
+    return false;
+  },
+
+  getFileSize({size}) {
+    if (size < 1024) {
+        return size + "BYTES";
+    }
+    if (size >= 1024 && size < 1048576) {
+      return (size/1024).toFixed(1) + "KB";
+    }
+    if (size >= 1048576) {
+      return (size/1048576).toFixed(1) + "MB";
     }
   },
 
@@ -31,31 +95,39 @@ const util = {
   },
 
   // Reset row props upwards
-  resetPropsUp(node) {},
+  resetPropsUp(row) {
+    this.scanUpwards(row, (row) => {
+      console.log(row);
+      // console.log(row.getAttributeNames());
+    });
+    console.log("reset data called-------------------------");
+  },
+
+  scanUpwards(row, fn) {
+    fn(row);
+    row = row.previousSibling;
+    this.scanUpwards(row, fn);
+  },
 
   // setup row props
-  setDataProps(node){
+  setDataProps(row){
     const {vars} = util;
-    node.dataset.pos = vars.pos++;
-    node.dataset.prev = vars.pos;
+    row.dataset.prev = vars.pos++;
+    row.dataset.pos = vars.pos;
+    console.log(row);
   },
   
   updateUI(item, amount) {
-    console.log(vars.activeRow);
-    util.setDataProps(item.parentNode);
     if (amount.dataset.operation == "delete") {
       amount.dataset.operation = "";
       vars.Total -= util.extractNumbers(amount.value);
     } else{
       vars.Total += util.extractNumbers(amount.value);
     }
-     //The elusive counter engine
     item.value = amount.value = "";
-    // item.placeholder = "New item";
-    // amount.placeholder = "New value";
     item.focus();
     vars.activeRow = null;
-    if (vars.Total != +vars.Total) {
+    if (isNaN(vars.Total)) {
       return //reset();
     }
     $("#total").text(`Total: ${vars.Total}`);
@@ -69,10 +141,11 @@ const util = {
         // Negative number facilitates subtraction
         var value = util.extractNumbers(`-${amountCell.text()}`);
         const amount = grab("#amount");
+        const item = grab("#item");
         amount.value = value;
         amount.dataset.operation = "delete";
-        console.log(value);
-        util.updateUI(grab("#item"), amount);
+        util.resetPropsUp(item.parentNode);
+        util.updateUI(item, amount);
         row.hideFX();
         setTimeout(function () {
           row.remove();
@@ -80,7 +153,7 @@ const util = {
         resolve(row);
       }).then(function (row) {
         console.log("Row deleted");
-        return row
+        return row;
       }).catch(function (error) {
         console.error(error);
       });
@@ -266,6 +339,9 @@ const util = {
     const item = grab("#item"), amount = grab("#amount");
     if (!util.validate(item, amount)) {
       return;
+    }
+    if (item && item.parentNode) {
+      util.setDataProps(item.parentNode)
     }
 
     // _techie.grab("table tbody").prependChild(createRow(input.value, amount.value));

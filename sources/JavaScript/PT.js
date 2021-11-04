@@ -3179,7 +3179,13 @@ Use isTag(string) instead; string will be created and checked against  isNode(ob
       },
 
       // Get all attributes of the elements in a set
-      attrs: function attrs(){},
+      attrs: function attrs(){
+        return this.map(function(node) {
+          if (node && node.nodeType == 1) {
+            return [].join.call(node.getAttributeNames(), " ")
+          }
+        });
+      },
 
       // Toggle an attribute's value for a matching set
       // If value not specified, empty string is used
