@@ -67,8 +67,9 @@ const util = {
       },
 
       // populate vars.tableData with valid data information
-      // invoke util.fillDataTable() - this uses info from vars.tableData and empties it
+      // Reset table and invoke util.fillDataTable()
       fillTableData() {
+        util.subscriptions.trigerEvent("reset");
         this.createData();
         util.fillTableData();
       }
@@ -78,7 +79,13 @@ const util = {
   
   createDataFromDownload() {
     const info = {
-      fillTableData() { },
+      // populate vars.tableData with valid data information
+      // Reset table and invoke util.fillDataTable()
+      fillTableData() {
+        util.subscriptions.trigerEvent("reset");
+        this.createData();
+        util.fillTableData();
+      }
     };
     return info;
   },
@@ -471,6 +478,8 @@ const util = {
     if (event) {
       return true;
     }
+    // ATTENTION: re-write this place using lass detection instead.
+    // ATTENTION: Use of id detection is hereby discontinued!
     var target = event.getTarget;
     if ((target.id == "equiv" || target.id == "manage") || (target.id == "equiv" || target.parentNode.id == "manage")) {
       return false;
@@ -506,7 +515,7 @@ const util = {
     util.pane = null;
     context = null;
   },
-
+ 
   HandleEnter(evnt) {
     if (evnt.keyCode == 13) {
       util.Foo.call(null, evnt);
@@ -538,6 +547,7 @@ const util = {
   Subscriptions(event, obj) {
 
     subscriptions = {
+      "subscriber": event.target,
       //Subscription is purely by criterion -: id, class, name, data-set etc
       "default_handlers": [util.CloseHandler], //Default handlers will always execute
       "grouped_subscribers": [
@@ -557,13 +567,45 @@ const util = {
         { "name": "swap", "handlers": [util.mobile_menu_open, util.toggleChange] }, // .swap
         { "name": "open-off-canvass", "handlers": [util.mobile_menu_open, util.toggleChange] } // .open-off-canvass
       ],
-      "subscriber": event.target,
-      "activate": function activator(event, subscriberString, actions) {
+
+      "activate": function activate(event, subscriberString, actions) {
         if (actions.length < 1) {
           console.warn("You have not specified any actions for subscriber:", subscriberString);
         }
         actions.forEach(function launch(action) {
           action.call(obj, event, subscriptions.subscriber, obj);
+        });
+      },
+
+      // get a subscriber by its name
+      "getSubscriber": function getSubscriber(name) {
+        for (const subscriber of this.subscribers) {
+          if (subscriber.name == name) {
+            return subscriber;
+          }
+        }
+      },
+
+      // get listening DOM elements
+      "getListeners": function getListeners(subscriber) {
+        const { name: className} = subscriber;
+        return [].slice.call(grabAll(`.${className}`));
+      },
+
+      // triggers a subscriber's event by name - executes it's listeners
+      "trigerEvent": function trigerEvent(className){
+        const subscriber = this.getSubscriber(className);
+        if (!subscriber) {
+          return
+        }
+        const listeners = this.getListeners(subscriber);
+        listeners.forEach((listener) => {
+          try {
+            // something like element.click()
+              listener[subscriber.event || "click"]();
+          } catch (error) {
+            console.warn(error);
+          }
         });
       }
     };
