@@ -1,6 +1,6 @@
 let $ = Techie;
-const grab = document.querySelector.bind(document);
-const grabAll = document.querySelectorAll.bind(document);
+const grab = document.querySelector.bind(document); // Picks first match
+const grabAll = document.querySelectorAll.bind(document); // Picks all maches
 
 const util = {
   grab,
@@ -48,7 +48,7 @@ const util = {
         }
         vars.tableData = Object.keys(object).map((key) => {
           const item = key, value = object[key];
-          return {item, value};
+          return {item, value, means: "upload"};
         });
       },
 
@@ -62,7 +62,7 @@ const util = {
           if (unit[1] && unit[1].trim()) {
             value = unit[1].trim();
           }
-          return {item, value};
+          return {item, value, means: "upload"};
         }).filter(e => e.item != null);
       },
 
@@ -86,11 +86,22 @@ const util = {
   // populate HTML table body with properly formatted table data
   // Automatically include values into calculation totals
   fillTableData(){
-    vars.tableData.forEach((data) => {
-      const row = util.createRow(util.ucWord(data.item), data.value || "");
+    vars.tableData.forEach((data, it) => {
+      const item = grab("#item"), amount = grab("#amount");
+      item.value = data.item;
+      amount.value = data.value
+      const row = util.createRow(
+        util.ucWord(item.value), amount.value || "", 
+        { 
+          means: data.means,
+          pos: it + 1,
+          prev: it
+        }
+        );
       const table = grab("table tbody");
       table.insertBefore(row, table.firstChild);
       vars.activeRow = grab.call(table, "tr");
+      util.updateUI(item, amount);
     });
   },
   
@@ -252,17 +263,23 @@ const util = {
     return str.charAt(0).toUpperCase().concat(str.substr(1, str.length - 1).toLowerCase());
   },
 
-  createRow(item, value) {
-    var number = -1, length = arguments.length;
-    var stack = [], args = arguments, txt,
-      row = document.createElement("tr"), cell = document.createElement("td");
+  createRow(item, value, props) {
+    var number = -1, stack = [], str, row = document.createElement("tr");
     while (++number < 2) {
-      txt = " <td class='cell' id='cell" + number + "'> </td> <span class='del del" + number +
-        "' title='Remove record'>x</span>"
-      stack.push(txt);
+      str = `<td class="cell cell${number}" id=cell${number}></td> 
+        <span class="del del${number}" title='Remove record'>x</span>`;
+      stack.push(str);
     }
-    // a(stack)
-    row.innerHTML = stack.join(' ');
+
+    // data-means=upload, create, download
+    // modified
+    row.dataset.means = "create";
+   if (props) {
+     Object.keys(props).forEach((prop) => {
+       row.dataset[prop]= props[prop];
+     });
+   }
+    row.innerHTML = stack.join(" ");
     row.querySelector("#cell0").textContent = util.ucWord(item);
     row.querySelector("#cell1").textContent = value;
     return row;
