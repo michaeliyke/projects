@@ -22,14 +22,14 @@ const util = {
     const info = {
       data, //Result dump from reading a file from disc
       createData() {
-        const {data} = this;
+        const { data } = this;
         let dataArray, text;
-        if (typeof data !== "string" ) {
+        if (typeof data !== "string") {
           return
         }
         // detect if it's json, fall back is text
         try {
-          dataArray = JSON.parse(data); 
+          dataArray = JSON.parse(data);
         } catch (error) {
           text = data;
         }
@@ -48,7 +48,7 @@ const util = {
         }
         vars.tableData = Object.keys(object).map((key) => {
           const item = key, value = object[key];
-          return {item, value, means: "upload"};
+          return { item, value, means: "upload" };
         });
       },
 
@@ -62,27 +62,27 @@ const util = {
           if (unit[1] && unit[1].trim()) {
             value = unit[1].trim();
           }
-          return {item, value, means: "upload"};
+          return { item, value, means: "upload" };
         }).filter(e => e.item != null);
       },
 
       // populate vars.tableData with valid data information
       // Reset table and invoke util.fillDataTable()
       fillTableData() {
-        util.subscriptions.trigerEvent("reset");
+        util.subscription.trigerEvent("reset");
         this.createData();
         util.fillTableData();
       }
     }
     return info;
   },
-  
+
   createDataFromDownload() {
     const info = {
       // populate vars.tableData with valid data information
       // Reset table and invoke util.fillDataTable()
       fillTableData() {
-        util.subscriptions.trigerEvent("reset");
+        util.subscription.trigerEvent("reset");
         this.createData();
         util.fillTableData();
       }
@@ -92,29 +92,29 @@ const util = {
 
   // populate HTML table body with properly formatted table data
   // Automatically include values into calculation totals
-  fillTableData(){
+  fillTableData() {
     vars.tableData.forEach((data, it) => {
       const item = grab("#item"), amount = grab("#amount");
       item.value = data.item;
       amount.value = data.value
       const row = util.createRow(
-        util.ucWord(item.value), amount.value || "", 
-        { 
+        util.ucWord(item.value), amount.value || "",
+        {
           means: data.means,
           pos: it + 1,
           prev: it
         }
-        );
+      );
       const table = grab("table tbody");
       table.insertBefore(row, table.firstChild);
       vars.activeRow = grab.call(table, "tr");
       util.updateUI(item, amount);
     });
   },
-  
-  uploadFileData(e){
+
+  uploadFileData(e) {
     vars.fileOpenActive = false;
-    const {files} = e.target;
+    const { files } = e.target;
     const accepts = ["application/json", "text/plain"];
     if (!files || !("length" in files) || files.length < 1) {
       return;
@@ -125,7 +125,7 @@ const util = {
     }
     // f.length, f.name, f.size, f.type i.e mime type
     const reader = new FileReader();
-    reader.addEventListener("load", function() {
+    reader.addEventListener("load", function () {
       const data = util.createDataFromDisc(this.result);
       data.fillTableData();
     });
@@ -141,7 +141,7 @@ const util = {
     input.click();
   },
 
-  sizeIsAllowable(size){
+  sizeIsAllowable(size) {
     const num = size.replace(/[^\d.]/g, "");
     const unit = size.replace(/[\d.]/g, "");
     if (unit.toUpperCase() == "MB") {
@@ -153,15 +153,15 @@ const util = {
     return false;
   },
 
-  getFileSize({size}) {
+  getFileSize({ size }) {
     if (size < 1024) {
-        return size + "BYTES";
+      return size + "BYTES";
     }
     if (size >= 1024 && size < 1048576) {
-      return (size/1024).toFixed(1) + "KB";
+      return (size / 1024).toFixed(1) + "KB";
     }
     if (size >= 1048576) {
-      return (size/1048576).toFixed(1) + "MB";
+      return (size / 1048576).toFixed(1) + "MB";
     }
   },
 
@@ -197,18 +197,18 @@ const util = {
   },
 
   // setup row props
-  setDataProps(row){
-    const {vars} = util;
+  setDataProps(row) {
+    const { vars } = util;
     row.dataset.prev = vars.pos++;
     row.dataset.pos = vars.pos;
     console.log(row);
   },
-  
+
   updateUI(item, amount) {
     if (amount.dataset.operation == "delete") {
       amount.dataset.operation = "";
       vars.Total -= util.extractNumbers(amount.value);
-    } else{
+    } else {
       vars.Total += util.extractNumbers(amount.value);
     }
     item.value = amount.value = "";
@@ -257,7 +257,7 @@ const util = {
     item.value = amount.value = "";
     item.placeholder = "New item";
     amount.placeholder = "New vlaue";
-    item.focus(); 
+    item.focus();
     vars.Total = 0;
     total.textContent = "Total: 0";
     $("table tbody").empty();
@@ -281,11 +281,11 @@ const util = {
     // data-means=upload, create, download
     // modified
     row.dataset.means = "create";
-   if (props) {
-     Object.keys(props).forEach((prop) => {
-       row.dataset[prop]= props[prop];
-     });
-   }
+    if (props) {
+      Object.keys(props).forEach((prop) => {
+        row.dataset[prop] = props[prop];
+      });
+    }
     row.innerHTML = stack.join(" ");
     row.querySelector("#cell0").textContent = util.ucWord(item);
     row.querySelector("#cell1").textContent = value;
@@ -515,7 +515,7 @@ const util = {
     util.pane = null;
     context = null;
   },
- 
+
   HandleEnter(evnt) {
     if (evnt.keyCode == 13) {
       util.Foo.call(null, evnt);
@@ -544,41 +544,160 @@ const util = {
     util.pane = pane;
   },
 
-  Subscriptions(event, obj) {
+  // Returns a single array containing all args together. This will spread any array argument in the list
+  mergeArgs() {
+    return [].concat.apply([], [].slice.call(arguments));
+  },
 
-    subscriptions = {
-      "subscriber": event.target,
-      //Subscription is purely by criterion -: id, class, name, data-set etc
-      "default_handlers": [util.CloseHandler], //Default handlers will always execute
-      "grouped_subscribers": [
-        {
-          "names": ["toggler", "equiv"],
-          "handlers": [util.ActionsMenuToggle]
-        }
-      ],
-      "subscribers": [
-        //subscribers -> classes or ids subscribing to the click (event) bubble
-        { "name": "toggle-sign", "handlers": [util.DropdownMenus] },
-        { "name": "del", "handlers": [util.del] }, // .del
-        { "name": "submit", "handlers": [util.Foo] }, //.submit
-        { "name": "projects-toggler", "handlers": [util.init] }, // .projects-toggler
-        { "name": "reset", "handlers": [util.Clean] }, // .reset
-        { "name": "converting", "handlers": [util.ConvertToPDF] }, // .converting
-        { "name": "swap", "handlers": [util.mobile_menu_open, util.toggleChange] }, // .swap
-        { "name": "open-off-canvass", "handlers": [util.mobile_menu_open, util.toggleChange] } // .open-off-canvass
-      ],
 
-      "activate": function activate(event, subscriberString, actions) {
-        if (actions.length < 1) {
-          console.warn("You have not specified any actions for subscriber:", subscriberString);
+
+  // Subscription is only by className
+  subscription: function subscription(event, ...rest) {
+    const events = util.mergeArgs(event, rest);
+    const supported = [
+      "click", "contextmenu", "dblclick", "drag", "dragend",
+      "dragenter", "dragleave", "dragover", "dragstart", "drop",
+      "keydown", "keypress", "keyup", "mousedown", "mouseenter",
+      "mouseleave", "mousemove", "mouseout", "mouseover", "mouseup", "pointerdown", "pointerup", "pointerout",
+      "pointerleave", "pointerenter", "pointerover", "pointermove", "pointercancel", "select", "wheel",
+    ];
+
+    events.forEach((event) => {
+      if (!supported.includes(event)) {
+        throw new Error(`unsported event '${event}'`);
+      }
+    });
+    event = {
+      type: events[0], // supported only one type
+      types: events,
+      handlers: [], // {"name": []}
+      subscribers: [], // {name, matchSet}
+      override: false,
+
+      // Add a handler for event identified by name i.e className
+      addHandler(name, handler){
+        if (Array.isArray(this.handlers[name])) {
+          this.handlers[name].push(handler);
+          return this;
         }
-        actions.forEach(function launch(action) {
-          action.call(obj, event, subscriptions.subscriber, obj);
+        this.handlers[name] = [handler];
+        return this;
+      },
+      defaultHandler(){
+        if (this.override) {
+          this.subscribbers.forEach((subscribber) => {
+            subscribber.matchSet.forEach((node) => {
+              this.handlers.forEach((handler) => {
+                this.types.forEach((type) => {
+                  node.addEventListener(type, handler);
+                });
+              });
+            });
+          });
+
+          /* 
+          if override is on - do not use delegation
+          instead: 
+          for every event listed in subscription call, 
+            for every subscribbed name
+              for every matchset node found
+                for every handler collected - node.addEventListener(type, handler);
+           */
+          
+          return this;
+        }
+        // if not, attatch type to document - in the fn body, switch between names and execute their handlers
+        return this;
+      },
+      getGenericHandler() {
+        return null;
+      }
+    };
+
+    return {
+      event,
+      events: [],
+      subscriber: null,
+      //subscribing to the click (event) bubble
+      // subscription is by className
+      subscribers: [],
+      overrides: [], //list of event that will not use default behaviour which is delegation
+      //Default handlers will always execute for a given subscription
+      defaults: { click: [], change: [] },
+      // many subscribers, for the same handlers
+      grouped_subscribers: [],
+      // live map of events that can be subscribed to, with associated handlers
+      subscriptions: { click: [], change: [], keydown: [] },
+
+      // Add handling functions to current event - veriadic
+      handle: function handle(...handlers) {
+        this.subscribers.forEach((subscribber) => {
+          handlers.forEach((handler) => {
+            this.event.addHandler(subscribber.name, handler);
+          });
         });
+        return this;
+      },
+
+      // Every call to subscribe wipes previously sunscribed names
+      subscribe: function subscribe(...names) {
+        const subscribbers = util.mergeArgs(...names).map((name) => {
+          const matchset = [].slice.call(document.getElementsByClassName(name));
+          return {name, matchSet: matchset};
+        });
+        // find current event set in the map list and add these names to its list of subbed names
+        // this shows that these names subscribbed to that event set
+        this.event.subscribers.push(...subscribbers);
+        this.prepare();
+        return this;
+      },
+
+      prepare: function prepare() {
+        const handler = this.event.getGenericHandler();
+        if(typeof handler === "function") {
+          handler();
+          return this;
+        }
+        this.event.defaultHandler();
+        return this;
+        // Receive a prepared event
+        // if there's no generic handler, call default handler - 
+        // get it's generic  handler and atatch the event to it - generice handler will take care of delegation
+      },
+
+      // call override removes delegation behaviour for a given event instance.
+      override: function override() {
+        this.event.override = true;
+        this.overrides.push(this.event);
+        this.events = this.events.filter(event => event.override);
+        return this;
+      },
+
+      subscribe_: function subscribe(name, ...rest) {
+        const classNames = util.mergeArgs(name, rest);
+        const obj = this.makeObject(name, event);
+      },
+
+      makeObject: function makeObject(className, event) {
+        const object = {};
+        if (this.supportsEvent(event)) {
+
+        }
+        return object;
+      },
+
+
+      // An alias to util.subscription. This creates a new instance to avoids inconsistent state
+      subscription: function subscription(event, ...rest) {
+        return util.subscription(...util.mergeArgs(event, rest));
+      },
+
+      activate: function activate(name, action, event) {
+        action(name, this.subscriber, event);
       },
 
       // get a subscriber by its name
-      "getSubscriber": function getSubscriber(name) {
+      getSubscriber: function getSubscriber(name) {
         for (const subscriber of this.subscribers) {
           if (subscriber.name == name) {
             return subscriber;
@@ -586,14 +705,41 @@ const util = {
         }
       },
 
-      // get listening DOM elements
-      "getListeners": function getListeners(subscriber) {
-        const { name: className} = subscriber;
+      // returns the name of event subscribed
+      getSubscription: function getSubscription(subscriber) {
+        return subscriber.subscription;
+      },
+
+      // setup event defaults
+      setup: function setup(setUp) {
+        this.defaults.click.push(this.CloseHandler);
+        this.subscribers.push(
+          { subscription: "click", names: ["toggler, equiv"], handlers: util.ActionsMenuToggle },
+          { subscription: "click", names: ["toggle-sign"], handlers: [util.DropdownMenus] },
+          { subscription: "click", names: ["del"], handlers: [util.del] }, // .del
+          { subscription: "click", names: ["submit"], handlers: [util.Foo] }, //.submit
+          { subscription: "click", names: ["projects-toggler"], handlers: [util.init] }, // .projects-toggler
+          { subscription: "click", names: ["reset"], handlers: [util.Clean] }, // .reset
+          { subscription: "click", names: ["converting"], handlers: [util.ConvertToPDF] }, // .converting
+          { subscription: "click", names: ["swap", "open-off-canvass"], handlers: [util.mobile_menu_open, util.toggleChange] }, // .swap
+        );
+        if (typeof setUp === "function") {
+          setUp.call(this, this);
+        }
+      },
+
+      // get listening DOM elements - a subscriber is a className
+      getListeners: function getListeners(subscriber) {
+        if (typeof subscriber !== "object" || !subscriber.name) {
+          return;
+        }
+        const { name: className } = subscriber;
         return [].slice.call(grabAll(`.${className}`));
       },
 
       // triggers a subscriber's event by name - executes it's listeners
-      "trigerEvent": function trigerEvent(className){
+      // util.subscription.trigerEvent("reset");
+      trigerEvent: function trigerEvent(className) {
         const subscriber = this.getSubscriber(className);
         if (!subscriber) {
           return
@@ -602,52 +748,47 @@ const util = {
         listeners.forEach((listener) => {
           try {
             // something like element.click()
-              listener[subscriber.event || "click"]();
+            listener[subscriber.event || "click"]();
           } catch (error) {
             console.warn(error);
           }
         });
-      }
-    };
+      },
 
-    filter = ActivationHandler;
-    subscriptions.default_handlers.forEach(function (handler) {
-      handler.call(obj, event, subscriptions.subscriber, obj);
-    });
-    // subscriptions.subscribers.forEach(filter);
-    HandlerGroup(filter);
-    HandleSingle(filter);
-    function HandlerGroup(handler) {
-      subscriptions.grouped_subscribers.forEach(function handleSubscription(group) {
-        group.names.forEach(function subscriber(subscriberString) {
-          handler(subscriberString, group);
+      // create a subscription stream which can be subscribed to
+      create: function create() {
+        // This will rely on how I invoke it
+      },
+      // Handle regular subscription
+      handle: function handle(handler, event) {
+        this.subscribers.forEach(function (subscriber) {
+          handler(subscriber.name, event);
         });
-      });
-    }
+      },
 
-    function HandleSingle(handler) {
-      subscriptions.subscribers.forEach(function handleSubscription(subscriber) {
-        handler(subscriber.name);
-      });
-    }
-
-    function ActivationHandler(subscriberString, group) {
-      if (subscriptions.subscriber.classList.contains(subscriberString)) {
-        if (Object.prototype.toString.call(group) == "[object Object]") {
-          actions = group.handlers;
-        } else {
-          subscriptions.subscribers.forEach(function handleSubscription(subscriber) {
-            if (subscriberString == subscriber.name) {
-              actions = subscriber.handlers;
-            }
+      activateHandler: function activateHandler(name, event) {
+        if (this.subscriber.classList.contains(name)) {
+          const subscriber = this.getSubscriber(name);
+          if (!subscriber) {
+            return
+          }
+          const subscription = this.getSubscription(subscriber);
+          const { handlers } = subscription;
+          handlers.forEach((handler) => {
+            this.activate(name, handler, event);
           });
         }
-        subscriptions.activate(event, subscriberString, actions);
       }
     }
+  },
 
+  Subscriptions(event) {
+    this.subscription.defaults.click.forEach((handler) => {
+      handler(event, this.subscription.subscriber);
+    });
+    this.subscription.handle(this.subscription.activateHandler, event);
   }
 
 };
 
-const {vars} = util;
+const { vars } = util;
