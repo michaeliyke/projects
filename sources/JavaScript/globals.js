@@ -549,8 +549,6 @@ const util = {
     return [].concat.apply([], [].slice.call(arguments));
   },
 
-
-
   // Subscription is only by className
   subscription: function subscription(event, ...rest) {
     const events = util.mergeArgs(event, rest);
@@ -567,29 +565,32 @@ const util = {
         throw new Error(`unsported event '${event}'`);
       }
     });
+
     event = {
-      type: events[0], // supported only one type
-      types: events,
-      handlers: [], // {"name": []}
-      subscribers: [], // {name, matchSet}
+      eventType: events[0], // supported only one type
+      eventTypes: events,
+      handlers: [], // {"className": []}
+      subscribers: [], // {className, matchSet}
       override: false,
 
-      // Add a handler for event identified by name i.e className
-      addHandler(name, handler){
-        if (Array.isArray(this.handlers[name])) {
-          this.handlers[name].push(handler);
+      // Add a handler for event identified by className i.e className
+      addHandler(className, handler){
+        alert(className)
+        if (Array.isArray(this.handlers[className])) {
+          this.handlers[className].push(handler);
           return this;
         }
-        this.handlers[name] = [handler];
+        
+        this.handlers[className] = [handler];
         return this;
       },
       defaultHandler(){
         if (this.override) {
-          this.subscribbers.forEach((subscribber) => {
-            subscribber.matchSet.forEach((node) => {
+          this.subscribers.forEach((subscriber) => {
+            subscriber.matchset.forEach((node) => {
               this.handlers.forEach((handler) => {
-                this.types.forEach((type) => {
-                  node.addEventListener(type, handler);
+                this.eventTypes.forEach((eventType) => {
+                  node.addEventListener(eventType, handler);
                 });
               });
             });
@@ -617,10 +618,10 @@ const util = {
     return {
       event,
       events: [],
-      subscriber: null,
+      subscriber: event.subscriber,
       //subscribing to the click (event) bubble
       // subscription is by className
-      subscribers: [],
+      subscribers: event.subscribers,
       overrides: [], //list of event that will not use default behaviour which is delegation
       //Default handlers will always execute for a given subscription
       defaults: { click: [], change: [] },
@@ -631,23 +632,27 @@ const util = {
 
       // Add handling functions to current event - veriadic
       handle: function handle(...handlers) {
-        this.subscribers.forEach((subscribber) => {
+        this.subscribers.forEach((subscriber) => {
           handlers.forEach((handler) => {
-            this.event.addHandler(subscribber.name, handler);
+            this.event.addHandler(subscriber.className, handler);
           });
         });
         return this;
       },
 
+      // publishes something - anything, you get
+      publish(){},
+
       // Every call to subscribe wipes previously sunscribed names
-      subscribe: function subscribe(...names) {
-        const subscribbers = util.mergeArgs(...names).map((name) => {
-          const matchset = [].slice.call(document.getElementsByClassName(name));
-          return {name, matchSet: matchset};
+      subscribe: function subscribe(...classNames) {
+        const subscribers = util.mergeArgs(...classNames).map((className) => {
+          const matchset = [].slice.call(document.getElementsByClassName(className));
+          console.log(className);
+          return {name: className, matchset: matchset};
         });
         // find current event set in the map list and add these names to its list of subbed names
         // this shows that these names subscribbed to that event set
-        this.event.subscribers.push(...subscribbers);
+        this.event.subscribers.push(...subscribers);
         this.prepare();
         return this;
       },
@@ -672,112 +677,10 @@ const util = {
         this.events = this.events.filter(event => event.override);
         return this;
       },
-
-      subscribe_: function subscribe(name, ...rest) {
-        const classNames = util.mergeArgs(name, rest);
-        const obj = this.makeObject(name, event);
-      },
-
-      makeObject: function makeObject(className, event) {
-        const object = {};
-        if (this.supportsEvent(event)) {
-
-        }
-        return object;
-      },
-
-
+      
       // An alias to util.subscription. This creates a new instance to avoids inconsistent state
       subscription: function subscription(event, ...rest) {
         return util.subscription(...util.mergeArgs(event, rest));
-      },
-
-      activate: function activate(name, action, event) {
-        action(name, this.subscriber, event);
-      },
-
-      // get a subscriber by its name
-      getSubscriber: function getSubscriber(name) {
-        for (const subscriber of this.subscribers) {
-          if (subscriber.name == name) {
-            return subscriber;
-          }
-        }
-      },
-
-      // returns the name of event subscribed
-      getSubscription: function getSubscription(subscriber) {
-        return subscriber.subscription;
-      },
-
-      // setup event defaults
-      setup: function setup(setUp) {
-        this.defaults.click.push(this.CloseHandler);
-        this.subscribers.push(
-          { subscription: "click", names: ["toggler, equiv"], handlers: util.ActionsMenuToggle },
-          { subscription: "click", names: ["toggle-sign"], handlers: [util.DropdownMenus] },
-          { subscription: "click", names: ["del"], handlers: [util.del] }, // .del
-          { subscription: "click", names: ["submit"], handlers: [util.Foo] }, //.submit
-          { subscription: "click", names: ["projects-toggler"], handlers: [util.init] }, // .projects-toggler
-          { subscription: "click", names: ["reset"], handlers: [util.Clean] }, // .reset
-          { subscription: "click", names: ["converting"], handlers: [util.ConvertToPDF] }, // .converting
-          { subscription: "click", names: ["swap", "open-off-canvass"], handlers: [util.mobile_menu_open, util.toggleChange] }, // .swap
-        );
-        if (typeof setUp === "function") {
-          setUp.call(this, this);
-        }
-      },
-
-      // get listening DOM elements - a subscriber is a className
-      getListeners: function getListeners(subscriber) {
-        if (typeof subscriber !== "object" || !subscriber.name) {
-          return;
-        }
-        const { name: className } = subscriber;
-        return [].slice.call(grabAll(`.${className}`));
-      },
-
-      // triggers a subscriber's event by name - executes it's listeners
-      // util.subscription.trigerEvent("reset");
-      trigerEvent: function trigerEvent(className) {
-        const subscriber = this.getSubscriber(className);
-        if (!subscriber) {
-          return
-        }
-        const listeners = this.getListeners(subscriber);
-        listeners.forEach((listener) => {
-          try {
-            // something like element.click()
-            listener[subscriber.event || "click"]();
-          } catch (error) {
-            console.warn(error);
-          }
-        });
-      },
-
-      // create a subscription stream which can be subscribed to
-      create: function create() {
-        // This will rely on how I invoke it
-      },
-      // Handle regular subscription
-      handle: function handle(handler, event) {
-        this.subscribers.forEach(function (subscriber) {
-          handler(subscriber.name, event);
-        });
-      },
-
-      activateHandler: function activateHandler(name, event) {
-        if (this.subscriber.classList.contains(name)) {
-          const subscriber = this.getSubscriber(name);
-          if (!subscriber) {
-            return
-          }
-          const subscription = this.getSubscription(subscriber);
-          const { handlers } = subscription;
-          handlers.forEach((handler) => {
-            this.activate(name, handler, event);
-          });
-        }
       }
     }
   },

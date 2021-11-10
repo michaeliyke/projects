@@ -65,25 +65,19 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
        return a subscription object with key properties - event
        event is an object to which subscribbers and handlers are added
        a call to execute will trigger the event
+    
        
+
   x.subscribe(n1, n2, n3, [n4, n4], n6, [n7]).handle(f1, f2, f3)
   x.subscribe("mouseup").handle(fn).subscribe().handle
 
+
+
+  
   util.subscription("click").subscription("keypress")
   .subscribe(n1).sub(n2);
   */
 
-  delegation = {
-    supported: [
-      "click", "contextmenu", "dblclick", "drag", "dragend",
-      "dragenter", "dragleave", "dragover", "dragstart", "drop",
-      "keydown", "keypress", "keyup", "mousedown", "mouseenter",
-      "mouseleave", "mousemove", "mouseout", "mouseover", "mouseup", "pointerdown", "pointerup", "pointerout",
-      "pointerleave", "pointerenter", "pointerover", "pointermove", "pointercancel", "select", "wheel",
-    ],
-    pointer(){},
-    keyboard() {}
-  }
 // event.pointerType == mouse|pen|touch
 // event.type == click
   function Calculator(e) {
