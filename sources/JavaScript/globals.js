@@ -566,16 +566,14 @@ const util = {
       }
     });
 
-    event = {
-      eventType: events[0], // supported only one type
-      eventTypes: events,
-      handlers: [], // {"className": []}
-      subscribers: [], // {className, matchSet}
-      override: false,
+    const root = {
+      types: events, // All specified event types in the call to .subscription(...)
+      handlers: {}, // {"className": []}
+      subscribers: [], // [{className: "hide", matchset: []}]
+      override: true,
 
       // Add a handler for event identified by className i.e className
       addHandler(className, handler){
-        alert(className)
         if (Array.isArray(this.handlers[className])) {
           this.handlers[className].push(handler);
           return this;
@@ -584,16 +582,39 @@ const util = {
         this.handlers[className] = [handler];
         return this;
       },
+
+      attach(node, eventType, handler) {
+        if (!(node && node[eventType + "Events"] && node[eventType + "Events"].includes(handler))) {
+          if (node && Array.isArray(node[eventType + "Events"])) {
+            node[eventType + "Events"].push(handler);
+          } else {
+            node[eventType + "Events"] = [handler];
+          }
+          node.addEventListener(eventType, handler);
+        }
+      },
+
+      publish(matchset, handlers, eventTypes) {
+        matchset.forEach((node) => {
+        eventTypes.forEach((eventType) => {
+          handlers.forEach((handler) => {
+            this.attach(node, eventType, handler); // This skips those that have aLready been marked
+          });
+        });
+      });
+        return this;
+      },
+
       defaultHandler(){
         if (this.override) {
           this.subscribers.forEach((subscriber) => {
-            subscriber.matchset.forEach((node) => {
-              this.handlers.forEach((handler) => {
-                this.eventTypes.forEach((eventType) => {
-                  node.addEventListener(eventType, handler);
-                });
-              });
-            });
+            const { matchset } = subscriber
+            const handlers = this.handlers[subscriber.className];
+            const {eventTypes} = this;
+            if (!(Array.isArray(matchset) && Array.isArray(handlers) && Array.isArray(eventTypes))) {
+              return
+            }
+            this.publish(matchset, this.handlers, eventTypes);
           });
 
           /* 
@@ -616,54 +637,52 @@ const util = {
     };
 
     return {
-      event,
-      events: [],
-      subscriber: event.subscriber,
-      //subscribing to the click (event) bubble
-      // subscription is by className
-      subscribers: event.subscribers,
+      root,
+      events,
+      handled: false,
       overrides: [], //list of event that will not use default behaviour which is delegation
-      //Default handlers will always execute for a given subscription
-      defaults: { click: [], change: [] },
-      // many subscribers, for the same handlers
-      grouped_subscribers: [],
-      // live map of events that can be subscribed to, with associated handlers
-      subscriptions: { click: [], change: [], keydown: [] },
 
       // Add handling functions to current event - veriadic
       handle: function handle(...handlers) {
-        this.subscribers.forEach((subscriber) => {
+        alert(this.root.subscribers)
+        this.root.subscribers.forEach((subscriber) => {
           handlers.forEach((handler) => {
-            this.event.addHandler(subscriber.className, handler);
+            if (subscriber.className && typeof handler === "function") {
+              this.root.addHandler(subscriber.className, handler);
+            }
           });
         });
+        // Mark the current batch of subscribe() calls as handled and reopen upon it's next call
+        this.handled = true; 
         return this;
       },
-
-      // publishes something - anything, you get
-      publish(){},
 
       // Every call to subscribe wipes previously sunscribed names
       subscribe: function subscribe(...classNames) {
         const subscribers = util.mergeArgs(...classNames).map((className) => {
-          const matchset = [].slice.call(document.getElementsByClassName(className));
-          console.log(className);
-          return {name: className, matchset: matchset};
-        });
+          if (className) {
+            const matchset = [].slice.call(document.getElementsByClassName(className));
+            return {name: className, matchset: matchset};
+          }
+        }).filter(subscriber => !(subscriber && subscribe.className));
         // find current event set in the map list and add these names to its list of subbed names
         // this shows that these names subscribbed to that event set
-        this.event.subscribers.push(...subscribers);
+        this.root.subscribers.push(...subscribers);
+        if (this.handled) {
+          this.handled = false;
+          this.root.subscribers = subscribers; // Once handled overwrite upon next call to subscribe()
+        }
         this.prepare();
         return this;
       },
 
       prepare: function prepare() {
-        const handler = this.event.getGenericHandler();
+        const handler = this.root.getGenericHandler();
         if(typeof handler === "function") {
           handler();
           return this;
         }
-        this.event.defaultHandler();
+        this.root.defaultHandler();
         return this;
         // Receive a prepared event
         // if there's no generic handler, call default handler - 
@@ -672,9 +691,9 @@ const util = {
 
       // call override removes delegation behaviour for a given event instance.
       override: function override() {
-        this.event.override = true;
-        this.overrides.push(this.event);
-        this.events = this.events.filter(event => event.override);
+        this.root.override = true;
+        // this.overrides.push(this.root);
+        // this.events = this.events.filter(event => event.override);
         return this;
       },
       
