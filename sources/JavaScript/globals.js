@@ -621,14 +621,14 @@ const util = {
           if override is on - do not use delegation
           instead: 
           for every event listed in subscription call, 
-            for every subscribbed name
+            for every subscribbed className
               for every matchset node found
                 for every handler collected - node.addEventListener(type, handler);
            */
           
           return this;
         }
-        // if not, attatch type to document - in the fn body, switch between names and execute their handlers
+        // if not, attatch type to document - in the fn body, switch between classNames and execute their handlers
         return this;
       },
       getGenericHandler() {
@@ -644,10 +644,9 @@ const util = {
 
       // Add handling functions to current event - veriadic
       handle: function handle(...handlers) {
-        alert(this.root.subscribers)
         this.root.subscribers.forEach((subscriber) => {
           handlers.forEach((handler) => {
-            if (subscriber.className && typeof handler === "function") {
+            if (subscriber.className && typeof handler === "function" && subscriber.matchset.length > 0) {
               this.root.addHandler(subscriber.className, handler);
             }
           });
@@ -657,16 +656,20 @@ const util = {
         return this;
       },
 
-      // Every call to subscribe wipes previously sunscribed names
+      // Every call to subscribe wipes previously sunscribed classNames
       subscribe: function subscribe(...classNames) {
         const subscribers = util.mergeArgs(...classNames).map((className) => {
           if (className) {
             const matchset = [].slice.call(document.getElementsByClassName(className));
-            return {name: className, matchset: matchset};
+            if (matchset.length > 0) {
+              return { className, matchset: matchset };
+            }
           }
-        }).filter(subscriber => !(subscriber && subscribe.className));
-        // find current event set in the map list and add these names to its list of subbed names
-        // this shows that these names subscribbed to that event set
+        }).filter(subscriber => {
+          return subscriber && subscriber.className;
+        });
+        // find current event set in the map list and add these classNames to its list of subbed classNames
+        // this shows that these classNames subscribbed to that event set
         this.root.subscribers.push(...subscribers);
         if (this.handled) {
           this.handled = false;
