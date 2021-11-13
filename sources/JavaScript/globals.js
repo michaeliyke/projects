@@ -574,12 +574,10 @@ const util = {
 
       // Add a handler for event identified by className i.e className
       addHandler(className, handler){
-        if (Array.isArray(this.handlers[className])) {
-          this.handlers[className].push(handler);
+        if (!Array.isArray(this.handlers[className]) || this.handlers[className].includes(handler)) {
           return this;
         }
-        
-        this.handlers[className] = [handler];
+        this.handlers[className].push(handler);
         return this;
       },
 
@@ -590,11 +588,14 @@ const util = {
           } else {
             node[eventType + "Events"] = [handler];
           }
-          node.addEventListener(eventType, handler);
+          node.addEventListener(eventType, handler, false);
         }
       },
 
       publish(matchset, handlers, eventTypes) {
+        if (!(Array.isArray(matchset) && Array.isArray(handlers) && Array.isArray(eventTypes))) {
+          throw new TypeError("Incorrect argument in call to publish()");
+        }
         matchset.forEach((node) => {
         eventTypes.forEach((eventType) => {
           handlers.forEach((handler) => {
@@ -607,16 +608,7 @@ const util = {
 
       defaultHandler(){
         if (this.override) {
-          this.subscribers.forEach((subscriber) => {
-            const { matchset } = subscriber
-            const handlers = this.handlers[subscriber.className];
-            const {eventTypes} = this;
-            if (!(Array.isArray(matchset) && Array.isArray(handlers) && Array.isArray(eventTypes))) {
-              return
-            }
-            this.publish(matchset, this.handlers, eventTypes);
-          });
-
+          this.subscribers.forEach((s) =>  this.publish(s.matchset, this.handlers[s.className], this.types));
           /* 
           if override is on - do not use delegation
           instead: 
@@ -631,6 +623,7 @@ const util = {
         // if not, attatch type to document - in the fn body, switch between classNames and execute their handlers
         return this;
       },
+      
       getGenericHandler() {
         return null;
       }
@@ -653,6 +646,7 @@ const util = {
         });
         // Mark the current batch of subscribe() calls as handled and reopen upon it's next call
         this.handled = true; 
+        this.prepare();
         return this;
       },
 
@@ -662,11 +656,13 @@ const util = {
           if (className) {
             const matchset = [].slice.call(document.getElementsByClassName(className));
             if (matchset.length > 0) {
-              return { className, matchset: matchset };
+              return { className, matchset };
             }
           }
-        }).filter(subscriber => {
-          return subscriber && subscriber.className;
+        }).filter((subscriber) => subscriber && subscriber.className);
+        
+        subscribers.forEach((subscriber) => {
+          this.root.handlers[subscriber.className] = [];
         });
         // find current event set in the map list and add these classNames to its list of subbed classNames
         // this shows that these classNames subscribbed to that event set

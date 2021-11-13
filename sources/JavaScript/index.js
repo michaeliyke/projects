@@ -48,13 +48,21 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
 
 
   // Abstract all event binding using delegation
-  $(body).click(util.Subscriptions).keydown(util.HandlerKeyPress, $(document));
+  // $(body).click(util.Subscriptions).keydown(util.HandlerKeyPress, $(document));
   $("input[name='item'], input[name='value']").on("input", Calculator);
 
   $(".file-data input").change(util.uploadFileData);
   $(".file-data").click(util.processDataUpload);
+  let x = function x(e) { console.log(e); }
+  let y = function x(e) { console.log(e); }
+  let z = function x(e) { console.log(e); }
+  util.subscription("contextmenu").subscribe("root-body", "db-body").handle(x, y, z);
+
+  
+
+  
   /*
-  subscribe = connect = add
+  subscribe = connect = add = key
   triggerEvent = trigger = execute = activate
   subscription = createEvent = createSubscription = event
   .event - event in play {name: click, handlers: []};
