@@ -557,7 +557,10 @@ const util = {
 
   // Returns a single array containing all args together. This will spread any array argument in the list
   mergeArgs() {
-    return [].concat.apply([], [].slice.call(arguments));
+    const args = [].slice.call(arguments).map((arg) => {
+      return (typeof arg === "object" && typeof arg.slice === "function") ? arg.slice() : arg;
+    });
+    return [].concat.apply([], args);
   },
 
   // Subscription is only by className
@@ -654,18 +657,26 @@ const util = {
 
       // Every call to subscribe wipes previously sunscribed classNames
       subscribe: function subscribe(...classNames) {
-        const subscribers = util.mergeArgs(...classNames).map((className) => {
-          if (className) {
+        let subscribers = util.mergeArgs(...classNames).map((className) => {
+          if (typeof className === "string") {
             const matchset = [].slice.call(document.getElementsByClassName(className));
             if (matchset.length > 0) {
               return { className, matchset };
             }
           }
         }).filter((subscriber) => subscriber && subscriber.className);
-console.log(subscribers);
-        subscribers.forEach((subscriber) => {
-          this.root.handlers[subscriber.className] = [];
-        });
+
+        if (subscribers.length == 0 && classNames.length > 0) {
+          const args = util.mergeArgs(...arguments);
+          let className = "cN" + ("" + (new Date()).getTime()).replace(/[A-z\s\W]/gi, "");
+          const matchset = args.filter((item) => item.nodeType == 1);
+          if (matchset.length != args.length) {
+            throw new Error("subscribe() invoked with invalid input");
+          }
+          subscribers = [{className, matchset}];
+        }
+        
+        subscribers.forEach((subscriber) => this.root.handlers[subscriber.className] = []);
         // find current event set in the map list and add these classNames to its list of subbed classNames
         // this shows that these classNames subscribbed to that event set
         this.root.subscribers.push(...subscribers);
