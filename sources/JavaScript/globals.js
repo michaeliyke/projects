@@ -138,6 +138,7 @@ const util = {
     }
     vars.fileOpenActive = true;
     const input = grab(".file-data input");
+    util.closeMgtTools();
     input.click();
   },
 
@@ -522,6 +523,16 @@ const util = {
     }
   },
 
+  closeMgtTools() {
+    grabAll(".mgt-toggle-btn").forEach((btn) => {
+      btn.setAttribute("aria-expanded", false);
+      btn.classList.add("collapsed");
+    });
+    grabAll(".mgt.show").forEach((e) => {
+      e.classList.remove("show");
+    });
+  },
+
   ActionsMenuToggle(event, dom, techie) {
     var width, pane;
     $("#manage").toggleClass(function () {
@@ -552,28 +563,18 @@ const util = {
   // Subscription is only by className
   subscription: function subscription(event, ...rest) {
     const events = util.mergeArgs(event, rest);
-    const supported = [
-      "click", "contextmenu", "dblclick", "drag", "dragend",
-      "dragenter", "dragleave", "dragover", "dragstart", "drop",
-      "keydown", "keypress", "keyup", "mousedown", "mouseenter",
-      "mouseleave", "mousemove", "mouseout", "mouseover", "mouseup", "pointerdown", "pointerup", "pointerout",
-      "pointerleave", "pointerenter", "pointerover", "pointermove", "pointercancel", "select", "wheel",
-    ];
-
-    events.forEach((event) => {
-      if (!supported.includes(event)) {
-        throw new Error(`unsported event '${event}'`);
-      }
-    });
+    const { isMixed, isDelegatable } = this.settings.events.checkDelegatable(events);
+    const override_ = isMixed;
 
     const root = {
+      override_, isDelegatable, isMixed,
+      override: true,
       types: events, // All specified event types in the call to .subscription(...)
       handlers: {}, // {"className": []}
       subscribers: [], // [{className: "hide", matchset: []}]
-      override: true,
 
       // Add a handler for event identified by className i.e className
-      addHandler(className, handler){
+      addHandler(className, handler) {
         if (!Array.isArray(this.handlers[className]) || this.handlers[className].includes(handler)) {
           return this;
         }
@@ -588,6 +589,7 @@ const util = {
           } else {
             node[eventType + "Events"] = [handler];
           }
+          console.log(eventType);
           node.addEventListener(eventType, handler, false);
         }
       },
@@ -597,18 +599,18 @@ const util = {
           throw new TypeError("Incorrect argument in call to publish()");
         }
         matchset.forEach((node) => {
-        eventTypes.forEach((eventType) => {
-          handlers.forEach((handler) => {
-            this.attach(node, eventType, handler); // This skips those that have aLready been marked
+          eventTypes.forEach((eventType) => {
+            handlers.forEach((handler) => {
+              this.attach(node, eventType, handler); // This skips those that have aLready been marked
+            });
           });
         });
-      });
         return this;
       },
 
-      defaultHandler(){
+      defaultHandler() {
         if (this.override) {
-          this.subscribers.forEach((s) =>  this.publish(s.matchset, this.handlers[s.className], this.types));
+          this.subscribers.forEach((s) => this.publish(s.matchset, this.handlers[s.className], this.types));
           /* 
           if override is on - do not use delegation
           instead: 
@@ -617,13 +619,13 @@ const util = {
               for every matchset node found
                 for every handler collected - node.addEventListener(type, handler);
            */
-          
+
           return this;
         }
         // if not, attatch type to document - in the fn body, switch between classNames and execute their handlers
         return this;
       },
-      
+
       getGenericHandler() {
         return null;
       }
@@ -645,7 +647,7 @@ const util = {
           });
         });
         // Mark the current batch of subscribe() calls as handled and reopen upon it's next call
-        this.handled = true; 
+        this.handled = true;
         this.prepare();
         return this;
       },
@@ -660,7 +662,7 @@ const util = {
             }
           }
         }).filter((subscriber) => subscriber && subscriber.className);
-        
+console.log(subscribers);
         subscribers.forEach((subscriber) => {
           this.root.handlers[subscriber.className] = [];
         });
@@ -677,7 +679,7 @@ const util = {
 
       prepare: function prepare() {
         const handler = this.root.getGenericHandler();
-        if(typeof handler === "function") {
+        if (typeof handler === "function") {
           handler();
           return this;
         }
@@ -695,10 +697,80 @@ const util = {
         // this.events = this.events.filter(event => event.override);
         return this;
       },
-      
+
       // An alias to util.subscription. This creates a new instance to avoids inconsistent state
       subscription: function subscription(event, ...rest) {
         return util.subscription(...util.mergeArgs(event, rest));
+      }
+    }
+  },
+
+  events: [
+    "beforeprint", "beforeunload", "blur", "canplay", "canplaythrough", "change", "click", "contextmenu",
+    "dblclick", "devicelight", "devicemotion", "deviceorientation", "deviceproximity", "drag", "dragend",
+    "dragenter", "dragleave", "dragover", "dragstart", "drop", "durationchange", "emptied", "ended", "error",
+    "focus", "hashchange", "input", "invalid", "keydown", "keyup", "load", "loadeddata", "loadedmetadata",
+    "loadstart", "message", "mousedown", "mouseenter", "afterprint", "mouseleave", "mousemove", "mouseout",
+    "mouseover", "mouseup", "mozfullscreenchange", "mozfullscreenerror", "mozpointerlockchange",
+    "mozpointerlockerror", "offline", "online", "abort", "pagehide", "pageshow", "pause", "play", "playing",
+    "popstate", "progress", "ratechange", "reset", "resize", "scroll", "seeked", "seeking", "select", "show",
+    "stalled", "submit", "suspend", "timeupdate", "unload", "userproximity", "volumechange", "waiting", "wheel"
+  ],
+
+  extraEvents: [
+    "enter", "escape", "backspace", "tab", "capslock", "shiftkey", "ctrl", "alt", "backspace", "del"
+  ],
+
+  settings: {
+    events: {
+      // returns status {isMixed, isDelegatable}
+      checkDelegatable(events) {
+        let isDelegatable = true;
+        events.forEach((event) => {
+          this.checkSupported(event);
+          if (!this.isDelegatable(event)) {
+            isDelegatable = !isDelegatable; // This is only executed if a non delegatable type is found
+          }
+        });
+        const isMixed = !isDelegatable;
+        return { isMixed, isDelegatable };
+      },
+
+      // Throw an error if specified type is not aN actual event and there's no provision
+      checkSupported(event) {
+        if (!util.events.includes(event)) {
+          throw new Error(`unsported event '${event}'`);
+        }
+      },
+
+      isDelegatable(event) {
+        const supported = [
+          "click", "contextmenu", "dblclick", "drag", "dragend", "dragenter", "dragleave", "dragover", "select",
+          "dragstart", "drop", "keydown", "keypress", "keyup", "mousedown", "mouseenter", "mouseleave", "wheel",
+          "mousemove", "mouseout", "mouseover", "mouseup", "pointerdown", "pointerup", "pointerout", "pointerover",
+          "pointerleave", "pointerenter", "pointermove", "pointercancel",
+        ];
+        if (!supported.includes(event)) {
+          return false;
+        }
+        return true;
+      },
+
+      setup() {
+        // Loop through each. 
+        // add keydown event to html and listen for any of these keys. Fire respective handler for a match
+        util.events.push.apply(util.events, util.extraEvents);
+        util.events.forEach((event) => {
+          const expr = `
+        (function ${event}(...classNames) {
+  const s = util.subscription("${event}");
+  if(classNames.length < 1) {
+    return s;
+  }
+  return s.subscribe(...classNames);
+})`;
+          util[event] = eval(expr);
+        });
       }
     }
   },
@@ -711,5 +783,7 @@ const util = {
   }
 
 };
+
+util.settings.events.setup();
 
 const { vars } = util;
