@@ -69,7 +69,7 @@ const util = {
       // populate vars.tableData with valid data information
       // Reset table and invoke util.fillDataTable()
       fillTableData() {
-        util.subscription.trigerEvent("reset");
+        util.settings.events.trigerEvent("reset");
         this.createData();
         util.fillTableData();
       }
@@ -592,7 +592,6 @@ const util = {
           } else {
             node[eventType + "Events"] = [handler];
           }
-          console.log(eventType);
           node.addEventListener(eventType, handler, false);
         }
       },
@@ -613,7 +612,9 @@ const util = {
 
       defaultHandler() {
         if (this.override) {
-          this.subscribers.forEach((s) => this.publish(s.matchset, this.handlers[s.className], this.types));
+          this.subscribers.forEach((s) => {
+            this.publish(s.matchset, this.handlers[s.className], this.types);
+          });
           /* 
           if override is on - do not use delegation
           instead: 
@@ -673,10 +674,16 @@ const util = {
           if (matchset.length != args.length) {
             throw new Error("subscribe() invoked with invalid input");
           }
+          this.override(); // Don's use delegation when actual DOM nodes are provided
           subscribers = [{className, matchset}];
         }
         
-        subscribers.forEach((subscriber) => this.root.handlers[subscriber.className] = []);
+        subscribers.forEach((subscriber) => {
+          this.root.handlers[subscriber.className] = [];
+          this.events.forEach((event) => {
+            util.settings.events.addStack(event, subscriber.className, subscriber.matchset);
+          });
+        });
         // find current event set in the map list and add these classNames to its list of subbed classNames
         // this shows that these classNames subscribbed to that event set
         this.root.subscribers.push(...subscribers);
@@ -734,6 +741,45 @@ const util = {
 
   settings: {
     events: {
+      stack: {}, // Register - {type: [{name: "xyz", nodes: [Nodes]}]}
+      addStack(type, name, nodes) {
+        if (!(type && name && Array.isArray(nodes))) {
+          return;
+        }
+        if (!this.stack[type]) {
+          this.stack[type] = [];
+        }
+        this.stack[type].push({name, nodes});
+      },
+      getStackItems(type) {
+        return this.stack[type] || []; // [{name: "xyz", nodes: [Nodes]}]
+      },
+
+      // returns an array - [Nodes]
+      getListeners(type, name) {
+        const items = this.getStackItems(type);
+        if (!name && items[0]) {
+          return items[0].nodes; // [Nodes]
+        }
+        for (const item of items) {
+          if (item[name]) {
+            return item[name]; // [Nodes]
+          }
+        }
+        return [];
+      },
+
+      // something like element.click()
+      trigerEvent(type, className) {
+        const listeners = this.getListeners(type, className);
+        listeners.forEach((listener) => {
+          try {
+            listener[type]();
+          } catch (error) {
+            console.warn(error);
+          }
+        });
+      },
       // returns status {isMixed, isDelegatable}
       checkDelegatable(events) {
         let isDelegatable = true;
