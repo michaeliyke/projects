@@ -113,6 +113,7 @@ const util = {
   },
 
   uploadFileData(e) {
+    console.log("change", vars.fileOpenActive);
     vars.fileOpenActive = false;
     const { files } = e.target;
     const accepts = ["application/json", "text/plain"];
@@ -133,13 +134,9 @@ const util = {
   },
 
   processDataUpload() {
-    if (vars.fileOpenActive) {
-      return;
-    }
-    vars.fileOpenActive = true;
-    const input = grab(".file-data input");
+    console.log("Here", vars.fileOpenActive);
     util.closeMgtTools();
-    input.click();
+    grab(".file-data input").click();
   },
 
   sizeIsAllowable(size) {
@@ -636,6 +633,7 @@ const util = {
     };
 
     return {
+      "__proto__": util, // This facilitates chaining after invoking an event method
       root,
       events,
       handled: false,
@@ -724,15 +722,17 @@ const util = {
   },
 
   events: [
-    "beforeprint", "beforeunload", "blur", "canplay", "canplaythrough", "change", "click", "contextmenu",
-    "dblclick", "devicelight", "devicemotion", "deviceorientation", "deviceproximity", "drag", "dragend",
-    "dragenter", "dragleave", "dragover", "dragstart", "drop", "durationchange", "emptied", "ended", "error",
-    "focus", "hashchange", "input", "invalid", "keydown", "keyup", "load", "loadeddata", "loadedmetadata",
-    "loadstart", "message", "mousedown", "mouseenter", "afterprint", "mouseleave", "mousemove", "mouseout",
-    "mouseover", "mouseup", "mozfullscreenchange", "mozfullscreenerror", "mozpointerlockchange",
-    "mozpointerlockerror", "offline", "online", "abort", "pagehide", "pageshow", "pause", "play", "playing",
-    "popstate", "progress", "ratechange", "reset", "resize", "scroll", "seeked", "seeking", "select", "show",
-    "stalled", "submit", "suspend", "timeupdate", "unload", "userproximity", "volumechange", "waiting", "wheel"
+    "beforeprint", "beforeunload", "blur", "canplay", "canplaythrough", "change", "click", 
+    "contextmenu", "dragend", "loadedmetadata", "mousemove", "mouseout", "select", "show",
+    "dblclick", "devicelight", "devicemotion", "deviceorientation", "deviceproximity", "drag",
+    "ended", "error", "mozpointerlockchange", "play", "playing", "waiting", "wheel",
+    "dragenter", "dragleave", "dragover", "dragstart", "drop", "durationchange", "emptied", 
+    "focus", "hashchange", "input", "invalid", "keydown", "keyup", "load", "loadeddata", 
+    "loadstart", "message", "mousedown", "mouseenter", "afterprint", "mouseleave", 
+    "mouseover", "mouseup", "mozfullscreenchange", "mozfullscreenerror", "cancel",
+    "mozpointerlockerror", "offline", "online", "abort", "pagehide", "pageshow", "pause", 
+    "popstate", "progress", "ratechange", "reset", "resize", "scroll", "seeked", "seeking", 
+    "stalled", "submit", "suspend", "timeupdate", "unload", "userproximity", "volumechange"
   ],
 
   extraEvents: [

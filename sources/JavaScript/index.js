@@ -50,9 +50,11 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
   // Abstract all event binding using delegation
   // $(body).click(util.Subscriptions).keydown(util.HandlerKeyPress, $(document));
   $("input[name='item'], input[name='value']").on("input", Calculator);
-
   util.change($(".file-data input")).handle(util.uploadFileData);
   util.click("file-data").handle(util.processDataUpload);
+    // util.subscription("click").subscribe("reset").handle(util.Clean);
+    // util.click(grab(".file-data input")).handle(e => {vars.fileOpenActive = true;});
+
   let x = function x(e) { console.log(e); }
   let y = function x(e) { console.log(e); }
   let z = function x(e) { console.log(e); }
