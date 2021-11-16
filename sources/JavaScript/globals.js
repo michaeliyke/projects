@@ -113,7 +113,6 @@ const util = {
   },
 
   uploadFileData(e) {
-    console.log("change", vars.fileOpenActive);
     vars.fileOpenActive = false;
     const { files } = e.target;
     const accepts = ["application/json", "text/plain"];
@@ -136,7 +135,6 @@ const util = {
   },
 
   processDataUpload() {
-    console.log("Here", vars.fileOpenActive);
     util.closeMgtTools();
     grab(".file-data input").click();
   },
