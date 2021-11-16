@@ -127,6 +127,8 @@ const util = {
     // f.length, f.name, f.size, f.type i.e mime type
     const reader = new FileReader();
     reader.addEventListener("load", function () {
+      grab(".file-data input").value = null;
+      grab(".reset").click();
       const data = util.createDataFromDisc(this.result);
       data.fillTableData();
     });

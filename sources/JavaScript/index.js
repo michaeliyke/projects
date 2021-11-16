@@ -46,47 +46,20 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
     input.focus();
   }
 
-
-  // Abstract all event binding using delegation
-  // $(body).click(util.Subscriptions).keydown(util.HandlerKeyPress, $(document));
-  $("input[name='item'], input[name='value']").on("input", Calculator);
-  util.change($(".file-data input")).handle(util.uploadFileData);
-  util.click("file-data").handle(util.processDataUpload);
-    // util.subscription("click").subscribe("reset").handle(util.Clean);
-    // util.click(grab(".file-data input")).handle(e => {vars.fileOpenActive = true;});
-
-  let x = function x(e) { console.log(e); }
-  let y = function x(e) { console.log(e); }
-  let z = function x(e) { console.log(e); }
-  // util.subscription("contextmenu").subscribe("root-body", "db-body").handle(x, y, z);
-
-  
-
-  
-  /*
-  subscribe = connect = add = key
-  triggerEvent = trigger = execute = activate
-  subscription = createEvent = createSubscription = event
-  .event - event in play {name: click, handlers: []};
-  events - all events yes on the instance
-
-  x =  util.subscription("click") // subscription - "click"
-  x =  x.subscription("mouseup") // fresh subscription - "mouseup"
-       return a subscription object with key properties - event
-       event is an object to which subscribbers and handlers are added
-       a call to execute will trigger the event
-    
-       
-
-  x.subscribe(n1, n2, n3, [n4, n4], n6, [n7]).handle(f1, f2, f3)
-  x.subscribe("mouseup").handle(fn).subscribe().handle
-
-
-
-  
-  util.subscription("click").subscription("keypress")
-  .subscribe(n1).sub(n2);
+  /* 
+  NB:- calls to either .subscription() or an event type creates a new subscription instance
+  *1 - create a click subscrition instance
+  *2 - add a subscriber and a handler to above instance
+  *3 - create fresh change event instance and add a subscriber, and a handler
+  *3 - create fresh click event instance and add a subscriber, and a handler
   */
+//  $(body).click(util.Subscriptions).keydown(util.HandlerKeyPress, $(document));
+  $("input[name='item'], input[name='value']").on("input", Calculator);
+  const s = util.subscription("click"); // *1
+  s.subscribe("reset").handle(util.Clean); // *2
+  s.change($(".file-data input")).handle(util.uploadFileData); // *3
+  s.click("file-data").handle(util.processDataUpload); // *4
+    // util.click(grab(".file-data input")).handle(e => {vars.fileOpenActive = true;});
 
 // event.pointerType == mouse|pen|touch
 // event.type == click
