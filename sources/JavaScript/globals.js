@@ -564,14 +564,23 @@ const util = {
   subscription: function subscription(event, ...rest) {
     const events = util.mergeArgs(event, rest);
     const { isMixed, isDelegatable, delegated } = this.settings.events.checkDelegatable(events);
-    const override = isMixed;
 
     const root = {
-      override, isDelegatable, isMixed, delegated, //override, isDelegatable, isMixed - bool, delegated - Array
+      isDelegatable, isMixed, delegated, //override, isDelegatable, isMixed - bool, delegated - Array
       types: events, // ll specified event types in the call to .subscription(...)
       handlers: {}, // {"className": []}
       subscribers: [], // [{className: "hide", matchset: []}]
 
+      get override(){
+        return !this.isDelegatable;
+      },
+
+      set override(v) {
+        if (typeof v !== "boolean") {
+          throw new TypeError("override can only be set to true of false.");
+        }
+        this.isDelegatable = !v;
+      },
       // Add a handler for event identified by className
       addHandler(className, handler) {
         if (!Array.isArray(this.handlers[className]) || this.handlers[className].includes(handler)) {
@@ -688,7 +697,7 @@ const util = {
         this.defaultHandler(instance);
 
         // delegated
-        this.isMixed = this.override = false;
+        this.override = this.isMixed = false;
         this.types = this.delegated;
         this.delegationHandler(instance);
         return this;
