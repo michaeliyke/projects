@@ -560,20 +560,19 @@ const util = {
     return [].concat.apply([], args);
   },
 
-  // Subscription is only by className
+  // Every call to subscription() spins up a new instance to avoid inconsistent state
   subscription: function subscription(event, ...rest) {
     const events = util.mergeArgs(event, rest);
-    const { isMixed, isDelegatable } = this.settings.events.checkDelegatable(events);
-    const override_ = isMixed;
+    const { isMixed, isDelegatable, delegated } = this.settings.events.checkDelegatable(events);
+    const override = isMixed;
 
     const root = {
-      override_, isDelegatable, isMixed,
-      override: true,
-      types: events, // All specified event types in the call to .subscription(...)
+      override, isDelegatable, isMixed, delegated, //override, isDelegatable, isMixed - bool, delegated - Array
+      types: events, // ll specified event types in the call to .subscription(...)
       handlers: {}, // {"className": []}
       subscribers: [], // [{className: "hide", matchset: []}]
 
-      // Add a handler for event identified by className i.e className
+      // Add a handler for event identified by className
       addHandler(className, handler) {
         if (!Array.isArray(this.handlers[className]) || this.handlers[className].includes(handler)) {
           return this;
@@ -593,6 +592,27 @@ const util = {
         }
       },
 
+      // returns  false if a subscriber has already been queued for processing for the same handler
+      // returns true if not queued, and puts the subscriber in queue.
+      attachx(subscriber, handlers) {
+        let response = false;
+        subscriber.matchset.forEach((node) => {
+          handlers.forEach((h) => {
+            this.types.forEach((eventType) => {
+              if (!(node[eventType + "xEvents"] && node[eventType + "xEvents"].includes(handler))) {
+                if (node && Array.isArray(node[eventType + "xEvents"])) {
+                  node[eventType + "xEvents"].push(handler);
+                } else {
+                  node[eventType + "xEvents"] = [handler];
+                }
+                response = true;
+              }
+            });
+          });
+        });
+        return response;
+      },
+
       publish(matchset, handlers, eventTypes) {
         if (!(Array.isArray(matchset) && Array.isArray(handlers) && Array.isArray(eventTypes))) {
           throw new TypeError("Incorrect argument in call to publish()");
@@ -607,28 +627,71 @@ const util = {
         return this;
       },
 
+      // default generic handler handles all non-delegated events
       defaultHandler() {
         if (this.override) {
           this.subscribers.forEach((s) => {
             this.publish(s.matchset, this.handlers[s.className], this.types);
           });
-          /* 
-          if override is on - do not use delegation
-          instead: 
-          for every event listed in subscription call, 
-            for every subscribbed className
-              for every matchset node found
-                for every handler collected - node.addEventListener(type, handler);
-           */
-
           return this;
         }
-        // if not, attatch type to document - in the fn body, switch between classNames and execute their handlers
         return this;
       },
 
-      getGenericHandler() {
-        return null;
+      // delegation generic handler handles delegated events
+      delegationHandler() {
+        // mark all subscribing nodes
+        this.types.forEach((eventType) => {
+          this.attach(document, eventType, this.fnx);
+        });
+        // filter subscribers for with attachx, and overrite instance subscribers with result
+        this.subscribers = this.subscribers.filter((s) => {
+          return this.attachx(s, this.handlers[s.className]);
+        });
+      },
+
+      // fnx is the delegation utility that handles the delegation job
+      fnx(event) {
+        // handling will come here for all the eventTypes registered on the instance
+        const t = event.target;
+        // execute all the handlers of this eventType
+        this.subscribers.forEach((s) => {
+          if (!t.classList.contains(s.className)) {
+            return;
+          }
+          this.handlers[s.className].forEach((h) => {
+              s.matchset.forEach((node) => {
+                h.call(node, event, node);
+              });
+            });
+        });
+      },
+
+      // determine and return the approperiate generic handling mechanism 
+      getGenericHandler(instance) {
+        if (this.isMixed) {
+          return this.mixedHandler.bind(this, instance); // mixed events here
+        }
+        if (this.isDelegatable) {
+          this.types = this.delegated; // delegated events here
+          return this.delegationHandler.bind(this, instance);
+        }
+        return this.defaultHandler.bind(this, instance);
+      },
+
+      // mixed handler simply stands inbetween default and delegation generic handlers
+      mixedHandler(instance) {
+        // non-delegated
+        this.types = this.types.filter((type) => {
+          return this.delegated.includes(type) == false;
+        });
+        this.defaultHandler(instance);
+
+        // delegated
+        this.isMixed = this.override = false;
+        this.types = this.delegated;
+        this.delegationHandler(instance);
+        return this;
       }
     };
 
@@ -637,7 +700,6 @@ const util = {
       root,
       events,
       handled: false,
-      overrides: [], //list of event that will not use default behaviour which is delegation
 
       // Add handling functions to current event - veriadic
       handle: function handle(...handlers) {
@@ -647,14 +709,16 @@ const util = {
               this.root.addHandler(subscriber.className, handler);
             }
           });
-        });
+        }); 
         // Mark the current batch of subscribe() calls as handled and reopen upon it's next call
         this.handled = true;
         this.prepare();
         return this;
       },
 
-      // Every call to subscribe wipes previously sunscribed classNames
+      // takes in classNames, creates a map of subscribers, fills instance root subscribers
+      // OR -
+      // takes in DOM Nodes, creates a map of subscribers, fills instance root subscribers
       subscribe: function subscribe(...classNames) {
         let subscribers = util.mergeArgs(...classNames).map((className) => {
           if (typeof className === "string") {
@@ -673,17 +737,17 @@ const util = {
             throw new Error("subscribe() invoked with invalid input");
           }
           this.override(); // Don's use delegation when actual DOM nodes are provided
-          subscribers = [{className, matchset}];
+          subscribers = [{ className, matchset }];
         }
-        
+
         subscribers.forEach((subscriber) => {
-          this.root.handlers[subscriber.className] = [];
-          this.events.forEach((event) => {
+          this.root.handlers[subscriber.className] = []; // set up fresh handling
+          this.events.forEach((event) => { // cache the record - {type, name, matchset}
             util.settings.events.addStack(event, subscriber.className, subscriber.matchset);
           });
         });
-        // find current event set in the map list and add these classNames to its list of subbed classNames
-        // this shows that these classNames subscribbed to that event set
+
+        // add subscribers to the list of existing subscribers to the current instance
         this.root.subscribers.push(...subscribers);
         if (this.handled) {
           this.handled = false;
@@ -694,27 +758,18 @@ const util = {
       },
 
       prepare: function prepare() {
-        const handler = this.root.getGenericHandler();
-        if (typeof handler === "function") {
-          handler();
-          return this;
-        }
-        this.root.defaultHandler();
+        const gh = this.root.getGenericHandler(); // get current generic handler for the instance
+        gh.call(this.root, this); // generice handler will take care of delegation matters
         return this;
-        // Receive a prepared event
-        // if there's no generic handler, call default handler - 
-        // get it's generic  handler and atatch the event to it - generice handler will take care of delegation
       },
 
-      // call override removes delegation behaviour for a given event instance.
+      // call removes delegation behaviour for a given event instance.
       override: function override() {
         this.root.override = true;
-        // this.overrides.push(this.root);
-        // this.events = this.events.filter(event => event.override);
         return this;
       },
 
-      // An alias to util.subscription. This creates a new instance to avoids inconsistent state
+      // An alias to util.subscription()
       subscription: function subscription(event, ...rest) {
         return util.subscription(...util.mergeArgs(event, rest));
       }
@@ -722,16 +777,16 @@ const util = {
   },
 
   events: [
-    "beforeprint", "beforeunload", "blur", "canplay", "canplaythrough", "change", "click", 
+    "beforeprint", "beforeunload", "blur", "canplay", "canplaythrough", "change", "click",
     "contextmenu", "dragend", "loadedmetadata", "mousemove", "mouseout", "select", "show",
     "dblclick", "devicelight", "devicemotion", "deviceorientation", "deviceproximity", "drag",
     "ended", "error", "mozpointerlockchange", "play", "playing", "waiting", "wheel",
-    "dragenter", "dragleave", "dragover", "dragstart", "drop", "durationchange", "emptied", 
-    "focus", "hashchange", "input", "invalid", "keydown", "keyup", "load", "loadeddata", 
-    "loadstart", "message", "mousedown", "mouseenter", "afterprint", "mouseleave", 
+    "dragenter", "dragleave", "dragover", "dragstart", "drop", "durationchange", "emptied",
+    "focus", "hashchange", "input", "invalid", "keydown", "keyup", "load", "loadeddata",
+    "loadstart", "message", "mousedown", "mouseenter", "afterprint", "mouseleave",
     "mouseover", "mouseup", "mozfullscreenchange", "mozfullscreenerror", "cancel",
-    "mozpointerlockerror", "offline", "online", "abort", "pagehide", "pageshow", "pause", 
-    "popstate", "progress", "ratechange", "reset", "resize", "scroll", "seeked", "seeking", 
+    "mozpointerlockerror", "offline", "online", "abort", "pagehide", "pageshow", "pause",
+    "popstate", "progress", "ratechange", "reset", "resize", "scroll", "seeked", "seeking",
     "stalled", "submit", "suspend", "timeupdate", "unload", "userproximity", "volumechange"
   ],
 
@@ -749,8 +804,9 @@ const util = {
         if (!this.stack[type]) {
           this.stack[type] = [];
         }
-        this.stack[type].push({name, nodes});
+        this.stack[type].push({ name, nodes });
       },
+
       getStackItems(type) {
         return this.stack[type] || []; // [{name: "xyz", nodes: [Nodes]}]
       },
@@ -780,17 +836,19 @@ const util = {
           }
         });
       },
+
       // returns status {isMixed, isDelegatable}
       checkDelegatable(events) {
-        let isDelegatable = true;
+        let delegated = [], unDelegated = [], isDelegatable = true;
         events.forEach((event) => {
           this.checkSupported(event);
           if (!this.isDelegatable(event)) {
             isDelegatable = !isDelegatable; // This is only executed if a non delegatable type is found
           }
+          const _ = isDelegatable ? delegated.push(event) : unDelegated.push(event);
         });
         const isMixed = !isDelegatable;
-        return { isMixed, isDelegatable };
+        return { isMixed, isDelegatable, delegated, unDelegated };
       },
 
       // Throw an error if specified type is not aN actual event and there's no provision
