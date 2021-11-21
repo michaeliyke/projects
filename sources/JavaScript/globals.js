@@ -561,6 +561,8 @@ const util = {
   },
 
   // Every call to subscription() spins up a new instance to avoid inconsistent state
+  // create a subscription() instance with the listed events as types
+  // set isDelegatable, isMixed, & delegated intsnace variables
   subscription: function subscription(event, ...rest) {
     const events = util.mergeArgs(event, rest);
     const { isMixed, isDelegatable, delegated } = this.settings.events.checkDelegatable(events);
@@ -805,6 +807,9 @@ const util = {
 
   settings: {
     events: {
+      vars: {
+        delegationClassName: "_del_"
+      },
       stack: {}, // Register - {type: [{name: "xyz", nodes: [Nodes]}]}
       addStack(type, name, nodes) {
         if (!(type && name && Array.isArray(nodes))) {
