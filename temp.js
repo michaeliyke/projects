@@ -11,6 +11,63 @@ s.handle(alert);
 
 */
 
+ // take in classNames, create a map of subscribers, fill instance root subscribers
+      // OR -
+      // take in DOM Nodes, create a map of subscribers, fill instance root subscribers
+      _subscribe: function subscribe(...classNames) {
+        let subscribers = util.mergeArgs(...classNames).map((className) => {
+          if (typeof className === "string") {
+            const matchset = [].slice.call(document.getElementsByClassName(className));
+            if (matchset.length > 0) {
+              return { className, matchset };
+            }
+          }
+        }).filter((subscriber) => subscriber && subscriber.className);
+
+        if (subscribers.length == 0 && classNames.length > 0) {
+          const args = util.mergeArgs(...arguments);
+          let className = "cN" + ("" + (new Date()).getTime()).replace(/[A-z\s\W]/gi, "");
+          const matchset = args.filter((item) => item.nodeType == 1);
+          if (matchset.length != args.length) {
+            throw new Error("subscribe() invoked with invalid input");
+          }
+          this.override(); // Don's use delegation when actual DOM nodes are provided
+          subscribers = [{ className, matchset }];
+        }
+
+        subscribers.forEach((subscriber) => {
+          this.root.handlers[subscriber.className] = []; // set up fresh handling
+          this.events.forEach((event) => { // cache the record - {type, name, matchset}
+            util.settings.events.addStack(event, subscriber.className, subscriber.matchset);
+          });
+        });
+
+        // add subscribers to the list of existing subscribers to the current instance
+        this.root.subscribers.push(...subscribers);
+        if (this.handled) {
+          this.handled = false;
+          this.root.subscribers = subscribers; // Once handled overwrite upon next call to subscribe()
+        }
+        this.prepare();
+        return this;
+      },
+
+
+ // Add handling functions to current event - veriadic
+      _handle: function handle(...handlers) {
+        this.root.subscribers.forEach((subscriber) => {
+          handlers.forEach((handler) => {
+            if (subscriber.className && typeof handler === "function" && subscriber.matchset.length > 0) {
+              this.root.addHandler(subscriber.className, handler);
+            }
+          });
+        });
+        // Mark the current batch of subscribe() calls as handled and reopen upon it's next call
+        this.handled = true;
+        this.prepare();
+        return this;
+      },
+
 //Default handlers will always execute for a given subscription
       defaults: { click: [], change: [] },
       // many subscribers, for the same handlers

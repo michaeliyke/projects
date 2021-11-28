@@ -59,8 +59,10 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
   s.subscribe("reset").handle(util.Clean); // *2
   s.change($(".file-data input")).handle(util.uploadFileData); // *3
   s.click("file-data").handle(util.processDataUpload); // *4
-    // util.click(grab(".file-data input")).handle(e => {vars.fileOpenActive = true;});
-
+  util.click(grab(".file-data input")).handle(e => {
+    console.log(vars.fileOpenActive)
+  });
+  
 // event.pointerType == mouse|pen|touch
 // event.type == click
   function Calculator(e) {
@@ -99,4 +101,22 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
     vars.activeRow.parentNode.removeChild(vars.activeRow);
     vars.activeRow = null;
   }
+
+  function init() {
+    obj = {
+      "#menu-container": ["hide-view", "show-view"],
+      "#menus": ["hide-view", "show-view"],
+      "#body-cover": ["body-cover"],
+      ".wrapper": ["wrapper-show"],
+      "body": ["fix"]
+    };
+    new Promise(function foo(resolve, reject) {
+      resolve(util.toggleClass(obj));
+    }).then(function bar(obj) {
+      setTimeout(function () {
+        util.toggleClass({ ".menu": ["menu-tile"] });
+      }, 500);
+    }).catch((error) => console.log(error));
+  }
+  
 });

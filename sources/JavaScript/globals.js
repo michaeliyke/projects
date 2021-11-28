@@ -135,6 +135,7 @@ const util = {
   },
 
   processDataUpload() {
+    console.log(vars.fileOpenActive)
     util.closeMgtTools();
     grab(".file-data input").click();
   },
@@ -389,23 +390,6 @@ const util = {
     });
   },
 
-  init() {
-    obj = {
-      "#menu-container": ["hide-view", "show-view"],
-      "#menus": ["hide-view", "show-view"],
-      "#body-cover": ["body-cover"],
-      ".wrapper": ["wrapper-show"],
-      "body": ["fix"]
-    };
-    new Promise(function foo(resolve, reject) {
-      resolve(util.toggleClass(obj));
-    }).then(function bar(obj) {
-      setTimeout(function () {
-        util.toggleClass({ ".menu": ["menu-tile"] });
-      }, 500);
-    }).catch((error) => console.log(error));
-  },
-
   added() {
     var ret = false;
     $("td").once(function () {
@@ -566,12 +550,11 @@ const util = {
   subscription: function subscription(event, ...rest) {
     const events = util.mergeArgs(event, rest);
     const { isMixed, isDelegatable, delegated } = this.settings.events.checkDelegatable(events);
-
     const root = {
       isDelegatable, isMixed, delegated, //override, isDelegatable, isMixed - bool, delegated - Array
       types: events, // ll specified event types in the call to .subscription(...)
       handlers: {}, // {"className": []}
-      subscribers: [], // [{className: "hide", matchset: []}]
+      subscribers: {name: "", nodes: []}, // {name: "xyz", nodes: []} - all maches share a single xyz name
 
       get override(){
         return !this.isDelegatable;
@@ -583,12 +566,30 @@ const util = {
         }
         this.isDelegatable = !v;
       },
+
+      addHandle() {
+        const handle = this.subscribers.name;
+        this.subscribers.nodes.forEach((node) => {
+          if (!node.dataset.handles) {
+            node.dataset.handles = handle;
+            return
+          }
+          node.dataset.handles += " " + handle;
+        });
+        return this;
+      },
+
+      checkHandle(node, handle) {
+        return node.dataset.handles && node.dataset.handles.split(" ").includes(handle);
+      },
+      
       // Add a handler for event identified by className
-      addHandler(className, handler) {
-        if (!Array.isArray(this.handlers[className]) || this.handlers[className].includes(handler)) {
-          return this;
-        }
-        this.handlers[className].push(handler);
+      addHandlers(handlers) {
+        this.types.forEach((type) => {
+          let H = this.handlers[type] || [];
+          H = H.concat.apply( H, handlers.filter((h) => H.indexOf(h) == -1));
+          this.handlers[type] = H;
+        });
         return this;
       },
 
@@ -641,41 +642,55 @@ const util = {
       // default generic handler handles all non-delegated events
       defaultHandler() {
         if (this.override) {
-          this.subscribers.forEach((s) => {
-            this.publish(s.matchset, this.handlers[s.className], this.types);
+          this.subscribers.nodes.forEach((node) => {
+            this.types.forEach((type) => {
+              (this.handlers[type] || []).forEach((fn) => {
+                this.attach(node, type, fn);
+              });
+            });
           });
-          return this;
         }
         return this;
       },
 
       // delegation generic handler handles delegated events
+      // attach all the events on the doc and put fnx to listen
+      // avoid repeat by filtering subscribers, over-write instance subscribers with result
+      // mark all subscribing nodes - data-events="click keydown drag mouseleave"
       delegationHandler() {
-        // mark all subscribing nodes
         this.types.forEach((eventType) => {
-          this.attach(document, eventType, this.fnx);
+          this.attach(document, eventType, this.fnx.bind(this));
         });
-        // filter subscribers for with attachx, and overrite instance subscribers with result
-        this.subscribers = this.subscribers.filter((s) => {
-          return this.attachx(s, this.handlers[s.className]);
+        this.prepareTC(this.subscribers.nodes, this.types, this.subscribers.name);
+        return this;
+      },
+
+      prepareTC(nodes, types, handle) {
+        let tc;
+        nodes.forEach((node) => {
+          types.forEach((type) => {
+            node.correspondence = node.correspondence || {};
+            tc = node.correspondence[type] || {handle};
+            tc.handlers = this.handlers[type];
+            node.correspondence[type] = tc;
+          });
         });
       },
 
+      // retrieve a target's correspondence for  given type if available
+      getTC(target, type) {
+        if ("correspondence" in target) {
+          return target.correspondence[type];
+        }
+      },
+
       // fnx is the delegation utility that handles the delegation job
+      // it executes all the listed handlers for the event type against target
       fnx(event) {
-        // handling will come here for all the eventTypes registered on the instance
-        const t = event.target;
-        // execute all the handlers of this eventType
-        this.subscribers.forEach((s) => {
-          if (!t.classList.contains(s.className)) {
-            return;
-          }
-          this.handlers[s.className].forEach((h) => {
-              s.matchset.forEach((node) => {
-                h.call(node, event, node);
-              });
-            });
-        });
+        const tc = this.getTC(event.target, event.type);
+        if (tc) {
+          tc.handlers.forEach((handler) => handler.call(event.target, event));
+        }
       },
 
       // determine and return the approperiate generic handling mechanism 
@@ -712,65 +727,64 @@ const util = {
       events,
       handled: false,
 
-      // Add handling functions to current event - veriadic
+      // subscriber list closes
       handle: function handle(...handlers) {
-        this.root.subscribers.forEach((subscriber) => {
-          handlers.forEach((handler) => {
-            if (subscriber.className && typeof handler === "function" && subscriber.matchset.length > 0) {
-              this.root.addHandler(subscriber.className, handler);
-            }
-          });
-        }); 
-        // Mark the current batch of subscribe() calls as handled and reopen upon it's next call
+        if (handlers[0]) {
         this.handled = true;
+        this.root.addHandle();
+        this.root.addHandlers(handlers);
         this.prepare();
+        }
         return this;
       },
 
-      // takes in classNames, creates a map of subscribers, fills instance root subscribers
-      // OR -
-      // takes in DOM Nodes, creates a map of subscribers, fills instance root subscribers
+      generateName() {
+        const nameIndex = util.settings.events.vars.nameIndex++;
+        return `x${nameIndex}`;
+      },
+
+      // get all matches, generate a name for them, update subscribers{name, nodes}
       subscribe: function subscribe(...classNames) {
-        let subscribers = util.mergeArgs(...classNames).map((className) => {
-          if (typeof className === "string") {
-            const matchset = [].slice.call(document.getElementsByClassName(className));
-            if (matchset.length > 0) {
-              return { className, matchset };
-            }
-          }
-        }).filter((subscriber) => subscriber && subscriber.className);
-
-        if (subscribers.length == 0 && classNames.length > 0) {
-          const args = util.mergeArgs(...arguments);
-          let className = "cN" + ("" + (new Date()).getTime()).replace(/[A-z\s\W]/gi, "");
-          const matchset = args.filter((item) => item.nodeType == 1);
-          if (matchset.length != args.length) {
-            throw new Error("subscribe() invoked with invalid input");
-          }
-          this.override(); // Don's use delegation when actual DOM nodes are provided
-          subscribers = [{ className, matchset }];
+        // build a new instance if the present one is already handled
+        if (this.handled) {
+          return this.subscription(this.events).subscribe(...classNames);
         }
-
-        subscribers.forEach((subscriber) => {
-          this.root.handlers[subscriber.className] = []; // set up fresh handling
-          this.events.forEach((event) => { // cache the record - {type, name, matchset}
-            util.settings.events.addStack(event, subscriber.className, subscriber.matchset);
-          });
+        let matches = [];
+        util.mergeArgs(...classNames).forEach((className) => {
+          if (typeof className === "string") {
+            const nodes = [].slice.call(document.getElementsByClassName(className));
+           matches.push.apply(matches, nodes);
+          }
         });
 
-        // add subscribers to the list of existing subscribers to the current instance
-        this.root.subscribers.push(...subscribers);
-        if (this.handled) {
-          this.handled = false;
-          this.root.subscribers = subscribers; // Once handled overwrite upon next call to subscribe()
+        if (matches.length == 0 && classNames.length > 0) {
+          const args = util.mergeArgs(...arguments), w = window, d = document;
+          matches = args.filter((i) => {
+            return (i && i.parentNode && i.parentNode.nodeType == 1) || i == w || i == d;
+          });
+          if (matches.length != args.length) {
+            throw new Error("subscribe() invoked with invalid input");
+          }
         }
+        this.root.subscribers.nodes.push(...matches); // all subscribing nodes to the instance are put together
+        if (!this.root.subscribers.name) { // under the same name for ease of use
+          this.root.subscribers.name = this.generateName();
+        }
+          // this.root.handlers[subscriber.className] = []; // set up fresh handling
+          // cache the record - {types, name, matchset}
+        //  util.settings.events.addStack(this.events, this.subscribers.name, matches);
+
         this.prepare();
         return this;
-      },
+      },     
 
+      // hand the present set of information over to a generic handler for processing
+      // generic handler will take care of delegation matters
       prepare: function prepare() {
-        const gh = this.root.getGenericHandler(); // get current generic handler for the instance
-        gh.call(this.root, this); // generice handler will take care of delegation matters
+        if (this.handled) {
+          const gh = this.root.getGenericHandler(this);
+          gh();
+        }
         return this;
       },
 
@@ -808,7 +822,8 @@ const util = {
   settings: {
     events: {
       vars: {
-        delegationClassName: "_del_"
+        delegationClassName: "_del_",
+        nameIndex: 0 // index of generated names for all the subscriptions
       },
       stack: {}, // Register - {type: [{name: "xyz", nodes: [Nodes]}]}
       addStack(type, name, nodes) {
@@ -902,13 +917,6 @@ const util = {
         });
       }
     }
-  },
-
-  Subscriptions(event) {
-    this.subscription.defaults.click.forEach((handler) => {
-      handler(event, this.subscription.subscriber);
-    });
-    this.subscription.handle(this.subscription.activateHandler, event);
   }
 
 };
