@@ -56,12 +56,21 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
 //  $(body).click(util.Subscriptions).keydown(util.HandlerKeyPress, $(document));
   $("input[name='item'], input[name='value']").on("input", Calculator);
   const s = util.subscription("click"); // *1
-  s.subscribe("reset").handle(util.Clean); // *2
-  s.change($(".file-data input")).handle(util.uploadFileData); // *3
-  s.click("file-data").handle(util.processDataUpload); // *4
-  util.click(grab(".file-data input")).handle(e => {
-    console.log(vars.fileOpenActive)
-  });
+  // s.subscribe("reset").handle(util.Clean); // *2
+  // s.change($(".file-data input")).handle(util.uploadFileData); // *3
+  // s.click("file-data").handle(util.processDataUpload); // *4
+  // util.click(grab(".file-data input")).handle(e => {console.log(vars.fileOpenActive)});
+
+  util.subscription("click").queue(
+    {subscribers: ["reset"], handlers: [util.Clean]},
+    {subscribers: ["file-data"], handlers: [util.processDataUpload]},
+    {
+      subscribers: [grab(".file-data input")],
+      handlers: [(e) => { console.log(vars.fileOpenActive);}]
+    }
+  ).subscription("change").group(
+    {subscribers: [$(".file-data input")], handlers: [util.uploadFileData]}
+  );
   
 // event.pointerType == mouse|pen|touch
 // event.type == click

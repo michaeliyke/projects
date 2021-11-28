@@ -9,6 +9,28 @@ s.subscribe("root-body");
 s.handle(alert);
 // s.event;
 
+click = util.subscription("click")
+click.subscribe()
+click.handle()
+click.subscribe()
+click.handle()
+
+// Group handling is where various names subscribe to the same set of handlers
+// Throw an error if there's no eventType to subscribe to
+click.group(
+  // A subscriber can be a node or a className
+  {subscribers: ["x"], handlers: [fn]},
+  {subscribers: ["x", "y"], handlers: [fn]},
+  {subscribers: ["x", "y"], handlers: [fn]}
+)
+
+.q, .add, .
+click.queue(
+  {subscribers: ["x"], handlers: [fn]},
+  {subscribers: ["y"], handlers: [fn]},
+  {subscribers: ["z"], handlers: [fn]}
+)
+
 */
 
  // take in classNames, create a map of subscribers, fill instance root subscribers

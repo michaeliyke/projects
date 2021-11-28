@@ -536,6 +536,22 @@ const util = {
     util.pane = pane;
   },
 
+  isNode(object) {
+    return object && object.nodeType == 1;
+  },
+
+  isNodeList(object) {
+    if (!(object && "length" in object)) {
+      return false;
+    }
+    for (let it = 0; it < object.length; it++) {
+      if (!(util.isNode(object[it]))) {
+        return false;
+      }
+    }
+    return true;
+  },
+
   // Returns a single array containing all args together. This will spread any array argument in the list
   mergeArgs() {
     const args = [].slice.call(arguments).map((arg) => {
@@ -727,6 +743,8 @@ const util = {
       events,
       handled: false,
 
+      instances: [], // stores the instances for a group subscription 
+
       // subscriber list closes
       handle: function handle(...handlers) {
         if (handlers[0]) {
@@ -741,6 +759,44 @@ const util = {
       generateName() {
         const nameIndex = util.settings.events.vars.nameIndex++;
         return `x${nameIndex}`;
+      },
+
+      // Group handling is where various names subscribe to the same set of handlers
+      // Throw an error if eventType is less or more than one
+      // clk = subscription("click"); 
+      // clk.group({subscribers: [], handlers: []},{subscribers: [], handlers: []}...);
+      group() {
+        const subscriptions = util.mergeArgs(...arguments);
+        if (this.events.length != 1) {
+          throw new Error("group() called with less than or more than one event type set");
+        }
+        const type = this.events[0];
+        const instance = this.subscription(type);
+        instance.instances = subscriptions.map((s) => {
+          if (!(s && Array.isArray(s.subscribers) && Array.isArray(s.handlers))) {
+            console.log(s);
+            throw new Error("group() called with incompatible subscription");
+          }
+          const subscribers = [];
+          s.subscribers.forEach((x) => {
+            if (util.isNode(x) || typeof x === "string") {
+              subscribers.push(x);
+              return
+            }
+            if (util.isNodeList(x)) {
+              subscribers.push.apply(subscribers, x);
+              return
+            }
+            throw new Error("invalid argument in call to group()");
+          });
+          return util.subscription(type).subscribe(subscribers).handle(s.handlers);
+        });
+        return instance;
+      },
+
+      // An alias to .group()
+      queue() {
+        return this.group(...arguments);
       },
 
       // get all matches, generate a name for them, update subscribers{name, nodes}
