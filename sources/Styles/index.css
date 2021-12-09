@@ -537,6 +537,10 @@ button:focus, button:active {
   cursor: pointer;
 }
 
+.file-data {
+  position: relative;
+}
+
 .mgt>.managed:not(.mgt>.managed.disabled):hover {
   background-color: rgba(118, 144, 255, 0.3);
   background-color: rgba(153, 153, 153, 0.5);
@@ -672,10 +676,17 @@ footer a:hover {
 }
 
 .file-data input {
-  font-size: 0;
-  width: 0;
-  height: 0;
-  margin: 0;
+  background-color: rgb(235, 235, 235);
+  border-radius: unset;
+  display: block;
+  height: 100%;
+  left: 0;
   padding: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  appearance: none;
+  outline: none;
+  text-indent: -999em;
   opacity: 0;
 }

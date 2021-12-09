@@ -55,47 +55,11 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
   */
 //  $(body).click(util.Subscriptions).keydown(util.HandlerKeyPress, $(document));
   $("input[name='item'], input[name='value']").on("input", Calculator);
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  const q = util.subscription("click"); // *1
-  q.subscribe("reset").handle(util.Clean); // *2
-  q.change($(".file-data input")).handle(util.uploadFileData); // *3
-  q.click("file-data").handle(util.processDataUpload); // *4
-  util.click(grab(".file-data input")).handle(e => {console.log(vars.fileOpenActive)});
-  
-  q.queue([
-    {types: ["click"], subscribers: ["reset"], handlers: [util.Clean]},
-    {types: ["click"], subscribers: ["file-data"], handlers: [util.processDataUpload]},
-    {types: ["click"], subscribers: ["data-upload"], handlers: [dataUploadInit] }
-  ]);
-
-  util.subscription("change").group([
-    { subscribers: ["data-upload"], handlers: [util.uploadFileData] }
-  ]);
-  
+  const s = util.subscription("click"); // *1
+  // s.subscribe("reset").handle(util.Clean); // *2
+  // s.change($(".file-data input")).handle(util.uploadFileData); // *3
+  // s.click("file-data").handle(util.processDataUpload); // *4
+  // util.click(grab(".file-data input")).handle(e => {console.log(vars.fileOpenActive)});
 
 
 
@@ -109,21 +73,33 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-  function dataUploadInit(e) {
+  const q = util.subscription("click");
+  q.subscribe("reset").handlers(util.Clean);
+  q.subscribe("file-data").handlers(util.processDataUpload);
+  util.subscription("change").subscribe("file-data").handlers(util.uploadFileData);
+  
+  q.subscribe("data-upload").handle((e) => {
     console.log("Input file clicked");
     e.preventDefault();
-  }
+  });
+  
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
 
   function Calculator(e) {
     const input = e.target;

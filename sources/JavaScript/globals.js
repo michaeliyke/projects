@@ -113,6 +113,7 @@ const util = {
   },
 
   uploadFileData(e) {
+
     vars.fileOpenActive = false;
     const { files } = e.target;
     const accepts = ["application/json", "text/plain"];
@@ -135,9 +136,11 @@ const util = {
   },
 
   processDataUpload() {
-    console.log(vars.fileOpenActive)
     util.closeMgtTools();
+    // if (vars.fileOpenActive) {
+    // vars.fileOpenActive = true;
     grab(".file-data input").click();
+    // }
   },
 
   sizeIsAllowable(size) {
@@ -552,7 +555,8 @@ const util = {
     return true;
   },
 
-  // Returns a single array containing all args together. This will spread any array argument in the list
+  // Returns a single array containing all args together.
+  // This will spread any array argument in the list.
   mergeArgs() {
     const args = [].slice.call(arguments).map((arg) => {
       return (typeof arg === "object" && typeof arg.slice === "function") ? arg.slice() : arg;
@@ -563,16 +567,19 @@ const util = {
   // Every call to subscription() spins up a new instance to avoid inconsistent state
   // create a subscription() instance with the listed events as types
   // set isDelegatable, isMixed, & delegated intsnace variables
-  subscription: function subscription(event, ...rest) {
-    const events = util.mergeArgs(event, rest);
-    const { isMixed, isDelegatable, delegated } = this.settings.events.checkDelegatable(events);
+  subscription: function subscription(eventType, ...rest) {
+    const eventTypes = util.mergeArgs(eventType, rest);
+    /**
+     * Importance properties of the root object
+     * 1. types - types specified in call to subscription
+     * 2. override - gets and sets true or false behaviour for delegation
+     * 3. isDelegatable - shows if event can be delegated
+     * 4. delegated - contains list of current events to be delegated
+     * 5. handlers - contains list of handlers mached to applicable subscribers
+     * 6. subscribers - all 
+    */
     const root = {
-      isDelegatable, isMixed, delegated, //override, isDelegatable, isMixed - bool, delegated - Array
-      types: events, // ll specified event types in the call to .subscription(...)
-      handlers: {}, // {"className": []}
-      subscribers: {name: "", nodes: []}, // {name: "xyz", nodes: []} - all maches share a single xyz name
-
-      get override(){
+      get override() {
         return !this.isDelegatable;
       },
 
@@ -598,12 +605,12 @@ const util = {
       checkHandle(node, handle) {
         return node.dataset.handles && node.dataset.handles.split(" ").includes(handle);
       },
-      
+
       // Add a handler for event identified by className
       addHandlers(handlers) {
         this.types.forEach((type) => {
           let H = this.handlers[type] || [];
-          H = H.concat.apply( H, handlers.filter((h) => H.indexOf(h) == -1));
+          H = H.concat.apply(H, handlers.filter((h) => H.indexOf(h) == -1));
           this.handlers[type] = H;
         });
         return this;
@@ -674,7 +681,8 @@ const util = {
       // avoid repeat by filtering subscribers, over-write instance subscribers with result
       // mark all subscribing nodes - data-events="click keydown drag mouseleave"
       delegationHandler() {
-        this.types.forEach((eventType) => {
+        // console.log(this);
+        this.types.forEach((eventType, it) => {
           this.attach(document, eventType, this.fnx.bind(this));
         });
         this.prepareTC(this.subscribers.nodes, this.types, this.subscribers.name);
@@ -686,7 +694,7 @@ const util = {
         nodes.forEach((node) => {
           types.forEach((type) => {
             node.correspondence = node.correspondence || {};
-            tc = node.correspondence[type] || {handle};
+            tc = node.correspondence[type] || { handle };
             tc.handlers = this.handlers[type];
             node.correspondence[type] = tc;
           });
@@ -705,7 +713,9 @@ const util = {
       fnx(event) {
         const tc = this.getTC(event.target, event.type);
         if (tc) {
-          tc.handlers.forEach((handler) => handler.call(event.target, event));
+          tc.handlers.forEach((handler) => {
+            handler.call(event.target, event);
+          });
         }
       },
 
@@ -737,21 +747,40 @@ const util = {
       }
     };
 
-    return {
-      "__proto__": util, // This facilitates chaining after invoking an event method
-      root,
-      events,
-      handled: false,
+    /**
+     * Important properties for the instance are as follows
+     * 1. root - object for managing internal state
+     * 2. events - holds all the event types ready for subscription
+     * 3. handled - boolean showing if handle() has been called yet after subscribe()calls
+    */
 
-      instances: [], // stores the instances for a group subscription 
+    const instance = {
+      "__proto__": util, // This facilitates chaining after invoking an event method
+      init(types) {
+        console.log(types);
+        const { 
+          isMixed, isDelegatable, delegated 
+        } = util.settings.events.checkDelegatable(types);
+        this.events = types;// All the current event types
+        this.handled = false; // Whether or not .handle() has been called
+        this.instances = []; // stores the instances for a group subscription
+        this.root = root; // The internal root
+        this.root.isDelegatable = isDelegatable; // If all supplied types are delegatable
+        this.root.isMixed = isMixed; // Whether types are a mix of delegatable and non
+        this.root.delegated = delegated; // an array of types to be delegated
+        this.root.types = types; // All supplied event types in .subscription() call
+        this.root.handlers = {}; // Event handlers identified by a ---
+        this.root.subscribers = { name: "", nodes: [] };
+        return this;
+      },
 
       // subscriber list closes
       handle: function handle(...handlers) {
         if (handlers[0]) {
-        this.handled = true;
-        this.root.addHandle();
-        this.root.addHandlers(handlers);
-        this.prepare();
+          this.handled = true;
+          this.root.addHandle();
+          this.root.addHandlers(handlers);
+          this.prepare();
         }
         return this;
       },
@@ -766,32 +795,23 @@ const util = {
       // clk = subscription("click"); 
       // clk.group({subscribers: [], handlers: []},{subscribers: [], handlers: []}...);
       group() {
-        const subscriptions = util.mergeArgs(...arguments);
-        if (this.events.length != 1) {
-          throw new Error("group() called with less than or more than one event type set");
+        if (this.events.length < 1) {
+          throw new Error("group() called without an event type set");
         }
-        const type = this.events[0];
-        const instance = this.subscription(type);
-        instance.instances = subscriptions.map((s) => {
+        util.mergeArgs(...arguments).forEach((s) => {
           if (!(s && Array.isArray(s.subscribers) && Array.isArray(s.handlers))) {
-            console.log(s);
             throw new Error("group() called with incompatible subscription");
           }
-          const subscribers = [];
-          s.subscribers.forEach((x) => {
-            if (util.isNode(x) || typeof x === "string") {
-              subscribers.push(x);
-              return
-            }
-            if (util.isNodeList(x)) {
-              subscribers.push.apply(subscribers, x);
-              return
-            }
-            throw new Error("invalid argument in call to group()");
+          const subscribers = s.subscribers.filter((x) => {
+            return util.isNode(x) || typeof x === "string" || util.isNodeList(x);
           });
-          return util.subscription(type).subscribe(subscribers).handle(s.handlers);
+          if (subscribers.length != s.subscribers.length) {
+            throw new Error("invalid argument in call to group()");
+          }
+          const types = s.types || this.events;
+          this.init(types).subscribe(util.mergeArgs(subscribers)).handle(s.handlers);
         });
-        return instance;
+        return this;
       },
 
       // An alias to .group()
@@ -803,36 +823,34 @@ const util = {
       subscribe: function subscribe(...classNames) {
         // build a new instance if the present one is already handled
         if (this.handled) {
-          return this.subscription(this.events).subscribe(...classNames);
+          return this.init(this.events).subscribe(...classNames);
+        }
+        const args = util.mergeArgs(...classNames);
+        // Ensure the arguments are not mixed up
+        const strArgs = args.every((x) => typeof x === "string");
+        const objArgs = args.every((x) => typeof x === "object");
+        if (!(strArgs || objArgs)) {
+          throw new Error("subscribe() invoked with invalid input");
         }
         let matches = [];
-        util.mergeArgs(...classNames).forEach((className) => {
-          if (typeof className === "string") {
+        if (strArgs) {
+          args.forEach((className) => {
             const nodes = [].slice.call(document.getElementsByClassName(className));
-           matches.push.apply(matches, nodes);
-          }
-        });
-
-        if (matches.length == 0 && classNames.length > 0) {
-          const args = util.mergeArgs(...arguments), w = window, d = document;
-          matches = args.filter((i) => {
-            return (i && i.parentNode && i.parentNode.nodeType == 1) || i == w || i == d;
+            matches.push.apply(matches, nodes);
           });
-          if (matches.length != args.length) {
-            throw new Error("subscribe() invoked with invalid input");
-          }
+        }
+        if (objArgs) {
+          matches = args.filter((i) => {
+            return (i && i.nodeType == 1) || i == window;
+          });
         }
         this.root.subscribers.nodes.push(...matches); // all subscribing nodes to the instance are put together
         if (!this.root.subscribers.name) { // under the same name for ease of use
           this.root.subscribers.name = this.generateName();
         }
-          // this.root.handlers[subscriber.className] = []; // set up fresh handling
-          // cache the record - {types, name, matchset}
-        //  util.settings.events.addStack(this.events, this.subscribers.name, matches);
-
         this.prepare();
         return this;
-      },     
+      },
 
       // hand the present set of information over to a generic handler for processing
       // generic handler will take care of delegation matters
@@ -852,9 +870,11 @@ const util = {
 
       // An alias to util.subscription()
       subscription: function subscription(event, ...rest) {
-        return util.subscription(...util.mergeArgs(event, rest));
+        return this.init(util.mergeArgs(event, rest));
       }
-    }
+    };
+
+    return instance.init(eventTypes);
   },
 
   events: [
