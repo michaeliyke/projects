@@ -564,6 +564,38 @@ const util = {
     return [].concat.apply([], args);
   },
 
+  // Group handling is where various names subscribe to the same set of handlers
+  // Throw an error if eventType is less or more than one
+  // clk = subscription("click"); 
+  // clk.group({subscribers: [], handlers: []},{subscribers: [], handlers: []}...);
+  group() {
+    if (this.events.length < 1) {
+      throw new Error("group() called without an event type set");
+    }
+    util.mergeArgs(...arguments).forEach((s) => {
+      if (!(s && Array.isArray(s.subscribers) && Array.isArray(s.handlers))) {
+        throw new Error("group() called with incompatible subscription");
+      }
+      const subscribers = s.subscribers.filter((x) => {
+        return util.isNode(x) || typeof x === "string" || util.isNodeList(x);
+      });
+      if (subscribers.length != s.subscribers.length) {
+        throw new Error("invalid argument in call to group()");
+      }
+      if ("root" in this && this.__proto__ == util) {
+        s.types = s.types || this.events;
+        console.log("The one is:-----------------", s.types);
+      }
+      this.subscription(s.types).subscribe(util.mergeArgs(subscribers)).handle(s.handlers);
+    });
+    return this;
+  },
+
+  // An alias to .group()
+  queue() {
+    return this.group(...arguments);
+  },
+
   // Every call to subscription() spins up a new instance to avoid inconsistent state
   // create a subscription() instance with the listed events as types
   // set isDelegatable, isMixed, & delegated intsnace variables
@@ -788,35 +820,6 @@ const util = {
       generateName() {
         const nameIndex = util.settings.events.vars.nameIndex++;
         return `x${nameIndex}`;
-      },
-
-      // Group handling is where various names subscribe to the same set of handlers
-      // Throw an error if eventType is less or more than one
-      // clk = subscription("click"); 
-      // clk.group({subscribers: [], handlers: []},{subscribers: [], handlers: []}...);
-      group() {
-        if (this.events.length < 1) {
-          throw new Error("group() called without an event type set");
-        }
-        util.mergeArgs(...arguments).forEach((s) => {
-          if (!(s && Array.isArray(s.subscribers) && Array.isArray(s.handlers))) {
-            throw new Error("group() called with incompatible subscription");
-          }
-          const subscribers = s.subscribers.filter((x) => {
-            return util.isNode(x) || typeof x === "string" || util.isNodeList(x);
-          });
-          if (subscribers.length != s.subscribers.length) {
-            throw new Error("invalid argument in call to group()");
-          }
-          const types = s.types || this.events;
-          this.init(types).subscribe(util.mergeArgs(subscribers)).handle(s.handlers);
-        });
-        return this;
-      },
-
-      // An alias to .group()
-      queue() {
-        return this.group(...arguments);
       },
 
       // get all matches, generate a name for them, update subscribers{name, nodes}

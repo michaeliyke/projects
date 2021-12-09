@@ -86,13 +86,13 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
   q.click("file-data").handle(util.processDataUpload); // *4
   util.click(grab(".file-data input")).handle(e => {console.log(vars.fileOpenActive)});
   
-  q.queue([
+  util.queue([
     {types: ["click"], subscribers: ["reset"], handlers: [util.Clean]},
     {types: ["click"], subscribers: ["file-data"], handlers: [util.processDataUpload]},
     {types: ["click"], subscribers: ["data-upload"], handlers: [dataUploadInit] }
   ]);
 
-  util.subscription("change").group([
+  util.change().group([
     { subscribers: ["data-upload"], handlers: [util.uploadFileData] }
   ]);
   
