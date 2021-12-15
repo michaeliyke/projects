@@ -95,7 +95,16 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
   util.change().group([
     { subscribers: ["data-upload"], handlers: [util.uploadFileData] }
   ]);
+
+  util.defaults(
+    { type: "click", handlers:[] },
+    { type: "escape", handlers: [] },
+    { type: "enter", handlers: [] },
+    { type: "keydown", handlers: [] },
+    { type: "hover", handlers: [] }
+  );
   
+  util.defaults("click").handle(alert, confirm, prompt, console.log);
 
 
 
