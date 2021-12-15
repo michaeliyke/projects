@@ -712,22 +712,23 @@ const util = {
       // Add a handler for event identified by className
       addHandlers(handlers) {
         this.types.forEach((type) => {
-          const h = Array.isArray(this.handlers[type]) ? this.handlers[type] : [];
-          h.push.apply(h, handlers.filter((fn) => !(h.includes(fn))));
-          this.handlers[type] = h;
+          const fns = Array.isArray(this.handlers[type]) ? this.handlers[type] : [];
+          fns.push.apply(fns, handlers.filter((fn) => !(fns.includes(fn))));
+          this.handlers[type] = fns;
         });
         return this;
       },
 
-      attach(node, eventType, handler) {
-        if (!(node && node[eventType + "Events"] && node[eventType + "Events"].includes(handler))) {
-          if (node && Array.isArray(node[eventType + "Events"])) {
-            node[eventType + "Events"].push(handler);
-          } else {
-            node[eventType + "Events"] = [handler];
-          }
-          node.addEventListener(eventType, handler, false);
+      attach(node, type, fn) {
+        if (node && typeof type === "string" && typeof fn === "function") {
+          throw new Error("invalid arguments in attach() in call to attach");
         }
+        const fns = Array.isArray(node[type + "Events"]) ? node[type + "Events"] : [];
+        if (!(fns.includes(fn))) {
+          fns.push(fn);
+          node.addEventListener(type, fn, false);
+        }
+        node[type + "Events"] = fns;
       },
 
       // returns  false if a subscriber has already been queued for processing for the same handler
@@ -839,6 +840,14 @@ const util = {
         }
       },
 
+      // hand the present set of information over to a generic handler for processing
+      // generic handler will take care of delegation matters
+      handle: function handle(instance) {
+        const gh = this.getGenericHandler(instance);
+        gh();
+        return this;
+      },
+
       // determine and return the approperiate generic handling mechanism 
       getGenericHandler(instance) {
         let gh;
@@ -901,12 +910,13 @@ const util = {
 
       // subscriber list closes
       handle: function handle(...handlers) {
-        if (handlers[0]) {
-          this.handled = true;
-          this.root.addHandle();
-          this.root.addHandlers(handlers);
-          this.prepare();
+        if (typeof handlers[0] !== "function") {
+          return this;
         }
+        this.handled = true;
+        this.root.addHandle();
+        this.root.addHandlers(handlers);
+        this.root.handle(this);
         return this;
       },
 
@@ -943,17 +953,6 @@ const util = {
         this.root.subscribers.nodes.push(...matches); // all subscribing nodes to the instance are put together
         if (!this.root.subscribers.name) { // under the same name for ease of use
           this.root.subscribers.name = this.generateName();
-        }
-        this.prepare();
-        return this;
-      },
-
-      // hand the present set of information over to a generic handler for processing
-      // generic handler will take care of delegation matters
-      prepare: function prepare() {
-        if (this.handled) {
-          const gh = this.root.getGenericHandler(this);
-          gh();
         }
         return this;
       },
