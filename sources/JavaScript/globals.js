@@ -604,7 +604,7 @@ const util = {
    * @returns {object}
    */
   defaults(...options) {
-    options = util.mergeArgs(options); // put all inputs into a single array
+    options = util.mergeArgs(...options); // put all inputs into a single array
     const strArgs = options.every(o => typeof o === "string"); // All args are string
     const fnArgs = options.every(o => typeof o === "function"); // All args are functions
     const optArgs = options.every((o) => { // All args are options
@@ -641,12 +641,13 @@ const util = {
    */
   handleDefault(options, isOptions) {
     if (!isOptions) { // handle() will completes the flow
-      return this.subscription(options.map(o => o.type)).override().subscribe(document);
-      // return this.subscription(["enter", "hover"]).subscribe(document);
+      const s = util.subscription(options.map(o => o.type)).subscribe(document);
+      return s.isDelegatable ? s : s.override();
     }
     options.forEach((option) => {
       const { type, handlers } = option;
-      this.subscription(type).override().subscribe(document).handle(handlers);
+      const s = this.subscription(type).subscribe(document);
+      return s.isDelegatable ? s.handle(handlers) : s.override().handle(handlers);
     });
     return this;
   },
@@ -720,7 +721,7 @@ const util = {
       },
 
       attach(node, type, fn) {
-        if (node && typeof type === "string" && typeof fn === "function") {
+        if (!(node && typeof type === "string" && typeof fn === "function")) {
           throw new Error("invalid arguments in attach() in call to attach");
         }
         const fns = Array.isArray(node[type + "Events"]) ? node[type + "Events"] : [];
@@ -768,15 +769,14 @@ const util = {
 
       // default generic handler handles all non-delegated events
       defaultHandler() {
-        if (this.override) {
-          this.subscribers.nodes.forEach((node) => {
-            this.types.forEach((type) => {
-              (this.handlers[type] || []).forEach((fn) => {
-                this.attach(node, type, fn);
-              });
-            });
-          });
+        if (!this.override) {
+          throw new Error("defaultHandler() invoked without an override")
         }
+        this.subscribers.nodes.forEach((node) => {
+          this.types.forEach((type) => {
+            this.attach(node, type, this.execute((this.handlers[type] || [])));
+          });
+        });
         return this;
       },
 
@@ -786,10 +786,10 @@ const util = {
       // mark all subscribing nodes - data-events="click keydown drag mouseleave"
       delegationHandler() {
         this.types = this.delegated;
-        this.types.forEach((eventType) => {
-          this.attach(document, eventType, this.fnx.bind(this));
+        this.types.forEach((type) => {
+          this.attach(document, type, this.delegate.bind(this));
         });
-        this.prepareTC(this.subscribers.nodes, this.types, this.subscribers.name);
+        this.applyTc(this.subscribers.nodes, this.types, this.subscribers.name);
         return this;
       },
 
@@ -797,46 +797,43 @@ const util = {
         this.extras.forEach((type) => {
           const info = util.extras.getInfo(type);
           if (info.token == "key") { // If it's a keyboard event
-            this.attach(document, "keyup", (e) => {
-              if (e.keyCode == info.code) {
-                (this.handlers[type] || []).forEach(fn => fn(e));
+            this.attach(document, "keyup", (event) => {
+              if (event.keyCode == info.code) {
+              this.execute(this.handlers[type])(event);
               }
             });
           }
 
-          if (info.token == "mouse") { // if it's a mouse event
-            // mouse event
+          if (info.token == "mouse") { // let's support hover
+            const nodes = this.subscribers.nodes.length > 0 ? this.subscribers.nodes : [document];
           }
         });
       },
 
-      prepareTC(nodes, types, handle) {
-        let tc;
+      applyTc(nodes, types, handle) {
         nodes.forEach((node) => {
           types.forEach((type) => {
-            node.correspondence = node.correspondence || {};
-            tc = node.correspondence[type] || { handle };
-            tc.handlers = this.handlers[type];
-            node.correspondence[type] = tc;
+            let tc = node.tc || {}; // tc stands for type correspondence
+            tc[type] = tc[type] || { handle };
+            tc[type].handlers = this.handlers[type];
+            node.tc = tc;
           });
         });
       },
 
-      // retrieve a target's correspondence for  given type if available
-      getTC(target, type) {
-        if ("correspondence" in target) {
-          return target.correspondence[type];
+      // retrieve a target's type correspondence for  given type if available
+      tc(target, type) {
+        if ("tc" in target) {
+          return target.tc[type];
         }
       },
 
-      // fnx is the delegation utility that handles the delegation job
+      // the delegation utility that handles the delegation job
       // it executes all the listed handlers for the event type against target
-      fnx(event) {
-        const tc = this.getTC(event.target, event.type);
+      delegate(event) {
+        const tc = this.tc(event.target, event.type);
         if (tc) {
-          tc.handlers.forEach((handler) => {
-            handler.call(event.target, event);
-          });
+          this.execute(tc.handlers)(event);
         }
       },
 
@@ -848,7 +845,13 @@ const util = {
         return this;
       },
 
-      // determine and return the approperiate generic handling mechanism 
+      execute(handlers) {
+        return function execute(event) {
+          handlers.forEach((fn) => fn.call(event.target, event));
+        };
+      },
+
+      // determine and return the approperiate generic handling mechanism
       getGenericHandler(instance) {
         let gh;
         switch (true) {
@@ -858,21 +861,21 @@ const util = {
           case this.isMixed: // mixed events here
             gh = this.mixedHandler;
             break;
-          case extras.length > 0:
+          case this.extras.length > 0:
             gh = this.extrasHandler;
             break;
-          default: 
-          gh = this.defaultHandler;
+          default:
+            gh = this.defaultHandler;
         }
         return gh.bind(this, instance);
       },
 
       // mixed handler simply stands inbetween default and delegation generic handlers
       mixedHandler(instance) {
-        // non-delegated
-        this.types = this.types.filter(type => !this.delegated.includes(type));
         // extras
         this.extrasHandler(instance);  // works with this.extras
+        // non-delegated
+        this.types = this.types.filter(t => !(this.delegated.includes(t) || this.extras.includes(t)));
         this.defaultHandler(instance);
 
         // delegated
@@ -891,12 +894,14 @@ const util = {
 
     const instance = {
       "__proto__": util, // This facilitates chaining after invoking an event method
+      get isDelegatable() {
+        return this.root.isDelegatable;
+      },
+
       init(types) {
-        console.log(types);
-        const { isMixed, isDelegatable, delegated, extras} = util.settings.events.detect(types);
+        const { isMixed, isDelegatable, delegated, extras } = util.settings.events.detect(types);
         this.events = types;// All the current event types
         this.handled = false; // Whether or not .handle() has been called
-        this.instances = []; // stores the instances for a group subscription
         this.root = root; // The internal root
         this.root.extras = extras;
         this.root.isDelegatable = isDelegatable; // If all supplied types are delegatable
@@ -910,12 +915,12 @@ const util = {
 
       // subscriber list closes
       handle: function handle(...handlers) {
-        if (typeof handlers[0] !== "function") {
-          return this;
+        if (!util.mergeArgs(...handlers).every((fn) => typeof fn === "function")) {
+          throw new Error("invalid input in handle()");
         }
         this.handled = true;
         this.root.addHandle();
-        this.root.addHandlers(handlers);
+        this.root.addHandlers(handlers); 
         this.root.handle(this);
         return this;
       },
@@ -988,15 +993,15 @@ const util = {
 
   extras: {
     map: {
-      enter: { code: 13, token: "key"}, escape: { code: 27, token: "key"}, space: { code: 32, token: "key"},
-      tab: { code: 9, token: "key"}, capslock: { code: 20, token: "key"}, shiftkey: { code: 16, token: "key"},
-      ctrl: { code: 17, token: "key"}, alt: { code: 18, token: "key"}, backspace: { code: 8, token: "key"}, 
-      del: { code: 46, token: "key"}
+      enter: { code: 13, token: "key" }, escape: { code: 27, token: "key" }, space: { code: 32, token: "key" },
+      tab: { code: 9, token: "key" }, capslock: { code: 20, token: "key" }, shiftkey: { code: 16, token: "key" },
+      ctrl: { code: 17, token: "key" }, alt: { code: 18, token: "key" }, backspace: { code: 8, token: "key" },
+      del: { code: 46, token: "key" }, hover: {token: "mouse", code: "mouseenter"}
     },
 
     getEntryType(entry) {
-      for (const type of this.types){
-        if(this.map[type] == entry) {
+      for (const type of this.types) {
+        if (this.map[type] == entry) {
           return type;
         }
       }
@@ -1072,10 +1077,15 @@ const util = {
           this.checkSupported(event);
           const _ = this.isDelegatable(event) ? delegated.push(event) : unDelegated.push(event);
         });
-        const isDelegatable = delegated.length == events.length && events[0];
+        const isDelegatable = delegated.length == events.length && !!(events[0]);
         const extras = events.filter(event => util.extras.includes(event));
-        const isMixed = (unDelegated[0] && delegated[0]) || (unDelegated[0] && extras[0]);
-        return { isMixed, isDelegatable, delegated, unDelegated, extras };
+        const isMixed = (function(unDel, del, ext){
+          // have both d & u or have e but u is larger in number
+          return !!((unDel[0] && del[0]) || (ext[0] && unDel.length > ext.length));
+        }(unDelegated, delegated, extras));
+        const x = { isMixed, isDelegatable, delegated, unDelegated, extras };
+        // console.log(x)
+        return x;
       },
 
       // Throw an error if specified type is not aN actual event and there's no provision
@@ -1087,12 +1097,11 @@ const util = {
 
       isDelegatable(event) {
         const supported = [
-          "click", "contextmenu", "dblclick", "drag", "dragend", "dragenter", "dragleave", "dragover", "select",
-          "dragstart", "drop", "keydown", "keypress", "keyup", "mousedown", "mouseenter", "mouseleave", "wheel",
+          "click", "contextmenu", "dblclick", "keydown", "keypress", "keyup", "mousedown", "mouseenter", "mouseleave",
           "mousemove", "mouseout", "mouseover", "mouseup", "pointerdown", "pointerup", "pointerout", "pointerover",
           "pointerleave", "pointerenter", "pointermove", "pointercancel",
         ];
-        return !supported.includes(event)
+        return supported.includes(event)
       },
 
       setup() {

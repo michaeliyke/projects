@@ -78,7 +78,7 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
   
   
   
-  
+  /* 
   
   const q = util.subscription("click"); // *1
   q.subscribe("reset").handle(util.Clean); // *2
@@ -103,14 +103,12 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
     { type: "keydown", handlers: [] },
     { type: "hover", handlers: [] }
   );
-  
-  util.defaults("click").handle(alert, confirm, prompt, console.log);
+   */
+
+  util.defaults("click mouseleave".split(" ")).handle(alert, console.log);
 
 
-
-
-
-
+/* DETERMIN THAT override is set correctly */
 
 
 
