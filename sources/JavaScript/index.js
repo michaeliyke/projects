@@ -96,16 +96,18 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
     { subscribers: ["data-upload"], handlers: [util.uploadFileData] }
   ]);
 
+  */
   util.defaults(
-    { type: "click", handlers:[] },
-    { type: "escape", handlers: [] },
-    { type: "enter", handlers: [] },
-    { type: "keydown", handlers: [] },
-    { type: "hover", handlers: [] }
+    // { type: "click", handlers:[function (e) {console.log(e)}] },
+    { type: "escape", handlers: [function (e) {console.log(e.key)}] },
+    { type: "enter", handlers: [function (e) {console.log(e.key)}] },
+    { type: "keydown", handlers: [function (e) {console.log(e.key)}] },
+    { type: "hover", handlers: [function (e) {console.log(e.key)}] }
   );
-   */
 
-  util.defaults("click mouseleave".split(" ")).handle(alert, console.log);
+  
+
+  // util.defaults("escape enter".split(" ")).handle(a, console.log);
 
 
 /* DETERMIN THAT override is set correctly */

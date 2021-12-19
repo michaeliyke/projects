@@ -641,13 +641,11 @@ const util = {
    */
   handleDefault(options, isOptions) {
     if (!isOptions) { // handle() will completes the flow
-      const s = util.subscription(options.map(o => o.type)).subscribe(document);
-      return s.isDelegatable ? s : s.override();
+      return util.subscription(options.map(o => o.type)).subscribe(document).override();
     }
     options.forEach((option) => {
       const { type, handlers } = option;
-      const s = this.subscription(type).subscribe(document);
-      return s.isDelegatable ? s.handle(handlers) : s.override().handle(handlers);
+      return this.subscription(type).subscribe(document).override().handle(handlers);
     });
     return this;
   },
@@ -697,6 +695,9 @@ const util = {
       addHandle() {
         const handle = this.subscribers.name;
         this.subscribers.nodes.forEach((node) => {
+          if (node.nodeType != 1) {
+            return
+          }
           if (!node.dataset.handles) {
             node.dataset.handles = handle;
             return
@@ -805,7 +806,12 @@ const util = {
           }
 
           if (info.token == "mouse") { // let's support hover
-            const nodes = this.subscribers.nodes.length > 0 ? this.subscribers.nodes : [document];
+            this.attach(document, "mousemove", (event) => {
+              console.log(event);
+              if (event.keyCode == info.code) {
+                this.execute(this.handlers[type])(event);
+              }
+            });
           }
         });
       },
@@ -831,6 +837,7 @@ const util = {
       // the delegation utility that handles the delegation job
       // it executes all the listed handlers for the event type against target
       delegate(event) {
+        console.log("delegate()");
         const tc = this.tc(event.target, event.type);
         if (tc) {
           this.execute(tc.handlers)(event);
@@ -847,7 +854,9 @@ const util = {
 
       execute(handlers) {
         return function execute(event) {
-          handlers.forEach((fn) => fn.call(event.target, event));
+          handlers.forEach((fn) => {
+            fn.call(event.target, event)
+          });
         };
       },
 
@@ -915,12 +924,13 @@ const util = {
 
       // subscriber list closes
       handle: function handle(...handlers) {
-        if (!util.mergeArgs(...handlers).every((fn) => typeof fn === "function")) {
+        const fns = util.mergeArgs(...handlers);
+        if (!fns.every((fn) => typeof fn === "function")) {
           throw new Error("invalid input in handle()");
         }
         this.handled = true;
         this.root.addHandle();
-        this.root.addHandlers(handlers); 
+        this.root.addHandlers(fns); 
         this.root.handle(this);
         return this;
       },
@@ -943,19 +953,19 @@ const util = {
         if (!(strArgs || objArgs)) {
           throw new Error("subscribe() invoked with invalid input");
         }
-        let matches = [];
+        let nodes = [];
         if (strArgs) {
           args.forEach((className) => {
             const nodes = [].slice.call(document.getElementsByClassName(className));
-            matches.push.apply(matches, nodes);
+            nodes.push.apply(nodes, nodes);
           });
         }
         if (objArgs) {
-          matches = args.filter((i) => {
-            return (i && i.nodeType == 1) || i == window;
+          nodes = args.filter((i) => {
+            return (i && i.nodeType == 1) || (i == window) || (i.nodeType == 9);
           });
         }
-        this.root.subscribers.nodes.push(...matches); // all subscribing nodes to the instance are put together
+        this.root.subscribers.nodes.push(...nodes); // all subscribing nodes to the instance are put together
         if (!this.root.subscribers.name) { // under the same name for ease of use
           this.root.subscribers.name = this.generateName();
         }
@@ -996,7 +1006,13 @@ const util = {
       enter: { code: 13, token: "key" }, escape: { code: 27, token: "key" }, space: { code: 32, token: "key" },
       tab: { code: 9, token: "key" }, capslock: { code: 20, token: "key" }, shiftkey: { code: 16, token: "key" },
       ctrl: { code: 17, token: "key" }, alt: { code: 18, token: "key" }, backspace: { code: 8, token: "key" },
-      del: { code: 46, token: "key" }, hover: {token: "mouse", code: "mouseenter"}
+      del: { code: 46, token: "key" },
+      hover: {token: "mouse", code: "mousemove"}
+    },
+
+    aliases: {
+      key: "keydown",
+      mouse: "mousemove"
     },
 
     getEntryType(entry) {
