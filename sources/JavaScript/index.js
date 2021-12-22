@@ -78,7 +78,6 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
   
   
   
-  /* 
   
   const q = util.subscription("click"); // *1
   q.subscribe("reset").handle(util.Clean); // *2
@@ -91,25 +90,11 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
     {types: ["click"], subscribers: ["file-data"], handlers: [util.processDataUpload]},
     {types: ["click"], subscribers: ["data-upload"], handlers: [dataUploadInit] }
   ]);
-
+  
   util.change().group([
     { subscribers: ["data-upload"], handlers: [util.uploadFileData] }
   ]);
-
-  */
-  util.defaults(
-    // { type: "click", handlers:[function (e) {console.log(e)}] },
-    { type: "escape", handlers: [function (e) {console.log(e.key)}] },
-    { type: "enter", handlers: [function (e) {console.log(e.key)}] },
-    { type: "keydown", handlers: [function (e) {console.log(e.key)}] },
-    { type: "hover", handlers: [function (e) {console.log(e.key)}] }
-  );
-
   
-
-  // util.defaults("escape enter".split(" ")).handle(a, console.log);
-
-
 /* DETERMIN THAT override is set correctly */
 
 

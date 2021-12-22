@@ -584,7 +584,6 @@ const util = {
       }
       if ("root" in this && Object.getPrototypeOf(this) == util) {
         s.types = s.types || this.events;
-        console.log("The one is:-----------------", s.types);
       }
       this.subscription(s.types).subscribe(util.mergeArgs(subscribers)).handle(s.handlers);
     });
@@ -807,7 +806,14 @@ const util = {
 
           if (info.token == "mouse") { // let's support hover
             this.attach(document, "mousemove", (event) => {
-              console.log(event);
+              const t = event.target;
+              const s = this.subscribers;
+              if (s.nodes[0] != document || (s.nodes[0] == document && s.nodes.length > 1)) {
+                if (!s.nodes.includes(t)) {
+                  return
+                }
+              }
+              console.log(t);
               if (event.keyCode == info.code) {
                 this.execute(this.handlers[type])(event);
               }
@@ -837,7 +843,6 @@ const util = {
       // the delegation utility that handles the delegation job
       // it executes all the listed handlers for the event type against target
       delegate(event) {
-        console.log("delegate()");
         const tc = this.tc(event.target, event.type);
         if (tc) {
           this.execute(tc.handlers)(event);
