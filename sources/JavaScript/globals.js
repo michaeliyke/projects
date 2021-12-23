@@ -203,7 +203,7 @@ const util = {
     const { vars } = util;
     row.dataset.prev = vars.pos++;
     row.dataset.pos = vars.pos;
-    console.log(row);
+    // console.log(row);
   },
 
   updateUI(item, amount) {
@@ -544,7 +544,7 @@ const util = {
   },
 
   isNodeList(object) {
-    if (!(object && "length" in object)) {
+    if (!(object && typeof object.length === "number")) {
       return false;
     }
     for (let it = 0; it < object.length; it++) {
@@ -558,10 +558,15 @@ const util = {
   // Returns a single array containing all args together.
   // This will spread any array argument in the list.
   mergeArgs() {
-    const args = [].slice.call(arguments).map((arg) => {
-      return (typeof arg === "object" && typeof arg.slice === "function") ? arg.slice() : arg;
+    const args = [];
+    [].slice.call(arguments).forEach((x) => {
+      if (typeof x === "object" && typeof x.length === "number") {
+        args.push.apply(args, [].slice.call(x));
+      } else if (x) {
+        args.push(x);
+      }
     });
-    return [].concat.apply([], args);
+    return args;
   },
 
   // Group handling is where various names subscribe to the same set of handlers
@@ -569,23 +574,23 @@ const util = {
   // clk = subscription("click"); 
   // clk.group({subscribers: [], handlers: []},{subscribers: [], handlers: []}...);
   group() {
-    if (this.events.length < 1) {
-      throw new Error("group() called without an event type set");
-    }
     util.mergeArgs(...arguments).forEach((s) => {
       if (!(s && Array.isArray(s.subscribers) && Array.isArray(s.handlers))) {
         throw new Error("group() called with incompatible subscription");
       }
-      const subscribers = s.subscribers.filter((x) => {
-        return util.isNode(x) || typeof x === "string" || util.isNodeList(x);
+      const subscribers = [];
+      s.subscribers.forEach((x) => {
+        if (util.isNode(x) || typeof x === "string") {
+          subscribers.push(x);
+        }
+        if (util.isNodeList(x)) {
+          subscribers.push.apply(subscribers, [].slice.call(x));
+        }
       });
-      if (subscribers.length != s.subscribers.length) {
-        throw new Error("invalid argument in call to group()");
-      }
       if ("root" in this && Object.getPrototypeOf(this) == util) {
         s.types = s.types || this.events;
       }
-      this.subscription(s.types).subscribe(util.mergeArgs(subscribers)).handle(s.handlers);
+      this.subscription(s.types).subscribe(subscribers).handle(s.handlers);
     });
     return this;
   },
@@ -658,6 +663,13 @@ const util = {
     return this.group(...arguments);
   },
 
+  delegationBridge(event) {
+    const tc = this.tc(event.target, event.type);
+    if (tc) {
+      this.execute(tc.handlers)(event);
+    }
+  },
+
   /**
   *
   * Every call to subscription() creates a new instance to avoid an inconsistent state.
@@ -720,18 +732,6 @@ const util = {
         return this;
       },
 
-      attach(node, type, fn) {
-        if (!(node && typeof type === "string" && typeof fn === "function")) {
-          throw new Error("invalid arguments in attach() in call to attach");
-        }
-        const fns = Array.isArray(node[type + "Events"]) ? node[type + "Events"] : [];
-        if (!(fns.includes(fn))) {
-          fns.push(fn);
-          node.addEventListener(type, fn, false);
-        }
-        node[type + "Events"] = fns;
-      },
-
       // returns  false if a subscriber has already been queued for processing for the same handler
       // returns true if not queued, and puts the subscriber in queue.
       attachx(subscriber, handlers) {
@@ -787,10 +787,22 @@ const util = {
       delegationHandler() {
         this.types = this.delegated;
         this.types.forEach((type) => {
-          this.attach(document, type, this.delegate.bind(this));
+          this.attach(document, type, util.delegationBridge);
         });
         this.applyTc(this.subscribers.nodes, this.types, this.subscribers.name);
         return this;
+      },
+
+      attach(node, type, fn) {
+        if (!(node && typeof type === "string" && typeof fn === "function")) {
+          throw new Error("invalid arguments in attach() in call to attach");
+        }
+        const fns = Array.isArray(node[`${type}Events`]) ? node[`${type}Events`] : [];
+        if (!(fns.includes(fn))) {
+          fns.push(fn);
+          node.addEventListener(type, fn.bind(this), false);
+        }
+        node[`${type}Events`] = fns;
       },
 
       extrasHandler() {
@@ -823,6 +835,7 @@ const util = {
       },
 
       applyTc(nodes, types, handle) {
+        // console.log(nodes);
         nodes.forEach((node) => {
           types.forEach((type) => {
             let tc = node.tc || {}; // tc stands for type correspondence
@@ -961,8 +974,7 @@ const util = {
         let nodes = [];
         if (strArgs) {
           args.forEach((className) => {
-            const nodes = [].slice.call(document.getElementsByClassName(className));
-            nodes.push.apply(nodes, nodes);
+            nodes = [].slice.call(document.getElementsByClassName(className));
           });
         }
         if (objArgs) {

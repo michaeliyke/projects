@@ -53,8 +53,6 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
   *3 - create fresh change event instance and add a subscriber, and a handler
   *3 - create fresh click event instance and add a subscriber, and a handler
   */
-//  $(body).click(util.Subscriptions).keydown(util.HandlerKeyPress, $(document));
-  $("input[name='item'], input[name='value']").on("input", Calculator);
   
   
   
@@ -79,21 +77,18 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
   
   
   
-  const q = util.subscription("click"); // *1
-  q.subscribe("reset").handle(util.Clean); // *2
-  q.change($(".file-data input")).handle(util.uploadFileData); // *3
-  q.click("file-data").handle(util.processDataUpload); // *4
-  util.click(grab(".file-data input")).handle(e => {console.log(vars.fileOpenActive)});
-  
+    
   util.queue([
     {types: ["click"], subscribers: ["reset"], handlers: [util.Clean]},
     {types: ["click"], subscribers: ["file-data"], handlers: [util.processDataUpload]},
-    {types: ["click"], subscribers: ["data-upload"], handlers: [dataUploadInit] }
+    { types: ["click"], subscribers: ["data-upload"], handlers: [dataUploadInit] },
+    { types: ["change"], subscribers: [$(".file-data input")], handlers: [util.uploadFileData] },
+    { types: ["input"], subscribers: [$("input[name='item'], input[name='value']")], handlers: [Calculator]}
   ]);
-  
-  util.change().group([
-    { subscribers: ["data-upload"], handlers: [util.uploadFileData] }
-  ]);
+
+  util.defaults([
+    { type: "keyup", handlers: [util.HandlerKeyPress]}
+  ])
   
 /* DETERMIN THAT override is set correctly */
 
