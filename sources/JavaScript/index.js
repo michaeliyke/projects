@@ -18,6 +18,8 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
   }
 
   util.queue([
+    { types: ["click"], subscribers: ["to-pdf"], handlers: [util.ConvertToPDF] },
+    { types: ["click"], subscribers: ["del"], handlers: [util.del] },
     { types: ["click"], subscribers: ["reset"], handlers: [util.Clean] },
     { types: ["click"], subscribers: ["file-data"], handlers: [util.processDataUpload] },
     { types: ["click"], subscribers: ["data-upload"], handlers: [dataUploadInit, util.closeMgtTools] },

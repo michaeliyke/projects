@@ -75,6 +75,15 @@ click.queue(
       },
 
 
+      const row = util.createRow(
+        util.ucWord(item.value), amount.value || "",
+        {
+          means: data.means,
+          pos: it + 1,
+          prev: it
+        }
+      );
+
  // Add handling functions to current event - veriadic
       _handle: function handle(...handlers) {
         this.root.subscribers.forEach((subscriber) => {

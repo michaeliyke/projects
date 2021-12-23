@@ -101,8 +101,8 @@ const util = {
         util.ucWord(item.value), amount.value || "",
         {
           means: data.means,
-          pos: it + 1,
-          prev: it
+          prev: vars.pos++,
+          pos: vars.pos
         }
       );
       const table = grab("table tbody");
@@ -400,15 +400,55 @@ const util = {
     return ret;
   },
 
+  nextRowDown(row) {
+    if (row && row.nodeName == "TR") {
+      const siblings = [].slice.call(row.parentNode.children);
+      const index = siblings.indexOf(row);
+      const nexts = siblings.slice(index + 1);
+      for (const ch of nexts) {
+        if (ch && ch.nodeName == "TR") {
+          return ch;
+        }
+      }
+    }
+  },
+
+  siblingRowsDown(row) {
+    if (row && row.nodeName == "TR") {
+      const siblings = [].slice.call(row.parentNode.children);
+      const index = siblings.indexOf(row);
+      const nexts = siblings.slice(index + 1);
+      return nexts.filter(ch => ch && ch.nodeName == "TR");
+    }
+  },
+  siblingRowsUp(row) {
+    if (row && row.nodeName == "TR") {
+      const siblings = [].slice.call(row.parentNode.children);
+      const index = siblings.indexOf(row);
+      const prevs = siblings.slice(index - 1);
+      return prevs.filter(ch => ch && ch.nodeName == "TR");
+    }
+  },
+
+  nextRowUp(row) {
+    if (row && row.nodeName == "TR") {
+      const siblings = [].slice.call(row.parentNode.children);
+      const index = siblings.indexOf(row);
+      const prevs = siblings.slice(index - 1);
+      for (const ch of prevs.reverse()) {
+        if (ch && ch.nodeName == "TR") {
+          return ch;
+        }
+      }
+    }
+  },
+
   Foo(evnt) {
     const item = grab("#item"), amount = grab("#amount");
     if (!util.validate(item, amount)) {
       return;
     }
-    if (item && item.parentNode) {
-      util.setDataProps(item.parentNode)
-    }
-
+    util.setDataProps(vars.activeRow)
     // _techie.grab("table tbody").prependChild(createRow(input.value, amount.value));
     util.updateUI(item, amount);
   },
