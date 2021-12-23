@@ -362,10 +362,7 @@ const util = {
 
   // Key press events group handler
   HandlerKeyPress(event, obj) {
-    // obj - the target element say it's tabbing functionality targeted
-    [
-      util.HandleEnter, util.EscapeKeyHandler, util.MainEscapeKeyHandler
-    ].forEach(function (handler) {
+    [util.HandleEnter, util.MainEscapeKeyHandler].forEach(function (handler) {
       handler(event, obj);
     });
 
@@ -401,16 +398,6 @@ const util = {
       }
     });
     return ret;
-  },
-
-  EscapeKeyHandler(event, obj) {
-    if (event.keyCode == 27) { //escape key
-      util.DropdownMenus(event);
-      if (context && context.width && context.width > 0) {
-        util.closePane.call(context, event, EscapeKeyHandler, context);
-
-      }
-    }
   },
 
   Foo(evnt) {

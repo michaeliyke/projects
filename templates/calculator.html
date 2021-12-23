@@ -21,14 +21,14 @@
               <div id="mgt-tools" class="collapse mgt">
                 <div class="text-muted">Management tools</div>
                 <hr />
-                <div class="managed file-data" id="converting">
-                  Load from file
-                  <input class="data-upload" title="" type="file" accept="application/json,text/plain" multiple />
+                <div class="managed file-data">
+                  <label for="data-upload-input">Load from file</label>
+                  <input class="data-upload" type="file" accept="application/json,text/plain" multiple id="data-upload-input" />
                 </div>
-                <div class="managed converting" id="converting">convert to pdf</div>
-                <div class="managed disabled saving" id="saving">save as text</div>
-                <div class="managed disabled managing" id="managing">share</div>
-                <div class="managed printing" id="printing"> print</div>
+                <div class="managed converting">convert to pdf</div>
+                <div class="managed disabled saving">save as text</div>
+                <div class="managed disabled managing">share</div>
+                <div class="managed printing"> print</div>
               </div>
             </div>
             <div class="col-3 px-0">
@@ -59,7 +59,7 @@
             <input type="digit" name="value" id="amount" class="input col-5 col-sm-12 type amount"
               placeholder="value" />
           </div>
-          <div id="current" class="trigger col-12">
+          <div class="trigger col-12">
             <span id="currentItem">current value</span> <span>:</span> <span id="current"> 0.0</span>
           </div>
         </div>
@@ -68,10 +68,6 @@
             width="100%">
 
             <tbody>
-
-              <tr>
-                <td colspan="" rowspan="" headers=""></td>
-              </tr>
             </tbody>
           </table>
         </div>

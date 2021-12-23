@@ -1,32 +1,3 @@
-/*
-  About the Techie Library
-    Techie behaves like jQuery
-    - easy DOM travasal, 
-    - event management, 
-    - AJAX (Module still in building)
-    - effects and animation (Module still in buiding)
-    
-    However
-     Unlike jQuery Libraray:
-      - You are in control
-      - You do and run things your way
-      - You can do it procedural pattern or OO patter, choice is yours
-
-      $("div", function(div){ //When DOM is ready run the function
-        this.doStuff();
-            OR
-        this.doStuff(div);
-      });
-
-      $(function(){ //Run upon DOM ready
-        
-      });
-
-      $(document).ready(function(){ //Run upon DOM ready
-        
-      });
- */
-
 Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAll, a) {
 
   var context = null;
@@ -46,72 +17,20 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
     input.focus();
   }
 
-  /* 
-  NB:- calls to either .subscription() or an event type creates a new subscription instance
-  *1 - create a click subscrition instance
-  *2 - add a subscriber and a handler to above instance
-  *3 - create fresh change event instance and add a subscriber, and a handler
-  *3 - create fresh click event instance and add a subscriber, and a handler
-  */
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-    
   util.queue([
-    {types: ["click"], subscribers: ["reset"], handlers: [util.Clean]},
-    {types: ["click"], subscribers: ["file-data"], handlers: [util.processDataUpload]},
-    { types: ["click"], subscribers: ["data-upload"], handlers: [dataUploadInit] },
+    { types: ["click"], subscribers: ["reset"], handlers: [util.Clean] },
+    { types: ["click"], subscribers: ["file-data"], handlers: [util.processDataUpload] },
+    { types: ["click"], subscribers: ["data-upload"], handlers: [dataUploadInit, util.closeMgtTools] },
     { types: ["change"], subscribers: [$(".file-data input")], handlers: [util.uploadFileData] },
-    { types: ["input"], subscribers: [$("input[name='item'], input[name='value']")], handlers: [Calculator]}
+    { types: ["input"], subscribers: [$("input[name='item'], input[name='value']")], handlers: [Calculator] }
   ]);
 
   util.defaults([
-    { type: "keyup", handlers: [util.HandlerKeyPress]}
-  ])
-  
-/* DETERMIN THAT override is set correctly */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    { type: "keyup", handlers: [util.HandlerKeyPress] }
+  ]);
 
   function dataUploadInit(e) {
     console.log("Input file clicked");
-    e.preventDefault();
   }
 
   function Calculator(e) {
@@ -167,5 +86,5 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
       }, 500);
     }).catch((error) => console.log(error));
   }
-  
+
 });
