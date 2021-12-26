@@ -577,11 +577,7 @@ input {
   padding: 1em;
 }
 
-.del0 {
-  display: none;
-}
-
-.del1 {
+.delete {
   font-weight: bold;
   margin-top: 0.6em;
   position: absolute;
@@ -592,7 +588,7 @@ input {
   color: #f0e68b;
 }
 
-.del1:hover {
+.delete:hover {
   color: rgb(144, 138, 100);
   cursor: pointer;
 }

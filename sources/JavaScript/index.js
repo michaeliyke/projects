@@ -19,20 +19,23 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
 
   util.queue([
     { types: ["click"], subscribers: ["to-pdf"], handlers: [util.ConvertToPDF] },
-    { types: ["click"], subscribers: ["del"], handlers: [util.del] },
-    { types: ["click"], subscribers: ["reset"], handlers: [util.Clean] },
+    { types: ["click"], subscribers: ["reset"], handlers: [util.Clean, util.vars.resetVars] },
     { types: ["click"], subscribers: ["file-data"], handlers: [util.processDataUpload] },
-    { types: ["click"], subscribers: ["data-upload"], handlers: [dataUploadInit, util.closeMgtTools] },
+    { types: ["click"], subscribers: ["data-upload"], handlers: [util.closeMgtTools] },
     { types: ["change"], subscribers: [$(".file-data input")], handlers: [util.uploadFileData] },
     { types: ["input"], subscribers: [$("input[name='item'], input[name='value']")], handlers: [Calculator] }
   ]);
 
   util.defaults([
-    { type: "keyup", handlers: [util.HandlerKeyPress] }
+    { type: "keyup", handlers: [util.HandlerKeyPress] },
+    { type: "click", handlers: [util.deleteRow] }
   ]);
 
-  function dataUploadInit(e) {
-    console.log("Input file clicked");
+  function test(e) {
+    const t = e.target;
+    if (t.classList.contains("row-trash-can")) {
+      console.log("Input file clicked");
+    }
   }
 
   function Calculator(e) {

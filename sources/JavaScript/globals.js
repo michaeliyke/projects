@@ -11,7 +11,14 @@ const util = {
     fileOpenActive: false,
     tableData: [],
     pos: 0,
-    prev: 1,
+    resetVars() {
+      const {vars: v} = util;
+      v.activeRow = null;
+      v.Total = 0;
+      v.fileOpenActive = false;
+      v.tableData = [];
+      v.pos = 0;
+    },
     mobile_menu_open: {
       dumming: false
     }
@@ -179,24 +186,7 @@ const util = {
     section_lists[1].style.width = "14em";// "50%";
   },
 
-  mobile_menu_close() {
-    section.style.width = 0;
-  },
-
-  // Reset row props upwards
-  resetPropsUp(row) {
-    this.scanUpwards(row, (row) => {
-      console.log(row);
-      // console.log(row.getAttributeNames());
-    });
-    console.log("reset data called-------------------------");
-  },
-
-  scanUpwards(row, fn) {
-    fn(row);
-    row = row.previousSibling;
-    this.scanUpwards(row, fn);
-  },
+  
 
   // setup row props
   setDataProps(row) {
@@ -220,33 +210,6 @@ const util = {
       return //reset();
     }
     $("#total").text(`Total: ${vars.Total}`);
-  },
-
-  del(e, btn) {
-    if (confirm("Do you want to delete this row?")) {
-      new Promise(function (resolve) {
-        const row = $(e.target.parentNode);
-        const amountCell = $(grab.call(row, ".cell ~ .cell"));
-        // Negative number facilitates subtraction
-        var value = util.extractNumbers(`-${amountCell.text()}`);
-        const amount = grab("#amount");
-        const item = grab("#item");
-        amount.value = value;
-        amount.dataset.operation = "delete";
-        util.resetPropsUp(item.parentNode);
-        util.updateUI(item, amount);
-        row.hideFX();
-        setTimeout(function () {
-          row.remove();
-        }, 1000);
-        resolve(row);
-      }).then(function (row) {
-        console.log("Row deleted");
-        return row;
-      }).catch(function (error) {
-        console.error(error);
-      });
-    }
   },
 
   updateCount() {
@@ -273,24 +236,19 @@ const util = {
   },
 
   createRow(item, value, props) {
-    var number = -1, stack = [], str, row = document.createElement("tr");
-    while (++number < 2) {
-      str = `<td class="cell cell${number}" id=cell${number}></td> 
-        <span class="del del${number}" title='Remove record'>x</span>`;
-      stack.push(str);
-    }
-
-    // data-means=upload, create, download
-    // modified
-    row.dataset.means = "create";
+    var str = `<td class="cell cell0" id="cell0"></td> <td class="cell cell1" id="cell1"></td>
+        <span class="delete row-trash-can" title="Delete record">x</span>`;
+    var row = document.createElement("tr");
+    row.innerHTML = str;
+    row.querySelector("#cell0").textContent = util.ucWord(item);
+    row.querySelector("#cell1").textContent = value;
+    row.dataset.means = "create"; // data-means=upload, create, download, modified
     if (props) {
       Object.keys(props).forEach((prop) => {
         row.dataset[prop] = props[prop];
       });
     }
-    row.innerHTML = stack.join(" ");
-    row.querySelector("#cell0").textContent = util.ucWord(item);
-    row.querySelector("#cell1").textContent = value;
+    
     return row;
   },
 
@@ -413,20 +371,30 @@ const util = {
     }
   },
 
+  // Reset row props upwards
+  resetPropsUp(row) {
+    vars.pos = row.dataset.pos - 1;
+    (this.siblingRowsUp(row) || []).forEach((r) => {
+      r.dataset.prev = vars.pos++;
+      r.dataset.pos = vars.pos;
+    });
+    return this;
+  },
+
   siblingRowsDown(row) {
     if (row && row.nodeName == "TR") {
       const siblings = [].slice.call(row.parentNode.children);
       const index = siblings.indexOf(row);
       const nexts = siblings.slice(index + 1);
-      return nexts.filter(ch => ch && ch.nodeName == "TR");
+      return nexts.filter(ch => ch && ch.nodeName == "TR").sort((a, b) => b.dataset.pos - a.dataset.pos);
     }
   },
   siblingRowsUp(row) {
     if (row && row.nodeName == "TR") {
       const siblings = [].slice.call(row.parentNode.children);
       const index = siblings.indexOf(row);
-      const prevs = siblings.slice(index - 1);
-      return prevs.filter(ch => ch && ch.nodeName == "TR");
+      const prevs = siblings.slice(0, index);
+      return prevs.filter(ch => ch && ch.nodeName == "TR").sort((a, b) => a.dataset.pos - b.dataset.pos);
     }
   },
 
@@ -440,6 +408,37 @@ const util = {
           return ch;
         }
       }
+    }
+  },
+  
+  deleteRow(e) {
+    const t = e.target;
+    if (!(t && t.classList.contains("row-trash-can"))) {
+      return
+    }
+    if (confirm("Do you want to delete this row?")) {
+      new Promise(function (resolve) {
+        const row = $(t.parentNode);
+        const amountCell = $(grab.call(row, ".cell ~ .cell"));
+        // Negative number facilitates subtraction
+        var value = util.extractNumbers(`-${amountCell.text()}`);
+        const amount = grab("#amount");
+        const item = grab("#item");
+        amount.value = value;
+        amount.dataset.operation = "delete";
+        util.resetPropsUp(t.parentNode);
+        util.updateUI(item, amount);
+        row.hideFX();
+        setTimeout(function () {
+          row.remove();
+        }, 1000);
+        resolve(row);
+      }).then(function (row) {
+        console.log("Row deleted");
+        return row;
+      }).catch(function (error) {
+        console.error(error);
+      });
     }
   },
 
