@@ -223,7 +223,6 @@ const util = {
     item.placeholder = "New item";
     amount.placeholder = "New vlaue";
     item.focus();
-    vars.Total = 0;
     total.textContent = "Total: 0";
     $("table tbody").empty();
   },
