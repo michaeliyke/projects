@@ -1,4 +1,3 @@
-let $ = Techie;
 const grab = document.querySelector.bind(document); // Picks first match
 const grabAll = document.querySelectorAll.bind(document); // Picks all maches
 
@@ -427,7 +426,7 @@ const util = {
         amount.dataset.operation = "delete";
         util.resetPropsUp(t.parentNode);
         util.updateUI(item, amount);
-        row.hideFX();
+        row.hide(700);
         setTimeout(function () {
           row.remove();
         }, 1000);

@@ -1,16 +1,8 @@
-Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAll, a) {
-
-  var context = null;
+jQuery(function ($) {
 
   const { vars } = util;
 
-  var d = document, getId = this.Id, v1 = "Next item", v2 = '0.00';
-  var amount = getId("amount"), total = getId("total"), submit = getId("submit");
-  var input = getId("item"), reset = getId("reset"), currentV = $("#current > #current");
-  var manage = getId("managing");
-  var printing = getId("printing"), saving = getId("saving"), _techie = this;
-  // var  table = getId("table"), mobile_menu = getByClass("open-off-canvass");
-  // var section_lists = query("header section nav ul");
+  var input = grab("#item");
 
   // Get all data
   if (input) {
@@ -30,13 +22,6 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
     { type: "keyup", handlers: [util.HandlerKeyPress] },
     { type: "click", handlers: [util.deleteRow] }
   ]);
-
-  function test(e) {
-    const t = e.target;
-    if (t.classList.contains("row-trash-can")) {
-      console.log("Input file clicked");
-    }
-  }
 
   function Calculator(e) {
     const input = e.target;
@@ -75,21 +60,5 @@ Techie(function ($, body, head, document, _, global, Log, stringify, stringifyAl
     vars.activeRow = null;
   }
 
-  function init() {
-    obj = {
-      "#menu-container": ["hide-view", "show-view"],
-      "#menus": ["hide-view", "show-view"],
-      "#body-cover": ["body-cover"],
-      ".wrapper": ["wrapper-show"],
-      "body": ["fix"]
-    };
-    new Promise(function foo(resolve, reject) {
-      resolve(util.toggleClass(obj));
-    }).then(function bar(obj) {
-      setTimeout(function () {
-        util.toggleClass({ ".menu": ["menu-tile"] });
-      }, 500);
-    }).catch((error) => console.log(error));
-  }
 
 });

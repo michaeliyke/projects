@@ -1,5 +1,5 @@
 /* jshint -W107 */
-Techie(function ($, body, head, d, _, w, Log, stringify, stringifyAll, a) {
+jQuery(function ($) {
 const log = console.log;
 
 
@@ -63,8 +63,7 @@ const log = console.log;
   }
   
 const route = getRoute();
-  $("body").getByAttribute("route").eachElement((element) => {
-    console.log(element);
+  $("[route]").each((_, element) => {
     if (element.getAttribute("route") == route) {
       element.classList.add("active");
       element.setAttribute("href", "JavaScript:void(0)");
