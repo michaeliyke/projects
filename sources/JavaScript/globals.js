@@ -236,7 +236,7 @@ const util = {
 
   createRow(item, value, props) {
     var str = `<td class="cell cell0" id="cell0"></td> <td class="cell cell1" id="cell1"></td>
-        <span class="delete row-trash-can" title="Delete record">x</span>`;
+        <span class="delete row-trash-can fas fa-trash" title="Delete record"></span>`;
     var row = document.createElement("tr");
     row.innerHTML = str;
     row.querySelector("#cell0").textContent = util.ucWord(item);

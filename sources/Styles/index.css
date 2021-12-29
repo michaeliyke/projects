@@ -1,4 +1,5 @@
 @import url("index.layout.css");
+
 .app-container {
   margin-top: 2.5rem;
 }
@@ -577,6 +578,10 @@ input {
   padding: 1em;
 }
 
+#resultsPane tr:hover .delete {
+  opacity: 1;
+}
+
 .delete {
   font-weight: bold;
   margin-top: 0.6em;
@@ -585,11 +590,13 @@ input {
   text-align: center;
   width: 1em;
   cursor: pointer;
-  color: #f0e68b;
+  opacity: 0;
+  color: rgb(144, 138, 100);
+  cursor: pointer;
 }
 
 .delete:hover {
-  color: rgb(144, 138, 100);
+  color: rgba(195, 8, 108, 0.671);
   cursor: pointer;
 }
 
