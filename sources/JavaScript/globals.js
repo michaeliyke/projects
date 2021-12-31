@@ -173,20 +173,6 @@ const util = {
     }
   },
 
-  mobile_menu_open() {
-    if (mobile_menu_open.dumming) {
-      mobile_menu_open.dumming = false;
-      section_lists[0].style.width = 0;
-      section_lists[1].style.width = 0;
-      return
-    }
-    mobile_menu_open.dumming = true;
-    section_lists[0].style.width = "14em";// "50%";
-    section_lists[1].style.width = "14em";// "50%";
-  },
-
-  
-
   // setup row props
   setDataProps(row) {
     const { vars } = util;
@@ -259,54 +245,6 @@ const util = {
     return JSON.stringify(data);
   },
 
-  getByClass(name, index) {
-    if (arguments.length > 1 && +index != index) {
-      return console.error(`Ensure ${index} is an integer number.`);
-    }
-    return typeof index === "number" ? query(`.${name}`, index) : query(name);
-  },
-
-  query(selector, index) {
-    if (arguments.length > 1 && +index != index) {
-      return console.error(`Ensure ${index} is an integer number.`);
-    }
-    list = [].slice.call(document.querySelectorAll(selector));
-    return typeof index === "number" ? list[index] : list;
-  },
-
-  DropdownMenus(e, target) {
-    if (target && target.nodeType == 1 && target.classList.contains("toggle-sign")) {
-      parent = traverseUp(target, (e) => e.querySelector(".drop-down-menu") != null);
-      dropdown = parent.querySelector(".drop-down-menu");
-      Techie.dropdownTarget = dropdown;
-      toggleDropdown(dropdown, "show-block", target);
-      return
-    }
-    this.toggleDropdown(Techie.dropdownTarget, "show-block");
-  },
-
-  traverseUp(e, test) {
-    if (e && e.tagName != "BODY") {
-      return test(e) ? e : traverseUp(e.parentNode, test);
-    }
-    return null;
-  },
-
-  toggleDropdown(element, name, eventTarget) {
-    if (!element) {
-      return
-    }
-    if (!(eventTarget && eventTarget.classList.contains("toggle-sign"))) {
-      element.classList.remove(name);
-      return
-    }
-    if (element.classList.contains(name)) {
-      element.classList.remove(name);
-    } else {
-      element.classList.add(name);
-    }
-  },
-
   validate(item, amount) {
     var test = /^((\w*|\W*)*[\w\s-]*)+$/.test(item.value.trim());
     if (!(test && amount.value.trim())) {
@@ -316,44 +254,11 @@ const util = {
     return true
   },
 
-  // Key press events group handler
-  HandlerKeyPress(event, obj) {
-    [util.HandleEnter, util.MainEscapeKeyHandler].forEach(function (handler) {
-      handler(event, obj);
-    });
-
-  },
-
-  MainEscapeKeyHandler() {
-    if (document.body.classList.contains("fix")) {
-      util.init();
-    }
-  },
-
   // PDF plug
   ConvertToPDF() {
     if (util.added()) {
       util.printsBlob();
     }
-  },
-
-  toggleChange(e) {
-
-    var target = util.getTarget(e);
-
-    $(target.classList.contains("swap") ? target.parentNode : target, function (k) {
-      util.toggleClass("unchanged", "changed");
-    });
-  },
-
-  added() {
-    var ret = false;
-    $("td").once(function () {
-      if (this.text()) {
-        ret = true;
-      }
-    });
-    return ret;
   },
 
   nextRowDown(row) {
@@ -440,13 +345,12 @@ const util = {
     }
   },
 
-  Foo(evnt) {
+  Foo() {
     const item = grab("#item"), amount = grab("#amount");
     if (!util.validate(item, amount)) {
       return;
     }
     util.setDataProps(vars.activeRow)
-    // _techie.grab("table tbody").prependChild(createRow(input.value, amount.value));
     util.updateUI(item, amount);
   },
 
@@ -470,61 +374,6 @@ const util = {
     }, margins);
   },
 
-  toggleClass(object) { //toggle({"div": ["red", "blue"]})
-    var selector;
-    for (selector in object) {
-      if (selector && object.hasOwnProperty(selector) && Array.isArray(object[selector])) {
-        var current = object[selector][0], replacement = object[selector][1];
-        if (typeof current !== "string" && typeof replacement !== "string") {
-          return
-        }
-        $(selector).toggleClass(current, replacement);
-      }
-    }
-  },
-
-  CloseHandler(event, dom, techie) {
-    if (event) {
-      return true;
-    }
-    // ATTENTION: re-write this place using lass detection instead.
-    // ATTENTION: Use of id detection is hereby discontinued!
-    var target = event.getTarget;
-    if ((target.id == "equiv" || target.id == "manage") || (target.id == "equiv" || target.parentNode.id == "manage")) {
-      return false;
-    }
-    switch (target.id) {
-      case "main":
-      // case "nav":
-      case "header":
-      case "project":
-      case "project-body":
-      case "trigger":
-      case "inputs":
-      case "input":
-        if (util.pane) {
-          util.closePane.call(this, event, CloseHandler, this);
-          util.type_ = "click";
-        }
-        break
-      default:
-      // console.info("Delegation no match! id -", target.id);
-    }
-  },
-
-  closePane(event, handler, pane) {
-    util.pane.css({
-      "width": "0px", opacity: 0
-    });
-    $("#equiv").html("&#9776;"/*"&#9776;"*/);
-    width = 0;
-    if (context) {
-      context.width = 0;
-    }
-    util.pane = null;
-    context = null;
-  },
-
   HandleEnter(evnt) {
     if (evnt.keyCode == 13) {
       util.Foo.call(null, evnt);
@@ -539,28 +388,6 @@ const util = {
     grabAll(".mgt.show").forEach((e) => {
       e.classList.remove("show");
     });
-  },
-
-  ActionsMenuToggle(event, dom, techie) {
-    var width, pane;
-    $("#manage").toggleClass(function () {
-      pane = this;
-      context = this;
-      this.pane = this;
-      width = this.computedStyle().width.replace(/[A-z]+/i, "");
-      context.width = width;
-      if (context.width == 0) {
-        this.css({
-          border: "0.01em solid",
-          width: "250px", opacity: 1
-        }); /*#equiv  &#9661;*/
-        $("#equiv").html("&#120169;");
-        context.width = 250;
-      } else {
-        util.closePane.call(this, event, util.ActionsMenuToggle, this);
-      }
-    });
-    util.pane = pane;
   },
 
   isNode(object) {

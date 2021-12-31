@@ -19,7 +19,7 @@ jQuery(function ($) {
   ]);
 
   util.defaults([
-    { type: "keyup", handlers: [util.HandlerKeyPress] },
+    { type: "keyup", handlers: [util.HandleEnter] },
     { type: "click", handlers: [util.deleteRow] }
   ]);
 
