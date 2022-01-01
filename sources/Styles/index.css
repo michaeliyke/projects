@@ -582,6 +582,13 @@ input {
   opacity: 1;
 }
 
+tr div.row-actions a {
+  color: black;
+  display: inline-block;
+  background: #ebebeb;
+  padding: 1em;
+}
+
 .delete {
   font-weight: bold;
   margin-top: 0.6em;
@@ -590,7 +597,7 @@ input {
   text-align: center;
   width: 1em;
   cursor: pointer;
-  opacity: 0;
+  /* opacity: 0; */
   color: rgb(144, 138, 100);
   cursor: pointer;
 }

@@ -220,12 +220,20 @@ const util = {
   },
 
   createRow(item, value, props) {
-    var str = `<td class="cell cell0" id="cell0"></td> <td class="cell cell1" id="cell1"></td>
-        <span class="delete row-trash-can fas fa-trash" title="Delete record"></span>`;
+    var str = `<td class="cell cell0" id="cell0">${util.ucWord(item)}</td>
+        <td class="cell cell1" id="cell1">${value}</td>
+         <div class="row-actions" aria-role="row actions">
+          <a href="JavaScript:void(0)" aria-label="Delete row">
+            <i class="delete trash fas fa-trash" aria-hidden="true"></i>
+          </a>
+          <a href="JavaScript:void(0)" aria-label="Edit row" class="mx-4">
+            <i class="delete edit fas fa-pencil-alt" aria-hidden="true"></i>
+          </a>
+        </div>`;
     var row = document.createElement("tr");
     row.innerHTML = str;
-    row.querySelector("#cell0").textContent = util.ucWord(item);
-    row.querySelector("#cell1").textContent = value;
+    // row.querySelector("#cell0").textContent = util.ucWord(item);
+    // row.querySelector("#cell1").textContent = value;
     row.dataset.means = "create"; // data-means=upload, create, download, modified
     if (props) {
       Object.keys(props).forEach((prop) => {
