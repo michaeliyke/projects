@@ -574,36 +574,36 @@ input {
 }
 
 .cell {
-  border: 1px solid #fff;
+  border: 1px outset #ffffff4d !important;
   padding: 1em;
+}
+
+#resultsPane tr.row {
+  display: table-row;
 }
 
 #resultsPane tr:hover .delete {
   opacity: 1;
 }
 
-tr div.row-actions a {
-  color: black;
+tr div.row-actions {
   display: inline-block;
-  background: #ebebeb;
-  padding: 1em;
+}
+
+tr div.row-actions a {
+  display: inline-block;
 }
 
 .delete {
-  font-weight: bold;
   margin-top: 0.6em;
-  position: absolute;
-  right: 12%;
   text-align: center;
-  width: 1em;
-  cursor: pointer;
-  /* opacity: 0; */
+  opacity: 0;
   color: rgb(144, 138, 100);
   cursor: pointer;
 }
 
 .delete:hover {
-  color: rgba(195, 8, 108, 0.671);
+  color: rgb(160, 148, 154);
   cursor: pointer;
 }
 
@@ -611,11 +611,10 @@ div#resultsPane {
   background-color: #E1C3A6;
 }
 
-table {
-  width: 85%;
-  margin: 0 auto;
+#resultsPane table {
+  border-spacing: 1.2rem 1rem;
   border: none;
-  border-top: 1px solid #fff;
+  border-collapse: separate;
 }
 
 footer {
