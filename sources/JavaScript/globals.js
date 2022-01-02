@@ -1,19 +1,9 @@
-const getByClass = function getByClass(className) {
-  return getAllByClass.call(this, className)[0];
-}.bind(document);
-
-const getAllByClass = function getAllByClass(className) {
-  return this.getElementsByClassName(className);
-}.bind(document);
-
 const grab = document.querySelector.bind(document); // Picks first match
 const grabAll = document.querySelectorAll.bind(document); // Picks all maches
 
 const util = {
   grab,
   grabAll,
-  getByClass,
-  getAllByClass,
   vars: {
     Total: 0,
     activeRow: null,
@@ -39,9 +29,6 @@ const util = {
       v.fileOpenActive = false;
       v.tableData = [];
       v.pos = 0;
-    },
-    mobile_menu_open: {
-      dumming: false
     }
   },
 
@@ -124,11 +111,9 @@ const util = {
     vars.tableData.forEach((data, it) => {
       const item = grab("#item"), amount = grab("#amount");
       item.value = data.item;
-      amount.value = data.value
+      amount.value = data.value;
       util.addRow(item, amount, {
-        means: data.means,
-        prev: vars.pos++,
-        pos: vars.pos
+        means: data.means
       });
     });
   },
@@ -255,7 +240,6 @@ const util = {
         row.dataset[prop] = props[prop];
       });
     }
-
     return row;
   },
 
@@ -373,11 +357,11 @@ const util = {
     const table = grab("table tbody");
     table.insertBefore(row, table.firstChild);
     vars.setActive();
-    return this;
+    return row;
   },
-
+  
   addRow(item, amount, props) {
-    insertFirstRow(item, amount, props);
+    util.setDataProps(util.insertFirstRow(item, amount, props));
     util.updateUI(item, amount);
     return this;
   },
@@ -390,16 +374,8 @@ const util = {
     if (!util.validate(item, amount)) {
       return;
     }
-
-    util.setDataProps(vars.activeRow)
-    // vars.removeActive();
-    util.addRow(
-      item, amount,
-      {
-        prev: vars.pos++,
-        pos: vars.pos
-      }
-    );
+    vars.removeActive();
+    util.addRow(item, amount);
   },
 
   calculate(event) {
