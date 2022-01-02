@@ -1,17 +1,39 @@
+const getByClass = function getByClass(className) {
+  return getAllByClass.call(this, className)[0];
+}.bind(document);
+
+const getAllByClass = function getAllByClass(className) {
+  return this.getElementsByClassName(className);
+}.bind(document);
+
 const grab = document.querySelector.bind(document); // Picks first match
 const grabAll = document.querySelectorAll.bind(document); // Picks all maches
 
 const util = {
   grab,
   grabAll,
+  getByClass,
+  getAllByClass,
   vars: {
     Total: 0,
     activeRow: null,
     fileOpenActive: false,
     tableData: [],
     pos: 0,
+    setActive() {
+      vars.activeRow = grab("table tr");
+    },
+    removeActive() {
+      if (vars.activeRow) {
+        vars.activeRow.parentNode.removeChild(vars.activeRow);
+        vars.unsetActive();
+      }
+    },
+    unsetActive() {
+      vars.activeRow = null;
+    },
     resetVars() {
-      const {vars: v} = util;
+      const { vars: v } = util;
       v.activeRow = null;
       v.Total = 0;
       v.fileOpenActive = false;
@@ -103,18 +125,11 @@ const util = {
       const item = grab("#item"), amount = grab("#amount");
       item.value = data.item;
       amount.value = data.value
-      const row = util.createRow(
-        util.ucWord(item.value), amount.value || "",
-        {
-          means: data.means,
-          prev: vars.pos++,
-          pos: vars.pos
-        }
-      );
-      const table = grab("table tbody");
-      table.insertBefore(row, table.firstChild);
-      vars.activeRow = grab.call(table, "tr");
-      util.updateUI(item, amount);
+      util.addRow(item, amount, {
+        means: data.means,
+        prev: vars.pos++,
+        pos: vars.pos
+      });
     });
   },
 
@@ -186,11 +201,11 @@ const util = {
       amount.dataset.operation = "";
       vars.Total -= util.extractNumbers(amount.value);
     } else {
-      vars.Total += util.extractNumbers(amount.value);
+      vars.Total += util.extractNumbers(amount.value || "");
     }
     item.value = amount.value = "";
     item.focus();
-    vars.activeRow = null;
+    vars.unsetActive();
     if (isNaN(vars.Total)) {
       return //reset();
     }
@@ -220,9 +235,9 @@ const util = {
   },
 
   createRow(item, value, props) {
-    var str = `<td class="cell col-8 cell0 px-4" id="cell0">${util.ucWord(item)}</td>
-        <td class="cell cell1 col-4 px-4" id="cell1">${value}
-         <div class="row-actions" aria-role="row actions">
+    var str = `<td class="cell cell-0 col-8 px-4">${util.ucWord(item)}</td>
+        <td class="cell cell-1 col-4 px-4">${value}
+         <div class="row-actions" aria-role="row-actions">
          <a href="JavaScript:void(0)" aria-label="Edit row" class="mx-4">
          <i class="delete edit fas fa-pencil-alt" aria-hidden="true"></i>
          </a>
@@ -230,7 +245,7 @@ const util = {
          <i class="delete trash fas fa-trash" aria-hidden="true"></i>
          </a>
          </div></td>`;
-         
+
     var row = document.createElement("tr");
     row.innerHTML = str;
     row.className = "row";
@@ -240,7 +255,7 @@ const util = {
         row.dataset[prop] = props[prop];
       });
     }
-    
+
     return row;
   },
 
@@ -321,7 +336,7 @@ const util = {
       }
     }
   },
-  
+
   deleteRow(e) {
     const t = e.target;
     if (!(t && t.classList.contains("row-trash-can"))) {
@@ -353,13 +368,68 @@ const util = {
     }
   },
 
-  Foo() {
+  insertFirstRow(item, amount, props) {
+    const row = util.createRow(item.value, amount.value, props);
+    const table = grab("table tbody");
+    table.insertBefore(row, table.firstChild);
+    vars.setActive();
+    return this;
+  },
+
+  addRow(item, amount, props) {
+    insertFirstRow(item, amount, props);
+    util.updateUI(item, amount);
+    return this;
+  },
+
+  HandleEnter(event) {
+    if (event.keyCode != 13) {
+      return;
+    }
     const item = grab("#item"), amount = grab("#amount");
     if (!util.validate(item, amount)) {
       return;
     }
+
     util.setDataProps(vars.activeRow)
-    util.updateUI(item, amount);
+    // vars.removeActive();
+    util.addRow(
+      item, amount,
+      {
+        prev: vars.pos++,
+        pos: vars.pos
+      }
+    );
+  },
+
+  calculate(event) {
+    const input = event.target, value = "";
+    if (input.value.trim().length > 0 && !vars.activeRow) {
+      util.insertFirstRow({ value }, { value }); // Add a row for the first add
+    }
+    if (!vars.activeRow) {
+      return
+    }
+    const itemInput = grab("#item"), valueInput = grab("#amount");
+    const grab_ = grab.bind(vars.activeRow.parentNode);
+    const itemCell = grab_(".cell-0"), valueCell = grab_(".cell-1");
+    // fill row text
+    if (input.id == "item") {
+      itemCell.textContent = util.ucWord(input.value);
+      if (valueInput.value.trim() || itemInput.value.trim()) {
+        return;
+      }
+    }
+    if (input.id == "amount") {
+      valueCell.textContent = input.value;
+      if (valueInput.value.trim() == "") {
+        itemInput.focus();
+      }
+      if (valueInput.value.trim() || itemInput.value.trim()) {
+        return;
+      }
+    }
+    vars.removeActive(); // remove row if value is empty
   },
 
   extractNumbers(string) {
@@ -380,12 +450,6 @@ const util = {
       var d = new Date(), t = d.getTime();
       pdf.save((d + "" + t).replace(/[A-z\s\W]/gi, "") + '.pdf');
     }, margins);
-  },
-
-  HandleEnter(evnt) {
-    if (evnt.keyCode == 13) {
-      util.Foo.call(null, evnt);
-    }
   },
 
   closeMgtTools() {
@@ -670,7 +734,7 @@ const util = {
           if (info.token == "key") { // If it's a keyboard event
             this.attach(document, "keyup", (event) => {
               if (event.keyCode == info.code) {
-              this.execute(this.handlers[type])(event);
+                this.execute(this.handlers[type])(event);
               }
             });
           }
@@ -807,7 +871,7 @@ const util = {
         }
         this.handled = true;
         this.root.addHandle();
-        this.root.addHandlers(fns); 
+        this.root.addHandlers(fns);
         this.root.handle(this);
         return this;
       },
@@ -883,7 +947,7 @@ const util = {
       tab: { code: 9, token: "key" }, capslock: { code: 20, token: "key" }, shiftkey: { code: 16, token: "key" },
       ctrl: { code: 17, token: "key" }, alt: { code: 18, token: "key" }, backspace: { code: 8, token: "key" },
       del: { code: 46, token: "key" },
-      hover: {token: "mouse", code: "mousemove"}
+      hover: { token: "mouse", code: "mousemove" }
     },
 
     aliases: {
@@ -971,7 +1035,7 @@ const util = {
         });
         const isDelegatable = delegated.length == events.length && !!(events[0]);
         const extras = events.filter(event => util.extras.includes(event));
-        const isMixed = (function(unDel, del, ext){
+        const isMixed = (function (unDel, del, ext) {
           // have both d & u or have e but u is larger in number
           return !!((unDel[0] && del[0]) || (ext[0] && unDel.length > ext.length));
         }(unDelegated, delegated, extras));

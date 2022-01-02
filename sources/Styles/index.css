@@ -569,7 +569,7 @@ input {
   outline: none;
 }
 
-#cell0 {
+.cell-0 {
   text-align: left;
 }
 
