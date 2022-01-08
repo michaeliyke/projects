@@ -49,7 +49,7 @@ const util = {
      * @param {string} amountText The text for the dummy amount input
      * @returns {object[]} Item and amount
      */
-    generateInputs(itemText, amountText) {
+    genInputs(itemText, amountText) {
       const item = document.createElement("input");
       const amount = document.createElement("input");
       item.value = itemText;
@@ -481,32 +481,17 @@ const util = {
 
   /**
    * Deletes a row for the list, rebuilds the table data settings, and updates the counters
-   * @param {object} row The table row element o delete from the DOM
+   * @param {object} r The table row element o delete from the DOM
    */
-  deleteRow(row) {
+  deleteRow(r) {
     if (confirm("Do you want to delete this row?")) {
-      new Promise(function (resolve) {
-        const rowObject = $(row);
-        const valueCell = $(grab.call(rowObject, ".cell ~ .cell"));
-        // Negative number facilitates subtraction
-        var value = util.extractNumbers(`-${valueCell.text()}`);
-        const valueInput = grab("#amount");
-        const itemInput = grab("#item");
-        valueInput.value = value;
-        valueInput.dataset.operation = "decrement";
-        util.resetPropsUp(row);
-        util.updateUI(itemInput, valueInput);
-        rowObject.hide(700);
-        setTimeout(function () {
-          rowObject.remove();
-        }, 1000);
-        resolve(rowObject);
-      }).then(function (rowObject) {
-        console.log("Row deleted");
-        return rowObject;
-      }).catch(function (error) {
-        console.error(error);
-      });
+      const value = grab.call(r, ".cell ~ .cell");
+      const [item, amount] = vars.genInputs("", value.textContent);
+      amount.dataset.operation = "decrement";
+      util.resetPropsUp(r);
+      util.updateUI(item, amount);
+      $(r).hide(700).remove();
+      console.log("Row deleted");
     }
   },
 
@@ -607,7 +592,7 @@ const util = {
     const body = util.getPreviousSibling(button.parentNode, "div"); // modal-body
     const [modalItem, modalAmount] = $(body).find("input");
     const [item, amount] = edit.find("td");
-    const [dummyItem, dummyAmount] = vars.generateInputs(
+    const [dummyItem, dummyAmount] = vars.genInputs(
       item.firstChild.textContent, amount.firstChild.textContent
       );
     item.textContent = modalItem.value;
