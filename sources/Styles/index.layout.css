@@ -58,6 +58,9 @@ div#main-heading {
   html {
     font-size: 62.5%;
   }
+  .modal-dialog {
+    margin: 2.8rem auto;
+  }
 }
 
 @media (min-width: 768px) {

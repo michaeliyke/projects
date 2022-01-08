@@ -582,7 +582,7 @@ input {
   display: table-row;
 }
 
-#resultsPane tr:hover .delete {
+#resultsPane tr:hover .row-actions {
   opacity: 1;
 }
 
@@ -594,15 +594,18 @@ tr div.row-actions a {
   display: inline-block;
 }
 
-.delete {
+.row-actions {
   margin-top: 0.6em;
   text-align: center;
   opacity: 0;
-  color: rgb(144, 138, 100);
-  cursor: pointer;
 }
 
-.delete:hover {
+.row-action {
+  cursor: pointer;
+  color: rgb(144, 138, 100);
+}
+
+.row-action:hover {
   color: rgb(160, 148, 154);
   cursor: pointer;
 }
@@ -698,4 +701,72 @@ footer a:hover {
   outline: none;
   text-indent: -999em;
   opacity: 0;
+}
+
+.modal-header {
+  padding: 1.6rem;
+  border-bottom-right-radius: calc(0.48rem - 1px);
+  border-bottom-left-radius: calc(0.48rem - 1px);
+}
+
+.modal-title {
+  font-size: 2rem;
+  text-align: center;
+  flex-basis: 100%;
+}
+
+.modal-header .close {
+  padding: 1.6rem;
+  margin: -1.6rem -1.6rem -1.6rem auto;
+  font-size: 2.4rem;
+}
+
+.modal-body {
+  padding: 1.6rem;
+}
+
+.modal-body p {
+  margin-bottom: 1.6rem;
+}
+
+.modal-dialog {
+  margin: 0.8rem auto;
+}
+
+.modal-content {
+  border-radius: .48rem;
+  color: #637995;
+}
+
+.modal-footer {
+  padding: 1.2rem;
+  border-bottom-right-radius: calc(0.48rem - 1px);
+  border-bottom-left-radius: calc(0.48rem - 1px);
+}
+
+.modal-footer>* {
+  margin: 0.4rem;
+}
+
+.modal-footer .btn {
+  font-size: 1.6rem;
+  border-radius: 0.4rem;
+  padding: 0.6rem 1.2rem;
+  color: #667b97;
+}
+
+.modal-footer .btn:hover {
+  text-decoration: none;
+}
+
+.modal-footer .btn[data-dismiss] {
+  color: #a4b1c1;
+}
+
+.modal-body input {
+  border: 0.1rem outset rgba(122, 172, 218, 0.2);
+  padding-left: 1.5rem;
+  color: rgba(102, 123, 151, 0.7);
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-weight: normal;
 }

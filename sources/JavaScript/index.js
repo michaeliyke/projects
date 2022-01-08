@@ -8,6 +8,7 @@ jQuery(function ($) {
   }
 
   util.queue([
+    { types: ["click"], subscribers: ["modal-yes"], handlers: [util.editRow] },
     { types: ["click"], subscribers: ["to-pdf"], handlers: [util.ConvertToPDF] },
     { types: ["click"], subscribers: ["reset"], handlers: [util.Clean, util.vars.resetVars] },
     { types: ["click"], subscribers: ["file-data"], handlers: [util.processDataUpload] },
@@ -18,7 +19,7 @@ jQuery(function ($) {
 
   util.defaults([
     { type: "keyup", handlers: [util.HandleEnter] },
-    { type: "click", handlers: [util.deleteRow] }
+    { type: "click", handlers: [util.rowActions] }
   ]);
 
 });

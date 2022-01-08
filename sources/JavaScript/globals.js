@@ -1,27 +1,93 @@
 const grab = document.querySelector.bind(document); // Picks first match
-const grabAll = document.querySelectorAll.bind(document); // Picks all maches
+
+const grabAll = function grabAll(selector) {
+  return [].slice.call(document.querySelectorAll.call(this, selector));
+}.bind(document);
+
+const byClass = function getElementsByClassName(className) {
+  return [].slice.call(document.getElementsByClassName.call(this, className));
+}.bind(document);
 
 const util = {
   grab,
   grabAll,
+  byClass,
   vars: {
     Total: 0,
     activeRow: null,
     fileOpenActive: false,
     tableData: [],
     pos: 0,
+    
+    /**
+     * Increments the value of budget calculator total
+     * @param {object} amount HTML input element object
+     */
+    increment(amount) {
+      const n = util.extractNumbers(amount.value); // extracts the first leading integer value
+      vars.Total += n;
+    },
+
+    /**
+     * Decrements the value of budget calculator total
+     * @param {object} amount HTML input element object
+     */
+    decrement(amount) {
+      if (amount.dataset.operation == "decrement") {
+        amount.dataset.operation = "";
+      }
+      const n = util.extractNumbers(amount.value);
+      vars.Total -= n;
+      if (vars.Total < 1) {
+        vars.Total = 0;
+      }
+    },
+
+    /**
+     * Creates an two input fields for item and amount respectively
+     * @param {string} itemText The text for the dummy item input
+     * @param {string} amountText The text for the dummy amount input
+     * @returns {object[]} Item and amount
+     */
+    generateInputs(itemText, amountText) {
+      const item = document.createElement("input");
+      const amount = document.createElement("input");
+      item.value = itemText;
+      amount.value = amountText;
+      return [item, amount];
+    },
+    
+    /**
+     * vars settings method
+     * @returns {object} util
+     */
     setActive() {
       vars.activeRow = grab("table tr");
+      return util;
     },
+    /**
+     * vars settings method
+     * @returns {object} util
+     */
     removeActive() {
       if (vars.activeRow) {
         vars.activeRow.parentNode.removeChild(vars.activeRow);
         vars.unsetActive();
       }
+      return util;
     },
+    /**
+     * vars settings method
+     * @returns {object}  util
+     */
     unsetActive() {
       vars.activeRow = null;
+      return util;
     },
+    /**
+     * vars settings method
+     * @returns {object} util
+     */
     resetVars() {
       const { vars: v } = util;
       v.activeRow = null;
@@ -29,13 +95,18 @@ const util = {
       v.fileOpenActive = false;
       v.tableData = [];
       v.pos = 0;
+      return util;
     }
   },
 
-  // Create Table data from disc uploads - application/json, text/plain
+  /**
+   * Create Table data from disc uploads - application/json, text/plain
+   * @param {object} data Result dump from reading a file from disc
+   * @returns {object} Information from data upload 
+   */
   createDataFromDisc(data) {
     const info = {
-      data, //Result dump from reading a file from disc
+      data,
       createData() {
         const { data } = this;
         let dataArray, text;
@@ -92,6 +163,10 @@ const util = {
     return info;
   },
 
+  /**
+   * Create Table data from download - application/json
+   * @returns {object} Information from data download
+   */
   createDataFromDownload() {
     const info = {
       // populate vars.tableData with valid data information
@@ -105,8 +180,11 @@ const util = {
     return info;
   },
 
-  // populate HTML table body with properly formatted table data
-  // Automatically include values into calculation totals
+  /**
+   * Populate HTML table body with properly formatted table data
+   * 
+   * Automatically include values into calculation totals
+   */
   fillTableData() {
     vars.tableData.forEach((data, it) => {
       const item = grab("#item"), amount = grab("#amount");
@@ -118,6 +196,11 @@ const util = {
     });
   },
 
+  /**
+   * Starts the file upload process
+   * @param {object} e The file upload change event
+   * @returns No return value
+   */
   uploadFileData(e) {
 
     vars.fileOpenActive = false;
@@ -149,6 +232,11 @@ const util = {
     // }
   },
 
+  /**
+   * shows if size is within the allowed range of 3MB
+   * @param {string} size The size to check against
+   * @returns {boolean} True if size is less than 3MB
+   */
   sizeIsAllowable(size) {
     const num = size.replace(/[^\d.]/g, "");
     const unit = size.replace(/[\d.]/g, "");
@@ -161,6 +249,11 @@ const util = {
     return false;
   },
 
+  /**
+   * Converts the given size to BYTES, KB, or MB
+   * @param {object} param0 An object(file) with the size property
+   * @returns {string} The size in BYTES, KB, or MB
+   */
   getFileSize({ size }) {
     if (size < 1024) {
       return size + "BYTES";
@@ -173,34 +266,45 @@ const util = {
     }
   },
 
-  // setup row props
+  /**
+   * setup row props
+   * @param {object} row table row element on which data props are set
+   */
   setDataProps(row) {
-    const { vars } = util;
     row.dataset.prev = vars.pos++;
     row.dataset.pos = vars.pos;
     // console.log(row);
   },
 
+  /**
+   * updates budget total on page, and unsets activeRow, and resets the input values, 
+   * @param {object} item Input element expected to contain item description
+   * @param {object} amount Input element expected to contain the mount
+   * @returns No return value
+   */
   updateUI(item, amount) {
-    if (amount.dataset.operation == "delete") {
-      amount.dataset.operation = "";
-      vars.Total -= util.extractNumbers(amount.value);
+    if (amount.dataset.operation == "decrement") {
+      vars.decrement(amount);
     } else {
-      vars.Total += util.extractNumbers(amount.value || "");
+      vars.increment(amount);
     }
     item.value = amount.value = "";
     item.focus();
-    vars.unsetActive();
-    if (isNaN(vars.Total)) {
-      return //reset();
-    }
-    $("#total").text(`Total: ${vars.Total}`);
+    return vars.unsetActive().updateCount();
   },
 
+  /**
+   * Updates the total value on the budject calculator UI
+   * @returns {object} The this object
+   */
   updateCount() {
     $("#total").text(`Total: ${vars.Total}`);
+    return this;
   },
 
+  /**
+   * Destroy budget calculator data and resets the UI
+   */
   Clean() {
     //reset all fields here
     const item = grab("#item"), amount = grab("#amount"), total = grab("#total");
@@ -212,6 +316,11 @@ const util = {
     $("table tbody").empty();
   },
 
+  /**
+   * Converts the first character of a string to uppcase and the rest to lowercase
+   * @param {string} str The string to be converted
+   * @returns {string} The converted string 
+   */
   ucWord(str) {
     if (Object.prototype.toString.call(str) !== "[object String]") {
       return null;
@@ -219,22 +328,29 @@ const util = {
     return str.charAt(0).toUpperCase().concat(str.substr(1, str.length - 1).toLowerCase());
   },
 
+  /**
+   * Creates a table row element
+   * @param {object} item item description
+   * @param {object} value associated value
+   * @param {object} props The props object containing settings to customize row creation
+   * @returns {object} The newly created table row element
+   */
   createRow(item, value, props) {
     var str = `<td class="cell cell-0 col-8 px-4">${util.ucWord(item)}</td>
         <td class="cell cell-1 col-4 px-4">${value}
          <div class="row-actions" aria-role="row-actions">
          <a href="JavaScript:void(0)" aria-label="Edit row" class="mx-4">
-         <i class="delete edit fas fa-pencil-alt" aria-hidden="true"></i>
+         <i class="row-action edit fas fa-pencil-alt" aria-hidden="true"></i>
          </a>
          <a href="JavaScript:void(0)" aria-label="Delete row" class="ml-4">
-         <i class="delete trash fas fa-trash" aria-hidden="true"></i>
+         <i class="row-action trash fas fa-trash" aria-hidden="true"></i>
          </a>
          </div></td>`;
 
     var row = document.createElement("tr");
     row.innerHTML = str;
     row.className = "row";
-    row.dataset.means = "create"; // data-means=upload, create, download, modified
+    row.dataset.means = "create"; // data-means=upload, create, download, edit
     if (props) {
       Object.keys(props).forEach((prop) => {
         row.dataset[prop] = props[prop];
@@ -243,22 +359,39 @@ const util = {
     return row;
   },
 
-  // Get json format of table data
+  /**
+   * Get the data within a row
+   * @param {object} row The table row element from which to retrieve data
+   * @returns {object} An object holding the item and amount of a row as properties
+   */
+  getRowData(row) {
+    const [item, value] = row.getElementsByTagName("td");
+    return { item: item.textContent, value: value.textContent };
+  },
+
+  /**
+   * Get json format of table data
+   * @param {object} table HTML table element form which to curate data  
+   * @returns {string} A JSON string containing data
+   */
   getData(table) {
-    const data = Array.prototype.map.call(grabAll.call(table, "tr"), (row) => {
-      const [item, amount] = row.getElementsByTagName("td");
-      return item && amount ? { item: item.textContent, amount: amount.textContent } : null;
-    }).filter(row => row != null);
+    const data = [].map.call(grabAll.call(table, "tr"), (row) => util.getRowData(row));
     return JSON.stringify(data);
   },
 
+  /**
+   * Show if both item and amount input elements contain expected values
+   * @param {object} item Input element expected to contain item description
+   * @param {object} amount Input element expected to contain the amount value
+   * @returns {boolean} True if both inputs are valid
+   */
   validate(item, amount) {
     var test = /^((\w*|\W*)*[\w\s-]*)+$/.test(item.value.trim());
     if (!(test && amount.value.trim())) {
-      console.warn("Warning:-   Make sure you are inputing the right values.");
+      console.warn("Wrong input found");
       return false;
     }
-    return true
+    return true;
   },
 
   // PDF plug
@@ -268,6 +401,11 @@ const util = {
     }
   },
 
+  /**
+   * Returns the next table row element in relation to a given table row element
+   * @param {object} row The reference table ow element for which next row is to be found
+   * @returns {object} The next table row element
+   */
   nextRowDown(row) {
     if (row && row.nodeName == "TR") {
       const siblings = [].slice.call(row.parentNode.children);
@@ -281,7 +419,11 @@ const util = {
     }
   },
 
-  // Reset row props upwards
+  /**
+   * Reset row props upwards starting from a given table row element
+   * @param {object} row The table row element from which to reset data properties
+   * @returns {object} This this object
+   */
   resetPropsUp(row) {
     vars.pos = row.dataset.pos - 1;
     (this.siblingRowsUp(row) || []).forEach((r) => {
@@ -291,6 +433,11 @@ const util = {
     return this;
   },
 
+  /**
+   * Returns all the siblings table row elements that follow after the one provided
+   * @param {object} row The reference table row element for which all following table rows are to be rturned
+   * @returns {object[]}
+   */
   siblingRowsDown(row) {
     if (row && row.nodeName == "TR") {
       const siblings = [].slice.call(row.parentNode.children);
@@ -299,6 +446,12 @@ const util = {
       return nexts.filter(ch => ch && ch.nodeName == "TR").sort((a, b) => b.dataset.pos - a.dataset.pos);
     }
   },
+
+  /**
+   * Get all the rows prior to the given one in order
+   * @param {object} row The reference table row element
+   * @returns {object} table row element
+   */
   siblingRowsUp(row) {
     if (row && row.nodeName == "TR") {
       const siblings = [].slice.call(row.parentNode.children);
@@ -308,6 +461,11 @@ const util = {
     }
   },
 
+  /**
+   * Returns the previous table row element in relation to a given table row element
+   * @param {object} row The reference table ow element for which previous row is to be found
+   * @returns {object} The previous table row element
+   */
   nextRowUp(row) {
     if (row && row.nodeName == "TR") {
       const siblings = [].slice.call(row.parentNode.children);
@@ -321,37 +479,201 @@ const util = {
     }
   },
 
-  deleteRow(e) {
-    const t = e.target;
-    if (!(t && t.classList.contains("row-trash-can"))) {
-      return
-    }
+  /**
+   * Deletes a row for the list, rebuilds the table data settings, and updates the counters
+   * @param {object} row The table row element o delete from the DOM
+   */
+  deleteRow(row) {
     if (confirm("Do you want to delete this row?")) {
       new Promise(function (resolve) {
-        const row = $(t.parentNode);
-        const amountCell = $(grab.call(row, ".cell ~ .cell"));
+        const rowObject = $(row);
+        const valueCell = $(grab.call(rowObject, ".cell ~ .cell"));
         // Negative number facilitates subtraction
-        var value = util.extractNumbers(`-${amountCell.text()}`);
-        const amount = grab("#amount");
-        const item = grab("#item");
-        amount.value = value;
-        amount.dataset.operation = "delete";
-        util.resetPropsUp(t.parentNode);
-        util.updateUI(item, amount);
-        row.hide(700);
+        var value = util.extractNumbers(`-${valueCell.text()}`);
+        const valueInput = grab("#amount");
+        const itemInput = grab("#item");
+        valueInput.value = value;
+        valueInput.dataset.operation = "decrement";
+        util.resetPropsUp(row);
+        util.updateUI(itemInput, valueInput);
+        rowObject.hide(700);
         setTimeout(function () {
-          row.remove();
+          rowObject.remove();
         }, 1000);
-        resolve(row);
-      }).then(function (row) {
+        resolve(rowObject);
+      }).then(function (rowObject) {
         console.log("Row deleted");
-        return row;
+        return rowObject;
       }).catch(function (error) {
         console.error(error);
       });
     }
   },
 
+  /**
+   * The root point for dialog boxes
+   * @param {string} modalType The type of modal to be created like action, info etc
+   * @param {string} message The message content, could be a HTML blob
+   * @param {function} cb Optional call back function to be executed
+   */
+  modal(modalType, message, cb) {
+    const modal = $("#mainModal");
+    const [header] = byClass.call(modal[0], "modal-header");
+    const [body] = byClass.call(modal[0], "modal-body");
+    const [footer] = byClass.call(modal[0], "modal-footer");
+
+    header.close = byClass.call(header, "close")[0];
+    header.modalTitle = byClass.call(header, "modal-title")[0];
+    footer.buttons = byClass.call(footer, "btn");
+    body.innerHTML = "<h2>" + message + "</h2>";
+
+    if (typeof cb === "function") {
+      const { hideCloser, borders } = cb.call(modal, body, header, footer);
+      console.log(body);
+      switch (true) {
+        case hideCloser: header.close.style.display = "none";
+        case borders:
+          header.style.border = "none";
+          footer.style.border = "none";
+      }
+    }
+
+    if (modalType == "info") {
+      // modal.find(".modal-footer").hide();
+      modal.find("modal-dialog").removeClass("modal-dialog-centered");
+    }
+    const options = {
+      backdrop: true,
+      keyboard: true,
+      focus: true,
+      show: true
+    };
+    $("#mainModal").modal(options);
+  },
+
+  infoModal(message, cb) {
+    util.modal("info", message, cb);
+  },
+
+  actionModal(content, cb) {
+    util.modal("action", content, cb);
+  },
+
+  rowActions(event) {
+    const t = event.target, has = t.classList.contains.bind(t.classList);
+    const row = util.getNextAncestor(t, "tr");
+    switch (true) {
+      case !(t && has("row-action")): return;
+
+      case has("trash"):
+        util.deleteRow(row);
+        break;
+
+      case has("edit"):
+        $(row).addClass("editting");
+        util.infoModal("", function cb(body, header, footer) {
+          const [close, save] = footer.buttons;
+          header.modalTitle.textContent = "Edit row";
+          const { item, value } = util.getRowData(util.getNextAncestor(t, "tr"));
+          const html = ` 
+              <div>
+                <input id="modal-item" class="item" value="${item.trim()}" />
+                <input id="modal-amount" class="amount" value="${value.trim()}" />
+              </div>
+              `;
+          body.innerHTML = html;
+          close.textContent = "CANCEL";
+          save.textContent = "UPDATE";
+          this.find("input.item").focus();
+          return {
+            hideCloser: true,
+            borders: true
+          }
+        });
+        break;
+    }
+  },
+
+  /**
+   * Updates the row in the edit row process
+   * @param {object} event The event object
+   */
+  editRow(event) {
+    const button = event.target;
+    const edit = $(".editting");
+    const [editRow] = edit;
+    editRow.dataset.means = "edit";
+    const [actions] = byClass.call(editRow, "row-actions");
+    const body = util.getPreviousSibling(button.parentNode, "div"); // modal-body
+    const [modalItem, modalAmount] = $(body).find("input");
+    const [item, amount] = edit.find("td");
+    const [dummyItem, dummyAmount] = vars.generateInputs(
+      item.firstChild.textContent, amount.firstChild.textContent
+      );
+    item.textContent = modalItem.value;
+    amount.innerHTML = modalAmount.value + actions.outerHTML;
+    dummyAmount.dataset.operation = "decrement";
+    util.updateUI(dummyItem, dummyAmount);
+    util.updateUI(modalItem, modalAmount);
+    edit.removeClass("editting");
+    $("#mainModal").modal("hide");
+  },
+
+  /**
+   * This function shifts the focus of a given input element to the previous neibouring input field
+   * @param {object} input The input element to start with
+   * @param {string} startClassName The class name to enforce on the input from which tab is shifted
+   */
+  tabBackward(input, startClassName) {
+    const yes = input && input.tagName.toLowerCase() == "input" && input.classList.contains(startClassName);
+    if (yes) {
+      if (input.value.length == 0) {
+        const prev = util.getPreviousSibling(input, "input");
+        if (prev) {
+          prev.focus();
+        }
+      }
+    }
+  },
+
+  /**
+   * This recurses up a tree till a parent with the specified tagName is found
+   * @param {object} node The node for which an ancestor is to be found
+   * @param {string} tagName The tag name of the ancestor to check against
+   * @returns {object}
+   */
+  getNextAncestor(node, tagName) {
+    return !(node && tagName && node.parentNode) ? null :
+      String(node.parentNode.tagName).toLowerCase() == tagName.toLowerCase() ? node.parentNode :
+        util.getNextAncestor(node.parentNode, tagName);
+  },
+
+  /**
+   * Gets the next previous sibling with the givn tag name of for which test function returns true
+   * @param {object} node The node to start with and for which the previous sibling is to be found
+   * @param {string} tagName The tag name of the previous sibling to check against
+   * @param {function} tester Optional test function. If the function returns true, the node is returned
+   * @returns {object|null}
+   */
+  getPreviousSibling(node, tagName, tester) {
+    const fn = typeof tester === "function" ? tester : function temp() { return false };
+    const siblings = node.parentNode.children;
+    const prevs = [].slice.call(siblings, 0, [].indexOf.call(siblings, node)).reverse();
+    for (const prev of prevs) {
+      if (fn(prev) || prev.tagName.toLowerCase() == tagName.toLowerCase()) {
+        return prev;
+      }
+    }
+    return null;
+  },
+
+  /**
+   * Creates a row with given settings and inserts it as first child of the table
+   * @param {object} item Input element expected to contain item description
+   * @param {object} amount Input element expected to contain the mount
+   * @param {object} props The props object containing settings to customize row creation
+   * @returns {object} The new row that has just been created.
+   */
   insertFirstRow(item, amount, props) {
     const row = util.createRow(item.value, amount.value, props);
     const table = grab("table tbody");
@@ -359,7 +681,14 @@ const util = {
     vars.setActive();
     return row;
   },
-  
+
+  /**
+   * Does the work of insertFirtRow but initiates approperiate data and UI updates
+   * @param {object} item Input element expected to contain item description
+   * @param {object} amount Input element expected to contain the mount
+   * @param {object} props The props object containing settings to customize row creation
+   * @returns {object} The this object
+   */
   addRow(item, amount, props) {
     util.setDataProps(util.insertFirstRow(item, amount, props));
     util.updateUI(item, amount);
@@ -378,6 +707,11 @@ const util = {
     util.addRow(item, amount);
   },
 
+  /**
+   * calculate does the temporary staging of a row while it's not yet committed
+   * @param {object} event The event object
+   * @returns No return value
+   */
   calculate(event) {
     const input = event.target, value = "";
     if (input.value.trim().length > 0 && !vars.activeRow) {
@@ -408,8 +742,21 @@ const util = {
     vars.removeActive(); // remove row if value is empty
   },
 
-  extractNumbers(string) {
-    return parseFloat(String(string).replace(/[^\d]/g, ""), 10);
+  /**
+   * Extract the value number from the input element that supplies mount
+   * @param {string} xyz The string value from the amount input element
+   * @returns {number} A float
+   */
+  extractNumbers(xyz) {
+    if (typeof xyz !== "string") {
+      return 0;
+    }
+    const [x] = xyz.trim().match(/\w+/); // First set of chacters without space
+    const extract = parseFloat(x.match(/^\d+/)); // Peel off trailing non-numbers
+    if (isNaN(extract)) {
+      return 0;
+    }
+    return extract;
   },
 
   printsBlob() {
@@ -428,6 +775,9 @@ const util = {
     }, margins);
   },
 
+  /**
+   * Closes the mgt family of tools within the budget calculator panel
+   */
   closeMgtTools() {
     grabAll(".mgt-toggle-btn").forEach((btn) => {
       btn.setAttribute("aria-expanded", false);
@@ -438,10 +788,20 @@ const util = {
     });
   },
 
+  /**
+   * Tests whether or not a given object is a DOM node
+   * @param {object} object An object to test if it's a DOM node or not
+   * @returns {boolean} True if the given object is a DOM node
+   */
   isNode(object) {
     return object && object.nodeType == 1;
   },
 
+  /**
+  * Tests whether or not a given object is an array of DOM nodes
+  * @param {object[]} object An object to test if it's an array of DOM nodes
+  * @returns {boolean} True if the given object is an array of DOM nodes
+  */
   isNodeList(object) {
     if (!(object && typeof object.length === "number")) {
       return false;
@@ -454,8 +814,12 @@ const util = {
     return true;
   },
 
-  // Returns a single array containing all args together.
-  // This will spread any array argument in the list.
+  /**
+   * Returns a single array containing all arguments merged together
+   * 
+   * This will spread any array arguments in the list
+   * @returns {*[]} An array of all supplied arguments flattened together 
+   */
   mergeArgs() {
     const args = [];
     [].slice.call(arguments).forEach((x) => {
@@ -468,10 +832,14 @@ const util = {
     return args;
   },
 
-  // Group handling is where various names subscribe to the same set of handlers
-  // Throw an error if eventType is less or more than one
-  // clk = subscription("click"); 
-  // clk.group({subscribers: [], handlers: []},{subscribers: [], handlers: []}...);
+  /**
+   * Group handling is where various names subscribe to the same set of handlers
+   * 
+   * Throw an error if eventType is less or more than one
+   * @example clk = subscription("click");
+   * clk.group({subscribers: [], handlers: []},{subscribers: [], handlers: []}...);
+   * @returns {object} The this object
+   */
   group() {
     util.mergeArgs(...arguments).forEach((s) => {
       if (!(s && Array.isArray(s.subscribers) && Array.isArray(s.handlers))) {
@@ -504,7 +872,7 @@ const util = {
    * util.defaults([{type: "click", handlers: []}, {type: "keyup", handlers: []}])
    * util.click().defaults([{handlers: []}, {handlers: []}])
    * util.click().defaults([f1, f2, f3])
-   * @returns {object}
+   * @returns {object} The this object
    */
   defaults(...options) {
     options = util.mergeArgs(...options); // put all inputs into a single array
@@ -540,7 +908,7 @@ const util = {
    * If all options are provided, or return handle  
    * @param {object} options a set of information used to setup util.defaults()
    * @param {boolean} isOptions shows if a call to handle() is expected
-   * @returns {object}
+   * @returns {object} The this object
    */
   handleDefault(options, isOptions) {
     if (!isOptions) { // handle() will completes the flow
@@ -556,12 +924,16 @@ const util = {
   /**
    * An alias to .group()
    * @borrows group as queue
-   * @returns 
+   * @returns {object} This this object
    */
   queue() {
     return this.group(...arguments);
   },
 
+  /**
+   * This is where delegation bridges with event handlers
+   * @param {object} event The event object
+   */
   delegationBridge(event) {
     const tc = this.tc(event.target, event.type);
     if (tc) {
@@ -571,13 +943,15 @@ const util = {
 
   /**
   *
-  * Every call to subscription() creates a new instance to avoid an inconsistent state.
-  * create a subscription() instance with the listed events as types
-  * set isDelegatable, isMixed, & delegated intsnace variables
+  * Every call to subscription() creates a new instance to ensure a consistent state.
+  * 
+  * Creates a subscription() instance with the listed events as types
+  * 
+  * Sets isDelegatable, isMixed, & delegated instance variables
   *
    * @param {string|object} eventType strings or object
    * @param  {...string|object} rest comma separated inputs of the same type
-   * @returns {object}
+   * @returns {object} The this object
    */
   subscription: function subscription(eventType, ...rest) {
     const eventTypes = util.mergeArgs(eventType, rest);
@@ -903,6 +1277,11 @@ const util = {
     return instance.init(eventTypes);
   },
 
+  /**
+   * All events go here - delegated, non-delegated, extra, & custom
+   * 
+   * Extra and custom events are merged unto this list at run time
+   */
   events: [
     "beforeprint", "beforeunload", "blur", "canplay", "canplaythrough", "change", "click",
     "contextmenu", "dragend", "loadedmetadata", "mousemove", "mouseout", "select", "show",
@@ -917,6 +1296,9 @@ const util = {
     "stalled", "submit", "suspend", "timeupdate", "unload", "userproximity", "volumechange"
   ],
 
+  /**
+   * Extra events
+   */
   extras: {
     map: {
       enter: { code: 13, token: "key" }, escape: { code: 27, token: "key" }, space: { code: 32, token: "key" },
@@ -952,6 +1334,17 @@ const util = {
     },
 
     handle() { }
+  },
+
+  /**
+   * Adds a list of custom made events to the list and repeats events setup
+   * 
+   * These will treated like any other extras family of events
+   * @param {string} eventNames The name of the custom event to add to the list of events
+   */
+  addCustomEvents(eventNames) {
+    util.events.push.apply(util.events, eventNames);
+    util.settings.events.setup();
   },
 
   settings: {
