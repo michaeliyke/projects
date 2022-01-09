@@ -484,14 +484,16 @@ const util = {
    * @param {object} r The table row element o delete from the DOM
    */
   deleteRow(r) {
-    if (confirm("Do you want to delete this row?")) {
+    const warning = "Do you want to delete this row?";
+    const confirmed = confirm(warning);
+    util.infoModal(warning);
+    if (confirmed) {
       const value = grab.call(r, ".cell ~ .cell");
       const [item, amount] = vars.genInputs("", value.textContent);
       amount.dataset.operation = "decrement";
       util.resetPropsUp(r);
       util.updateUI(item, amount);
       $(r).hide(700).remove();
-      console.log("Row deleted");
     }
   },
 
