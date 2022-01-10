@@ -755,18 +755,14 @@ footer a:hover {
   color: #667b97;
 }
 
-.modal-footer .btn:hover {
-  text-decoration: none;
-}
-
-.modal-footer .btn[data-dismiss] {
+.modal-footer .btn.unfocus {
   color: #a4b1c1;
 }
 
 .modal-body input {
-  border: 0.1rem outset rgba(122, 172, 218, 0.2);
+  border: 0.1rem outset rgba(122, 172, 218, 0.8);
   padding-left: 1.5rem;
-  color: rgba(102, 123, 151, 0.7);
-  font-family: Georgia, 'Times New Roman', Times, serif;
+  color: black;
+  font-family: unset;
   font-weight: normal;
 }

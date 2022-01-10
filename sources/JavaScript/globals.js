@@ -8,6 +8,19 @@ const byClass = function getElementsByClassName(className) {
   return [].slice.call(document.getElementsByClassName.call(this, className));
 }.bind(document);
 
+/**
+ * Checks if a HTML element contains a class name
+ * @param {string} className Name of HTML class to check
+ * @param {object} target HTML Element object
+ * @returns {boolean} True if the target contains className
+ */
+function hasClass(className, target = this) {
+  if (typeof className !== "string" || !(target instanceof HTMLElement)) {
+      throw new Error("Invalid argument to has()");
+    }
+    return target.classList.contains(className);
+}
+
 const util = {
   grab,
   grabAll,
@@ -18,7 +31,25 @@ const util = {
     fileOpenActive: false,
     tableData: [],
     pos: 0,
-    
+    modalHTML: "",
+
+    /**
+     * Preserves the orginal HTML of main modal
+     * This facilitates restore commands
+     */
+    saveModalHTML() {
+      vars.modalHTML = grab("#mainModal").outerHTML;
+    },
+
+    /**
+     * Restores the orginal HTML contents of the modal dialog
+     */
+    restoreModalHTML() {
+      if (vars.modalHTML) {
+        grab("#mainModal").outerHTML = vars.modalHTML;
+      }
+    },
+
     /**
      * Increments the value of budget calculator total
      * @param {object} amount HTML input element object
@@ -56,7 +87,7 @@ const util = {
       amount.value = amountText;
       return [item, amount];
     },
-    
+
     /**
      * vars settings method
      * @returns {object} util
@@ -290,12 +321,13 @@ const util = {
     }
     item.value = amount.value = "";
     item.focus();
-    return vars.unsetActive().updateCount();
+    vars.unsetActive().updateCount();
+    return util; 
   },
 
   /**
    * Updates the total value on the budject calculator UI
-   * @returns {object} The this object
+   * @returns {object} this
    */
   updateCount() {
     $("#total").text(`Total: ${vars.Total}`);
@@ -374,7 +406,7 @@ const util = {
    * @param {object} table HTML table element form which to curate data  
    * @returns {string} A JSON string containing data
    */
-  getData(table) {
+  getTableData(table) {
     const data = [].map.call(grabAll.call(table, "tr"), (row) => util.getRowData(row));
     return JSON.stringify(data);
   },
@@ -422,7 +454,7 @@ const util = {
   /**
    * Reset row props upwards starting from a given table row element
    * @param {object} row The table row element from which to reset data properties
-   * @returns {object} This this object
+   * @returns {object} this
    */
   resetPropsUp(row) {
     vars.pos = row.dataset.pos - 1;
@@ -480,21 +512,79 @@ const util = {
   },
 
   /**
-   * Deletes a row for the list, rebuilds the table data settings, and updates the counters
-   * @param {object} r The table row element o delete from the DOM
+   * Modal dialog response router
+   * @param {object} event Event
    */
-  deleteRow(r) {
-    const warning = "Do you want to delete this row?";
-    const confirmed = confirm(warning);
-    util.infoModal(warning);
-    if (confirmed) {
-      const value = grab.call(r, ".cell ~ .cell");
-      const [item, amount] = vars.genInputs("", value.textContent);
-      amount.dataset.operation = "decrement";
-      util.resetPropsUp(r);
-      util.updateUI(item, amount);
-      $(r).hide(700).remove();
+  modalDialogResponse(event) {
+    console.log("Response");
+    const has = hasClass.bind(event.target);
+    if (has("modal-no")) {
+      util.modalDialogReject(event);
     }
+    if (has("modal-yes")) {
+      util.modalDialogAccept(event);
+    }
+    if (event.defaultPrevented === false) {
+      util.modalHide();
+    } else {
+      console.log("Default prevented");
+    }
+  },
+
+  /**
+   * 
+   * @param {object} event The event objct
+   */
+  modalDialogAccept(event) {
+    switch (util.modalRole) {
+      case "edit": util.performRowEdit(event);
+        break;
+      case "delete": util.performRowDelete(event);
+        break;
+    }
+    // DO nothing for other modal roles like info 
+  },
+
+  /**
+   * Handles Cancel selection on main modal
+   * @param {object} event Event
+   */
+  modalDialogReject(event) {
+    console.log("reject");
+    return false;
+  },
+
+  /**
+   * Returns the role of the modal
+   * @example
+   * data-role="edit|confirm|info"
+   * @returns {string} Modal dialog data role
+   */
+  get modalRole() {
+    const modal = grab("#mainModal");
+    return util.isNode(modal) ? modal.dataset.role : "";
+  },
+
+  /**
+   * Sets modal dialog data role
+   * @example
+   * data-role="edit|confirm|info"
+   */
+  set modalRole(role) {
+    const modal = grab("#mainModal");
+    if (util.isNode(modal)) {
+      modal.dataset.role = role;
+    }
+  },
+
+  /**
+   * Hides the main modal and restore its HTML contents
+   * @returns {object} this
+   */
+  modalHide() {
+    $("#mainModal").modal("hide");
+    vars.restoreModalHTML();
+    return this;
   },
 
   /**
@@ -515,8 +605,10 @@ const util = {
     body.innerHTML = "<h2>" + message + "</h2>";
 
     if (typeof cb === "function") {
-      const { hideCloser, borders } = cb.call(modal, body, header, footer);
+      const { hideCloser, borders } = cb.call(modal, body, footer, header);
       console.log(body);
+      // Fall-through required in switch statement
+      /* jshint -W086 */ 
       switch (true) {
         case hideCloser: header.close.style.display = "none";
         case borders:
@@ -542,68 +634,103 @@ const util = {
     util.modal("info", message, cb);
   },
 
+  confirmModal(message, cb) {
+    util.modal("info", message, cb);
+    return 
+  },
+
   actionModal(content, cb) {
     util.modal("action", content, cb);
   },
 
   rowActions(event) {
-    const t = event.target, has = t.classList.contains.bind(t.classList);
-    const row = util.getNextAncestor(t, "tr");
+    const t = event.target, has = hasClass.bind(t);
     switch (true) {
       case !(t && has("row-action")): return;
-
-      case has("trash"):
-        util.deleteRow(row);
+      case has("trash"): util.launchDeleteRow(event);
         break;
-
-      case has("edit"):
-        $(row).addClass("editting");
-        util.infoModal("", function cb(body, header, footer) {
-          const [close, save] = footer.buttons;
-          header.modalTitle.textContent = "Edit row";
-          const { item, value } = util.getRowData(util.getNextAncestor(t, "tr"));
-          const html = ` 
-              <div>
-                <input id="modal-item" class="item" value="${item.trim()}" />
-                <input id="modal-amount" class="amount" value="${value.trim()}" />
-              </div>
-              `;
-          body.innerHTML = html;
-          close.textContent = "CANCEL";
-          save.textContent = "UPDATE";
-          this.find("input.item").focus();
-          return {
-            hideCloser: true,
-            borders: true
-          }
-        });
+      case has("edit"): util.launchRowEdit(event);
         break;
     }
   },
 
   /**
-   * Updates the row in the edit row process
-   * @param {object} event The event object
+  * Deletes a row for the list, rebuilds the table data settings, and updates the counters
+  * @param {object} r The table row element o delete from the DOM
+  */
+  performRowDelete(event) {
+    console.log("delete");
+    if (false) {
+      const r = util.getNextAncestor(event.target, "tr");
+      const value = grab.call(r, ".cell ~ .cell");
+      const [item, amount] = vars.genInputs("", value.textContent);
+      amount.dataset.operation = "decrement";
+      util.resetPropsUp(r);
+      util.updateUI(item, amount);
+      $(r).hide(700).remove();
+    }
+  },
+
+  launchDeleteRow() {
+    util.modalRole = "delete"; // will be removed by the aftermath reset
+    const warning = "Do you want to delete this row?";
+    util.infoModal(warning, launchDeleteRowCB);
+    function launchDeleteRowCB(body, footer, header) {
+      return {
+        hideCloser: true,
+        borders: true
+      };
+    }
+  },
+
+  /**
+   * Completes and closes the row update experience
+   * @param {object} event Event
    */
-  editRow(event) {
+  performRowEdit(event) {
     const button = event.target;
-    const edit = $(".editting");
-    const [editRow] = edit;
-    editRow.dataset.means = "edit";
-    const [actions] = byClass.call(editRow, "row-actions");
+    const edit = $(".editting").attr("data-means", "edit");
+    const [actions] = edit.find(".row-actions");
     const body = util.getPreviousSibling(button.parentNode, "div"); // modal-body
     const [modalItem, modalAmount] = $(body).find("input");
     const [item, amount] = edit.find("td");
     const [dummyItem, dummyAmount] = vars.genInputs(
       item.firstChild.textContent, amount.firstChild.textContent
-      );
+    );
     item.textContent = modalItem.value;
     amount.innerHTML = modalAmount.value + actions.outerHTML;
     dummyAmount.dataset.operation = "decrement";
-    util.updateUI(dummyItem, dummyAmount);
-    util.updateUI(modalItem, modalAmount);
-    edit.removeClass("editting");
-    $("#mainModal").modal("hide");
+    util.updateUI(dummyItem, dummyAmount).updateUI(modalItem, modalAmount);
+    edit.removeClass("editting").attr("data-role", "info");
+  },
+
+  /**
+   * Launches the row update experience
+   * @param {object} event Event
+   */
+  launchRowEdit(event) {
+    const t = event.target;
+    const row = util.getNextAncestor(t, "tr");
+    const { item, value } = util.getRowData(row);
+    const html = `
+        <div>
+          <input id="modal-item" class="item" value="${item.trim()}" />
+          <input id="modal-amount" class="amount" value="${value.trim()}" />
+        </div>
+              `;
+    $(row).addClass("editting").attr("data-role", "edit");
+    util.infoModal("", cb);
+    function cb(body, footer, header) {
+      const [close, save] = footer.buttons;
+      header.modalTitle.textContent = "Edit row";
+      body.innerHTML = html;
+      close.classList.add("unfocus");
+      save.textContent = "Update";
+      return {
+        hideCloser: true,
+        borders: true
+      };
+    }
   },
 
   /**
@@ -674,7 +801,7 @@ const util = {
    * @param {object} item Input element expected to contain item description
    * @param {object} amount Input element expected to contain the mount
    * @param {object} props The props object containing settings to customize row creation
-   * @returns {object} The this object
+   * @returns {object} this
    */
   addRow(item, amount, props) {
     util.setDataProps(util.insertFirstRow(item, amount, props));
@@ -696,7 +823,7 @@ const util = {
 
   /**
    * calculate does the temporary staging of a row while it's not yet committed
-   * @param {object} event The event object
+   * @param {object} event Event
    * @returns No return value
    */
   calculate(event) {
@@ -781,7 +908,7 @@ const util = {
    * @returns {boolean} True if the given object is a DOM node
    */
   isNode(object) {
-    return object && object.nodeType == 1;
+    return object instanceof HTMLElement;
   },
 
   /**
@@ -825,7 +952,7 @@ const util = {
    * Throw an error if eventType is less or more than one
    * @example clk = subscription("click");
    * clk.group({subscribers: [], handlers: []},{subscribers: [], handlers: []}...);
-   * @returns {object} The this object
+   * @returns {object} this
    */
   group() {
     util.mergeArgs(...arguments).forEach((s) => {
@@ -859,7 +986,7 @@ const util = {
    * util.defaults([{type: "click", handlers: []}, {type: "keyup", handlers: []}])
    * util.click().defaults([{handlers: []}, {handlers: []}])
    * util.click().defaults([f1, f2, f3])
-   * @returns {object} The this object
+   * @returns {object} this
    */
   defaults(...options) {
     options = util.mergeArgs(...options); // put all inputs into a single array
@@ -895,7 +1022,7 @@ const util = {
    * If all options are provided, or return handle  
    * @param {object} options a set of information used to setup util.defaults()
    * @param {boolean} isOptions shows if a call to handle() is expected
-   * @returns {object} The this object
+   * @returns {object} this
    */
   handleDefault(options, isOptions) {
     if (!isOptions) { // handle() will completes the flow
@@ -911,7 +1038,7 @@ const util = {
   /**
    * An alias to .group()
    * @borrows group as queue
-   * @returns {object} This this object
+   * @returns {object} this
    */
   queue() {
     return this.group(...arguments);
@@ -919,7 +1046,7 @@ const util = {
 
   /**
    * This is where delegation bridges with event handlers
-   * @param {object} event The event object
+   * @param {object} event Event
    */
   delegationBridge(event) {
     const tc = this.tc(event.target, event.type);
@@ -938,7 +1065,7 @@ const util = {
   *
    * @param {string|object} eventType strings or object
    * @param  {...string|object} rest comma separated inputs of the same type
-   * @returns {object} The this object
+   * @returns {object} this
    */
   subscription: function subscription(eventType, ...rest) {
     const eventTypes = util.mergeArgs(eventType, rest);
@@ -1039,6 +1166,11 @@ const util = {
         });
         return this;
       },
+
+      /**
+       * Hanldes custom events task
+       */
+      customEventsHandler() {},
 
       // delegation generic handler handles delegated events
       // attach all the events on the doc and put fnx to listen
@@ -1200,7 +1332,11 @@ const util = {
         return this;
       },
 
-      // subscriber list closes
+      /**
+       * subscriber list closes
+       * @param  {...function} handlers handler functions
+       * @returns {object} this
+       */
       handle: function handle(...handlers) {
         const fns = util.mergeArgs(...handlers);
         if (!fns.every((fn) => typeof fn === "function")) {
@@ -1218,7 +1354,12 @@ const util = {
         return `x${nameIndex}`;
       },
 
-      // get all matches, generate a name for them, update subscribers{name, nodes}
+      /**
+       * get all matches, generate a name for them, update 
+       * subscribers{name, nodes}
+       * @param  {...any} classNames class names or element objects
+       * @returns {object} this
+       */
       subscribe: function subscribe(...classNames) {
         // build a new instance if the present one is already handled
         if (this.handled) {
@@ -1249,13 +1390,21 @@ const util = {
         return this;
       },
 
-      // call removes delegation behaviour for a given event instance.
+      /**
+       * call removes delegation behaviour for a given event 
+       * instance
+       * @returns {object} this
+       */
       override: function override() {
         this.root.override = true;
         return this;
       },
 
-      // An alias to util.subscription()
+      /**
+       * An alias to util.subscription()
+       * @borrows subscription as util.subscription
+       * @returns {object} this
+       */
       subscription: function subscription(event, ...rest) {
         return this.init(util.mergeArgs(event, rest));
       }
@@ -1332,6 +1481,32 @@ const util = {
   addCustomEvents(eventNames) {
     util.events.push.apply(util.events, eventNames);
     util.settings.events.setup();
+  },
+
+  /**
+   * Creates a custom event that trigger upon an action
+   * @param {string} customEvent Name of custom event
+   * @param {string} baseEvent base trigger event
+   * @param {object} baseTarget The target of base event
+   */
+  createCustomEvent(customEvent, baseEvent, baseTarget) {
+    util.addCustomEvents(customEvent);
+    const event = new Event('build');
+
+/* 
+    Three Steps
+    0. save customEvent in dedicated util list for diligence
+    1. setup a normal event with baseEvent and baseTarget
+    2. create a dispatch method and set as handler; it will
+       trigger or invoke the custom event
+    3. develope customEventsHandler() to handle custom events
+ */
+    // Listen for the event.
+    function fn(e) {baseEvent.dispatchEvent()}
+    baseTarget.addEventListener(baseEvent, fn, false);
+
+    // Dispatch the event.
+    elem.dispatchEvent(event);
   },
 
   settings: {
