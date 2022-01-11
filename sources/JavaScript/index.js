@@ -16,17 +16,11 @@ jQuery(function ($) {
     { types: ["click"], subscribers: ["file-data"], handlers: [util.processDataUpload] },
     { types: ["click"], subscribers: ["data-upload"], handlers: [util.closeMgtTools] },
     { types: ["change"], subscribers: [$(".file-data input")], handlers: [util.uploadFileData] },
-    { types: ["input"], subscribers: [$("input[name='item'], input[name='value']")], handlers: [util.calculate] }
+    { types: ["input"], subscribers: [$("input[name='item'], input[name='value']")], handlers: [util.calculate] },
   ]);
 
-  util.subscription("click").override().subscribe("modal-footer").handle(
-    fn, util.modalDialogResponse
-    );
-  
-    function fn() {
-      console.log("cb called()");
-    }
-
+  util.subscription("click", "escape").override().subscribe("modal").handle(vars.resetModalHTML);
+  util.subscription("click").override().subscribe("modal-footer").handle(util.modalDialogResponse);
 
   util.defaults([
     { type: "keyup", handlers: [util.HandleEnter] },
@@ -34,3 +28,8 @@ jQuery(function ($) {
   ]);
 
 });
+
+function fn() {
+  console.log("cb() called");
+  console.log("Thankks!");
+}

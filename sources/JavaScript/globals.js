@@ -8,6 +8,21 @@ const byClass = function getElementsByClassName(className) {
   return [].slice.call(document.getElementsByClassName.call(this, className));
 }.bind(document);
 
+function find(selector, target = this) {
+  if (typeof selector !== "string" || !(target instanceof HTMLElement)) {
+    throw new Error("Invalid argument to find()");
+  }
+  return target.querySelector(selector);
+}
+
+function findAll(selector, target = this) {
+  if (typeof selector !== "string" || !(target instanceof HTMLElement)) {
+    throw new Error("Invalid argument to find()");
+  }
+  return [].slice.call(target.querySelectorAll(selector));
+}
+
+
 /**
  * Checks if a HTML element contains a class name
  * @param {string} className Name of HTML class to check
@@ -31,23 +46,34 @@ const util = {
     fileOpenActive: false,
     tableData: [],
     pos: 0,
-    modalHTML: "",
-
     /**
      * Preserves the orginal HTML of main modal
      * This facilitates restore commands
      */
     saveModalHTML() {
-      vars.modalHTML = grab("#mainModal").outerHTML;
+      
     },
 
     /**
      * Restores the orginal HTML contents of the modal dialog
      */
-    restoreModalHTML() {
-      if (vars.modalHTML) {
-        grab("#mainModal").outerHTML = vars.modalHTML;
-      }
+    resetModalHTML() {
+      const m = grab("#mainModal");
+      $("tr[data-role='editing'], tr[data-role='deleting']").each((_, node) => {
+        return node && node.removeAttribute("data-role");
+      });
+      m.dataset.role = "info";
+      m.removeAttribute("style");
+      const f = find.bind(m);
+      f(".modal-header").removeAttribute("style");
+      f(".modal-body").innerHTML = f(".modal-header h5").textContent = "";
+      const footer = f(".modal-footer");
+      footer.removeAttribute("style");
+      [cancel, accept] = findAll.call(footer, "button");
+      cancel.textContent = "Cancel";
+      cancel.classList.remove("unfocus");
+      accept.textContent = "Continue";
+      accept.classList.remove("unfocus");
     },
 
     /**
@@ -516,7 +542,6 @@ const util = {
    * @param {object} event Event
    */
   modalDialogResponse(event) {
-    console.log("Response");
     const has = hasClass.bind(event.target);
     if (has("modal-no")) {
       util.modalDialogReject(event);
@@ -550,8 +575,7 @@ const util = {
    * @param {object} event Event
    */
   modalDialogReject(event) {
-    console.log("reject");
-    return false;
+    
   },
 
   /**
@@ -583,7 +607,7 @@ const util = {
    */
   modalHide() {
     $("#mainModal").modal("hide");
-    vars.restoreModalHTML();
+    vars.resetModalHTML();
     return this;
   },
 
@@ -606,7 +630,6 @@ const util = {
 
     if (typeof cb === "function") {
       const { hideCloser, borders } = cb.call(modal, body, footer, header);
-      console.log(body);
       // Fall-through required in switch statement
       /* jshint -W086 */ 
       switch (true) {
@@ -659,23 +682,25 @@ const util = {
   * @param {object} r The table row element o delete from the DOM
   */
   performRowDelete(event) {
-    console.log("delete");
-    if (false) {
-      const r = util.getNextAncestor(event.target, "tr");
-      const value = grab.call(r, ".cell ~ .cell");
-      const [item, amount] = vars.genInputs("", value.textContent);
-      amount.dataset.operation = "decrement";
-      util.resetPropsUp(r);
-      util.updateUI(item, amount);
-      $(r).hide(700).remove();
-    }
+    const pane = util.getNextAncestor(event.target, "", (t) => hasClass("calc-pane", t));
+    const row = find("tr[data-role='deleting']", pane);
+    const value = grab.call(row, ".cell ~ .cell");
+    const [item, amount] = vars.genInputs("", value.textContent);
+    amount.dataset.operation = "decrement";
+    util.resetPropsUp(row);
+    util.updateUI(item, amount);
+    $(row).hide(700).remove();
   },
 
-  launchDeleteRow() {
+  launchDeleteRow(event) {
+    const row = util.getNextAncestor(event.target, "tr");
+    row.dataset.role = "deleting";
     util.modalRole = "delete"; // will be removed by the aftermath reset
     const warning = "Do you want to delete this row?";
     util.infoModal(warning, launchDeleteRowCB);
     function launchDeleteRowCB(body, footer, header) {
+      const [cancel, accept] = footer.buttons;
+      accept.classList.add("unfocus");
       return {
         hideCloser: true,
         borders: true
@@ -689,7 +714,7 @@ const util = {
    */
   performRowEdit(event) {
     const button = event.target;
-    const edit = $(".editting").attr("data-means", "edit");
+    const edit = $("tr[data-role='editing']").attr("data-means", "edit");
     const [actions] = edit.find(".row-actions");
     const body = util.getPreviousSibling(button.parentNode, "div"); // modal-body
     const [modalItem, modalAmount] = $(body).find("input");
@@ -701,7 +726,6 @@ const util = {
     amount.innerHTML = modalAmount.value + actions.outerHTML;
     dummyAmount.dataset.operation = "decrement";
     util.updateUI(dummyItem, dummyAmount).updateUI(modalItem, modalAmount);
-    edit.removeClass("editting").attr("data-role", "info");
   },
 
   /**
@@ -709,6 +733,7 @@ const util = {
    * @param {object} event Event
    */
   launchRowEdit(event) {
+    util.modalRole = "edit";
     const t = event.target;
     const row = util.getNextAncestor(t, "tr");
     const { item, value } = util.getRowData(row);
@@ -718,9 +743,9 @@ const util = {
           <input id="modal-amount" class="amount" value="${value.trim()}" />
         </div>
               `;
-    $(row).addClass("editting").attr("data-role", "edit");
-    util.infoModal("", cb);
-    function cb(body, footer, header) {
+    row.dataset.role = "editing";
+    util.infoModal("", launchRowEditCB);
+    function launchRowEditCB(body, footer, header) {
       const [close, save] = footer.buttons;
       header.modalTitle.textContent = "Edit row";
       body.innerHTML = html;
@@ -756,10 +781,19 @@ const util = {
    * @param {string} tagName The tag name of the ancestor to check against
    * @returns {object}
    */
-  getNextAncestor(node, tagName) {
-    return !(node && tagName && node.parentNode) ? null :
-      String(node.parentNode.tagName).toLowerCase() == tagName.toLowerCase() ? node.parentNode :
-        util.getNextAncestor(node.parentNode, tagName);
+  getNextAncestor(node, tagName, predicate) {
+    const fn = typeof predicate === "function" ? predicate : function fn() {return false;};
+    const yes = fn(node.parentNode,  tagName);
+    if (!tagName && predicate) {
+      tagName = "";
+    }
+    if (!(node && typeof tagName === "string" && node.parentNode)) {
+      return null;
+    }
+    if (yes || node.parentNode.tagName == tagName.toUpperCase()) {
+      return node.parentNode;
+    }
+    return util.getNextAncestor(node.parentNode, tagName, fn);
   },
 
   /**
@@ -1185,18 +1219,6 @@ const util = {
         return this;
       },
 
-      attach(node, type, fn) {
-        if (!(node && typeof type === "string" && typeof fn === "function")) {
-          throw new Error("invalid arguments in attach() in call to attach");
-        }
-        const fns = Array.isArray(node[`${type}Events`]) ? node[`${type}Events`] : [];
-        if (!(fns.includes(fn))) {
-          fns.push(fn);
-          node.addEventListener(type, fn.bind(this), false);
-        }
-        node[`${type}Events`] = fns;
-      },
-
       extrasHandler() {
         this.extras.forEach((type) => {
           const info = util.extras.getInfo(type);
@@ -1225,6 +1247,19 @@ const util = {
           }
         });
       },
+
+      attach(node, type, fn) {
+        if (!(node && typeof type === "string" && typeof fn === "function")) {
+          throw new Error("invalid arguments in attach() in call to attach");
+        }
+        const fns = Array.isArray(node[`${type}Events`]) ? node[`${type}Events`] : [];
+        if (!(fns.includes(fn))) {
+          fns.push(fn);
+          node.addEventListener(type, fn.bind(this), false);
+        }
+        node[`${type}Events`] = fns;
+      },
+
 
       applyTc(nodes, types, handle) {
         // console.log(nodes);

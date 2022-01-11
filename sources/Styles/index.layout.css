@@ -50,7 +50,7 @@ div#main-heading {
   :root {
     /* --font-size--largest: 2.5rem; */
     --font-size--largest: 2.7rem;
-    --font-size--medium:1.7rem;
+    --font-size--medium: 1.7rem;
   }
 }
 
@@ -58,6 +58,7 @@ div#main-heading {
   html {
     font-size: 62.5%;
   }
+
   .modal-dialog {
     margin: 2.8rem auto;
   }
