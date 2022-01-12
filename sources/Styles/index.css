@@ -492,11 +492,6 @@ input {
   background-image: none !important;
 }
 
-.mgt-toggle-btn span {
-  color: #FFF !important;
-  font-size: 1.6rem;
-}
-
 button:focus, button:active {
   /* border: none !important; */
   outline: none !important;
@@ -511,12 +506,24 @@ button:focus, button:active {
   background-color: rgba(153, 153, 153, 0.5);
   background-color: #CFB39C;
 }
+#mgt-options .text-muted {
+  font-size: unset;
+}
+
+.mgt * {
+  font-weight: bold;
+  white-space: nowrap !important;
+}
 
 .mgt .text-muted {
   padding-top: 2rem;
   padding-left: 1rem;
-  text-align: left;
-  font-size: 2.4rem;
+  text-align: center;
+  font-size: 1.6rem;
+}
+
+.managed .managed {
+  color: #FFFFFF;
 }
 
 .mgt .text-muted+hr {
@@ -525,6 +532,11 @@ button:focus, button:active {
 
 .mgt .text-muted+hr+div {
   padding-top: 2rem;
+}
+
+#add-to-list .text-muted {
+  font-size: 1.6rem;
+  text-align: left;
 }
 
 .mgt>.managed {
@@ -536,6 +548,31 @@ button:focus, button:active {
   text-align: left;
   text-transform: uppercase;
   cursor: pointer;
+}
+
+.action-btn {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #FFFFFF !important;
+}
+
+.managed.view-recent {
+  font-weight: bold;
+  padding-left: 1rem;
+}
+
+.managed.view-recent i {
+  padding-left: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.view-recent button{
+    color: #FFFFFF !important;
+    padding-left: 0;
+  }
+
+.col-item {
+  font-weight: bold;
 }
 
 .file-data {
@@ -551,6 +588,11 @@ button:focus, button:active {
   cursor: default;
   background-color: rgba(153, 153, 153, 1);
   color: #dddddd;
+}
+
+.collections-mgt-menu .dropright {
+  font-size: 2rem;
+  margin-left: 0.2rem;
 }
 
 input {
