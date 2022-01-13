@@ -11,20 +11,21 @@ jQuery(function ($) {
   }
 
   util.queue([
-    { types: ["click"], subscribers: ["to-pdf"], handlers: [util.ConvertToPDF] },
-    { types: ["click"], subscribers: ["reset"], handlers: [util.Clean, util.vars.resetVars] },
-    { types: ["click"], subscribers: ["file-data"], handlers: [util.processDataUpload] },
-    { types: ["click"], subscribers: ["data-upload"], handlers: [util.closeMgtTools] },
-    { types: ["change"], subscribers: [$(".file-data input")], handlers: [util.uploadFileData] },
-    { types: ["input"], subscribers: [$("input[name='item'], input[name='value']")], handlers: [util.calculate] },
+    { type: "click", subscriber: "create-listing", handler: util.collections.createListing },
+    { type: "click", subscriber: "to-pdf", handler: util.ConvertToPDF },
+    { type: "click", subscriber: "reset", handlers: [util.Clean, util.vars.resetVars] },
+    { type: "click", subscriber: "file-data", handler: util.processDataUpload },
+    { type: "click", subscriber: "data-upload", handler: util.closeMgtTools },
+    { type: "change", subscriber: $(".file-data input"), handler: util.uploadFileData },
+    { type: "input", subscriber: $("#item, #amount"), handler: util.calculate }
   ]);
 
   util.subscription("click", "escape").override().subscribe("modal").handle(vars.resetModalHTML);
   util.subscription("click").override().subscribe("modal-footer").handle(util.modalDialogResponse);
 
   util.defaults([
-    { type: "keyup", handlers: [util.HandleEnter] },
-    { type: "click", handlers: [util.rowActions] }
+    { type: "keyup", handler: util.HandleEnter },
+    { type: "click", handler: util.rowActions }
   ]);
 
 });

@@ -40,6 +40,11 @@ const util = {
   grab,
   grabAll,
   byClass,
+  collections: {
+    createListing(event) {
+      console.log(event.target);
+    }
+  },
   vars: {
     Total: 0,
     activeRow: null,
@@ -990,11 +995,27 @@ const util = {
    */
   group() {
     util.mergeArgs(...arguments).forEach((s) => {
-      if (!(s && Array.isArray(s.subscribers) && Array.isArray(s.handlers))) {
-        throw new Error("group() called with incompatible subscription");
+      const sHold = Array.isArray(s.subscribers) && s.subscriber ? s.subscribers.concat(s.subscriber) : 
+        s.subscriber ? [s.subscriber] : Array.isArray(s.subscribers) ? s.subscribers : [];
+      const fnHold = Array.isArray(s.handlers) && s.handler ? s.handlers.concat(s.handler) :
+        s.handler ? [s.handler] : Array.isArray(s.handlers) ? s.handlers : [];
+      const tHold = Array.isArray(s.types) && s.type ? s.types.concat(s.type) :
+        s.type ? [s.type] : Array.isArray(s.types) ? s.types : [];
+     
+      if ((s && s.types) && !Array.isArray(s.types)) {
+        throw new Error("Inavid input provided as types array");
+      }
+      if ((s && s.subscribers) && !Array.isArray(s.subscribers)) {
+        throw new Error("Inavid input provided as subscribers array");
+      }
+      if ((s && s.handlers) && !Array.isArray(s.handlers)) {
+        throw new Error("Inavid input provided as handlers array");
+      }
+      if (sHold.length < 1 || fnHold.length < 1 || tHold.length < 1) {
+        return
       }
       const subscribers = [];
-      s.subscribers.forEach((x) => {
+      sHold.forEach((x) => {
         if (util.isNode(x) || typeof x === "string") {
           subscribers.push(x);
         }
@@ -1002,10 +1023,7 @@ const util = {
           subscribers.push.apply(subscribers, [].slice.call(x));
         }
       });
-      if ("root" in this && Object.getPrototypeOf(this) == util) {
-        s.types = s.types || this.events;
-      }
-      this.subscription(s.types).subscribe(subscribers).handle(s.handlers);
+      this.subscription(tHold).subscribe(subscribers).handle(fnHold);
     });
     return this;
   },
@@ -1027,21 +1045,34 @@ const util = {
     const strArgs = options.every(o => typeof o === "string"); // All args are string
     const fnArgs = options.every(o => typeof o === "function"); // All args are functions
     const optArgs = options.every((o) => { // All args are options
-      return o && typeof o.type === "string" && Array.isArray(o.handlers);
+      return o && typeof o.type === "string" && (Array.isArray(o.handlers) || typeof o.handler === "function");
     });
 
-    switch (true) {
-      case strArgs: options = options.map((type) => {
-        return { type, handlers: [] };
+    if (optArgs) {
+      options = options.map((o) => {
+        switch(true) {
+          case o.handlers && !Array.isArray(o.handlers): 
+            throw new Error("Inavid input provided as handlers array");
+          case o.handler && o.handlers: o.handlers.push(o.handler); break;
+          case o.handler && !o.handlers: o.handlers = [o.handler]; break;
+        }
+        switch (true) {
+          case o.types && !Array.isArray(o.types): throw new Error("Inavid input provided as types array");
+          case o.type && o.types: o.types.push(o.type); break;
+          case o.type && !o.types: o.types = [o.type]; break;
+        }
+        return o;
       });
+    }
+
+    switch (true) {
+      case strArgs: options = [{ types: options, handlers: [] }];
         break;
       case fnArgs:
-        if (!(this.events && this.events.length > 0)) {
+        if (!(Object.getPrototypeOf(this) == util && this.events && this.events.length > 0)) {
           throw new Error("util.defaults(): event type not set");
         }
-        options = this.events.map((type) => {
-          return { type, handlers: options };
-        });
+        options = [{ types: this.events, handlers: options }];
         break;
       default:
         if (!optArgs) {
@@ -1060,11 +1091,13 @@ const util = {
    */
   handleDefault(options, isOptions) {
     if (!isOptions) { // handle() will completes the flow
-      return util.subscription(options.map(o => o.type)).subscribe(document).override();
+      const [{types, handlers}] = options;
+      const s = util.subscription(types).subscribe(document).override();
+      return Array.isArray(handlers) && handlers.length > 0 ? s.handle(handlers) : s;
     }
     options.forEach((option) => {
-      const { type, handlers } = option;
-      return this.subscription(type).subscribe(document).override().handle(handlers);
+      const { types, handlers } = option;
+      return this.subscription(types).subscribe(document).override().handle(handlers);
     });
     return this;
   },
