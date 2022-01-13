@@ -50,15 +50,16 @@
                   </button>
                 </nav>
                 <div id="mgt-options" class="collapse mgt collections-mgt-menu">
-                  <div class="text-muted">COLLECTIONS</div>
+                  <div class="text-muted">Manage Listing</div> <!-- tooltip-->
                   <hr />
+                  <div class="managed create-list">Save listing</div> <!-- tooltip-->
                   <div class="managed view-recent">
                     <div class="btn-group dropright">
                       <nav class="navbar navbar-light p-0">
                         <button class="navbar-toggler mb-2 mgt-toggle-btn" type="button" data-toggle="collapse"
                           data-target="#add-to-list" aria-controls="add-to-list" aria-expanded="false"
                           aria-label="Add to list">
-                          <span>ADD TO LIST
+                          <span>Add to collection
                             <i class="fas fa-caret-right" aria-haspopup="true" aria-expanded="false"></i>
                           </span>
                   
@@ -68,15 +69,15 @@
                       <div id="add-to-list" class="collapse mgt collections-mgt-menu dropdown-menu">
                         <div class="text-muted">Create new</div>
                         <hr />
-                        <div class="managed">Browse one</div>
-                        <div class="managed">Browse two</div>
-                        <div class="managed disabled">Browse three</div>
-                        <div class="managed">Browse four</div>
+                        <div class="managed">List one</div>
+                        <div class="managed">List two</div>
+                        <div class="managed disabled">List three</div>
+                        <div class="managed">List four</div>
                       </div>
                     </div>
                   </div>
 
-                  <div class="managed disabled">Browse list</div>
+                  <div class="managed disabled">Browse collections</div>
 
                   <div class="managed view-recent">
                     <div class="btn-group dropright">
@@ -84,20 +85,21 @@
                         <button class="navbar-toggler mb-2 mgt-toggle-btn" type="button" data-toggle="collapse"
                           data-target="#recent-collections" aria-controls="mgt-options" aria-expanded="false"
                           aria-label="recent collection">
-                          <span>RECENT ITEMS
+                          <span>Recent collections
                             <i class="fas fa-caret-right" aria-haspopup="true" aria-expanded="false"></i>
                           </span>
                   
                         </button>
                       </nav>
-                      <!--  -->
-                      <div id="recent-collections" class="collapse mgt dropdown-menu">
-                        <p>No data...</p>
+                      <!-- collapse mgt collections-mgt-menu  -->
+                      <div id="recent-collections" class="collapse mgt dropdown-menu collections-mgt-menu">
+                        <div class="text-muted">Create new</div>
+                        <div class="managed">List four</div>
                       </div>
                     </div>
                   </div>
 
-                  <div class="managed">Manage</div>
+                  <div class="managed">Manage collections</div>
                 </div>
               </div>
 

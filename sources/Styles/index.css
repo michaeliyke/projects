@@ -543,10 +543,10 @@ button:focus, button:active {
   border-bottom: 0.016rem solid;
   border-top: medium none;
   cursor: pointer;
-  font-size: 1.4rem;
+  font-size: 1.7rem;
   padding: var(--font-size--small);
   text-align: left;
-  text-transform: uppercase;
+  text-transform: initial;
   cursor: pointer;
 }
 
@@ -561,9 +561,13 @@ button:focus, button:active {
   padding-left: 1rem;
 }
 
+.managed.view-recent button span {
+  font-size: 1.6rem;
+}
+
 .managed.view-recent i {
   padding-left: 0.5rem;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
 }
 
 .view-recent button{
