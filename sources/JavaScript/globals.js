@@ -1640,20 +1640,24 @@ const util = {
 
       // returns status {isMixed, isDelegatable}
       detect(types) {
-        let delegated = [], unDelegated = [];
-        types.forEach((event) => {
-          this.checkSupported(event);
-          const _ = this.isDelegatable(event) ? delegated.push(event) : unDelegated.push(event);
+        let delegated = [], unDelegated = [], extras = [], defaultTypes = [];
+        types.forEach((t) => {
+          this.checkSupported(t);
+          if (this.isDelegatable(t)) {
+            return delegated.push(t);
+          }
+          isDelegatable = false;
+          unDelegated.push(t);
+          if (util.extras.includes(t)) {
+            return extras.push(t);
+          }
+          defaultTypes.push(t);
         });
-        const isDelegatable = delegated.length == types.length && !!(types[0]);
-        const extras = types.filter(t => util.extras.includes(t));
-        const defaultTypes = unDelegated.filter((t) => extras.includes(t) == false);
         let isMixed = Boolean(unDelegated[0] && delegated[0]);
         isMixed = Boolean(isMixed || (extras[0] && unDelegated.length > extras.length));
-        const x = {
+        return {
           isMixed, isDelegatable, delegated, unDelegated, extras, defaultTypes
         };
-        return x;
       },
 
       // Throw an error if specified type is not aN actual event and there's no provision

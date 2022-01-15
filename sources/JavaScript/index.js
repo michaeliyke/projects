@@ -1,11 +1,6 @@
 jQuery(function ($) {
  
   var input = grab("#item");
-  // Save original contents of modal dialog HTML
-  // This will enable vars.restoreModalHTML() to revert modal dialog changes
-  vars.saveModalHTML();
-
-  // Get all data
   if (input) {
     input.focus();
   }
