@@ -5,6 +5,7 @@ jQuery(function ($) {
     input.focus();
   }
 
+
   util.queue([
     { type: "click", subscriber: "create-listing", handler: util.collections.createListing },
     { type: "click", subscriber: "to-pdf", handler: util.ConvertToPDF },

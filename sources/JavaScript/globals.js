@@ -91,29 +91,37 @@ const util = {
       accept.classList.remove("unfocus");
     },
 
+    // 08106500826
+    // Miles Munro Kingdom Principles, 
     /**
-     * Increments the value of budget calculator total
+     * updates the value of budget calculator total
      * @param {object} amount HTML input element object
      */
-    increment(amount) {
-      const n = util.extractNumbers(amount.value); // extracts the first leading integer value
-      vars.Total += n;
+    update(row) {
+      if (!(row instanceof HTMLTableRowElement)) {
+        throw new Error(`update() expects a table row but got ${row}`);
+      }
+      const value = parseFloat(row.dataset.amount);
+      switch(row.dataset.operation) {
+        case "update":
+          const update = util.extractNumbers(row.dataset.update);
+          row.dataset.amount = update;
+          vars.Total -= value;
+          vars.Total += update;
+          break;
+        case "subtraction": vars.Total -= value;
+        break;
+        case "addition": vars.Total += value;
+        break;
+        }
+         if(vars.Total < 0) {
+           vars.Total = 0;
+         }
+      row.removeAttribute("data-update");
+      row.removeAttribute("data-operation");      
+      vars.unsetActive().updateCount();
     },
 
-    /**
-     * Decrements the value of budget calculator total
-     * @param {object} amount HTML input element object
-     */
-    decrement(amount) {
-      if (amount.dataset.operation == "decrement") {
-        amount.dataset.operation = "";
-      }
-      const n = util.extractNumbers(amount.value);
-      vars.Total -= n;
-      if (vars.Total < 1) {
-        vars.Total = 0;
-      }
-    },
 
     /**
      * Creates an two input fields for item and amount respectively
@@ -168,7 +176,18 @@ const util = {
       v.tableData = [];
       v.pos = 0;
       return util;
-    }
+    },
+
+    /**
+     * Reset item and value inputs
+     * 
+     * Shift focus to iteminput box
+     */
+    resetInputs() {
+    const inputs = grabAll("#item, #amount");
+    inputs.forEach((input) => input.value = "");
+    inputs[0].focus();
+  }
   },
 
   /**
@@ -346,24 +365,6 @@ const util = {
     row.dataset.prev = vars.pos++;
     row.dataset.pos = vars.pos;
     // console.log(row);
-  },
-
-  /**
-   * updates budget total on page, and unsets activeRow, and resets the input values, 
-   * @param {object} item Input element expected to contain item description
-   * @param {object} amount Input element expected to contain the mount
-   * @returns No return value
-   */
-  updateUI(item, amount) {
-    if (amount.dataset.operation == "decrement") {
-      vars.decrement(amount);
-    } else {
-      vars.increment(amount);
-    }
-    item.value = amount.value = "";
-    item.focus();
-    vars.unsetActive().updateCount();
-    return util; 
   },
 
   /**
@@ -647,10 +648,11 @@ const util = {
     body.innerHTML = "<h2>" + message + "</h2>";
 
     if (typeof cb === "function") {
-      const { hideCloser, borders } = cb.call(modal, body, footer, header);
+      const { hideCloser, borders, unfocus } = cb.call(modal, body, footer, header);
       // Fall-through required in switch statement
       /* jshint -W086 */ 
       switch (true) {
+        case unfocus instanceof HTMLButtonElement: unfocus.classList.add("unfocus");
         case hideCloser: header.close.style.display = "none";
         case borders:
           header.style.border = "none";
@@ -702,26 +704,25 @@ const util = {
   performRowDelete(event) {
     const pane = util.getNextAncestor(event.target, "", (t) => hasClass("calc-pane", t));
     const row = find("tr[data-role='deleting']", pane);
-    const value = grab.call(row, ".cell ~ .cell");
-    const [item, amount] = vars.genInputs("", value.textContent);
-    amount.dataset.operation = "decrement";
+    row.dataset.operation = "subtraction";
+    vars.update(row); // uses row.dataset.amount to update vars.Total 
     util.resetPropsUp(row);
-    util.updateUI(item, amount);
     $(row).hide(700).remove();
   },
 
   launchDeleteRow(event) {
     const row = util.getNextAncestor(event.target, "tr");
     row.dataset.role = "deleting";
+    row.dataset.operation = "subtraction";
     util.modalRole = "delete"; // will be removed by the aftermath reset
     const warning = "Do you want to delete this row?";
     util.infoModal(warning, launchDeleteRowCB);
     function launchDeleteRowCB(body, footer, header) {
       const [cancel, accept] = footer.buttons;
-      accept.classList.add("unfocus");
       return {
         hideCloser: true,
-        borders: true
+        borders: true,
+        unfocus: accept
       };
     }
   },
@@ -737,13 +738,10 @@ const util = {
     const body = util.getPreviousSibling(button.parentNode, "div"); // modal-body
     const [modalItem, modalAmount] = $(body).find("input");
     const [item, amount] = edit.find("td");
-    const [dummyItem, dummyAmount] = vars.genInputs(
-      item.firstChild.textContent, amount.firstChild.textContent
-    );
     item.textContent = modalItem.value;
     amount.innerHTML = modalAmount.value + actions.outerHTML;
-    dummyAmount.dataset.operation = "decrement";
-    util.updateUI(dummyItem, dummyAmount).updateUI(modalItem, modalAmount);
+    edit.attr("data-operation", "update").attr("data-update", modalAmount.value);
+    vars.update(edit[0]);
   },
 
   /**
@@ -767,11 +765,11 @@ const util = {
       const [close, save] = footer.buttons;
       header.modalTitle.textContent = "Edit row";
       body.innerHTML = html;
-      close.classList.add("unfocus");
       save.textContent = "Update";
       return {
         hideCloser: true,
-        borders: true
+        borders: true,
+        unfocus: close
       };
     }
   },
@@ -795,23 +793,23 @@ const util = {
 
   /**
    * This recurses up a tree till a parent with the specified tagName is found
-   * @param {object} node The node for which an ancestor is to be found
+   * @param {object} child The node for which an ancestor is to be found
    * @param {string} tagName The tag name of the ancestor to check against
    * @returns {object}
    */
-  getNextAncestor(node, tagName, predicate) {
+  getNextAncestor(child, tagName, predicate) {
     const fn = typeof predicate === "function" ? predicate : function fn() {return false;};
-    const yes = fn(node.parentNode,  tagName);
+    const yes = fn(child.parentNode,  tagName);
     if (!tagName && predicate) {
       tagName = "";
     }
-    if (!(node && typeof tagName === "string" && node.parentNode)) {
+    if (!(child && typeof tagName === "string" && child.parentNode)) {
       return null;
     }
-    if (yes || node.parentNode.tagName == tagName.toUpperCase()) {
-      return node.parentNode;
+    if (yes || child.parentNode.tagName == tagName.toUpperCase()) {
+      return child.parentNode;
     }
-    return util.getNextAncestor(node.parentNode, tagName, fn);
+    return util.getNextAncestor(child.parentNode, tagName, fn);
   },
 
   /**
@@ -856,8 +854,12 @@ const util = {
    * @returns {object} this
    */
   addRow(item, amount, props) {
-    util.setDataProps(util.insertFirstRow(item, amount, props));
-    util.updateUI(item, amount);
+    const row = util.insertFirstRow(item, amount, props);
+    util.setDataProps(row);
+    row.dataset.operation = "addition";
+    row.dataset.amount = util.extractNumbers(amount.value);
+    vars.update(row);
+    vars.resetInputs();
     return this;
   },
 
@@ -914,7 +916,7 @@ const util = {
    * @returns {number} A float
    */
   extractNumbers(xyz) {
-    if (typeof xyz !== "string") {
+    if (typeof xyz !== "string" || !Array.isArray(xyz.trim().match(/\w+/))) {
       return 0;
     }
     const [x] = xyz.trim().match(/\w+/); // First set of chacters without space
