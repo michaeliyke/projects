@@ -51,8 +51,30 @@ const util = {
   grabAll,
   byClass,
   collections: {
+
     createListing(event) {
-      console.log(event.target);
+    util.infoModal("", util.collections.launchEditCB);
+    },
+
+    launchEditCB(body, footer, header) {
+      let d = String(new Date()).split(" ").slice(0, 5);
+      let t = d.pop().replace(/:\d+$/, "");
+      let s = "listing-" + d.join("-").toLowerCase() + "-" + t;
+      const html = `
+        <div class="row col-11  mx-auto">
+          <input id="modal-item" class="create-listing item col-12 pt-1" value="${s}" />
+        </div>
+      `;
+      const [close, save] = footer.buttons;
+      header.modalTitle.textContent = "Edit row";
+      body.innerHTML = html;
+      body.getElementsByTagName("input")[0].addEventListener("focus", (event) => {
+        event.target.select();
+      });
+      save.textContent = "Update";
+      return {
+        hideCloser: !0, borders: !0
+      };
     }
   },
   vars: {
@@ -648,16 +670,18 @@ const util = {
     body.innerHTML = "<h2>" + message + "</h2>";
 
     if (typeof cb === "function") {
-      const { hideCloser, borders, unfocus } = cb.call(modal, body, footer, header);
+      const {
+        hideCloser, borders, unfocus, footerBorders, headerBorders
+      } = cb.call(modal, body, footer, header);
       // Fall-through required in switch statement
       /* jshint -W086 */ 
-      switch (true) {
-        case unfocus instanceof HTMLButtonElement: unfocus.classList.add("unfocus");
-        case hideCloser: header.close.style.display = "none";
-        case borders:
-          header.style.border = "none";
-          footer.style.border = "none";
-      }
+        if (unfocus instanceof HTMLButtonElement) unfocus.classList.add("unfocus");
+        if (hideCloser) header.close.style.display = "none";
+        if (borders) {
+          console.log("here")
+          if(!headerBorders) header.style.border = "none";
+          if (!footerBorders) footer.style.border = "none";
+        }
     }
 
     if (modalType == "info") {

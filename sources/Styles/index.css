@@ -768,7 +768,7 @@ footer a:hover {
 }
 
 .modal-body {
-  padding: 1.6rem;
+  /* padding: 1.6rem; */
 }
 
 .modal-body p {
@@ -811,4 +811,12 @@ footer a:hover {
   color: black;
   font-family: unset;
   font-weight: normal;
+}
+#modal-item.create-listing {
+  border-radius: 5px;
+  padding-right: .5rem;
+  padding-left: 0.5rem;
+  font-size: 1.4rem;
+  padding-bottom: 0.5rem;
+  border: 0.1rem outset rgba(122, 172, 218, 0.2);
 }
