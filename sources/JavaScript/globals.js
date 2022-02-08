@@ -172,6 +172,11 @@ const util = {
       const title = find.call(header, "h5");
       title.className = "modal-title";
       title.textContent = "";
+      const button = find.call(header, ".close");
+      button.className = "close";
+      const closeBtn = find.call(button, ".close-btn");
+      closeBtn.className = "close-btn";
+      closeBtn.innerHTML = "&times";
 
       const body = find.call(content, ".modal-body");
       body.className = "modal-body col-12 row mx-0 px-0 py-0";
@@ -186,7 +191,8 @@ const util = {
       btnYes.textContent = "CONTINUE";
 
       [
-      modal, dialog, content, header, title, body, footer, btnNo, btnYes
+      modal, dialog, content, header, title, body, footer, btnNo, btnYes, 
+      button, closeBtn
       ].forEach((node) => node.removeAttribute("style"));
     },
 
@@ -720,7 +726,7 @@ const util = {
       resolved = true;
     }
 
-    if(has("close") || has("modal")) {
+    if(has("close-btn") || has("close") || has("modal")) {
       vars.resetModalHTML();
     }
 
@@ -803,18 +809,26 @@ const util = {
     footer.buttons = byClass.call(footer, "btn");
     body.innerHTML = "<h2>" + message + "</h2>";
 
+    const hiders = [];
+
     if (typeof cb === "function") {
+      
       const {
         hideCloser, borders, unfocus, footerBorders, headerBorders, hideCancel,
         hideAccept, hideFooter
       } = cb.call(modal, body, footer, header);
-      // Fall-through required in switch statement
-      /* jshint -W086 */
+      
       if (unfocus instanceof HTMLButtonElement) unfocus.classList.add("unfocus");
       if (hideCloser) header.close.style.display = "none";
-      if (hideCancel) footer.buttons[0].style.opacity = 0;
-      if (hideAccept) footer.buttons[1].style.opacity = 0;
-      if (hideFooter) footer.style.opacity = 0;
+      if (hideCancel) hiders.push(footer.buttons[0]);
+      if (hideAccept) hiders.push(footer.buttons[1]);
+      if (hideFooter) hiders.push(footer);
+
+      hiders.forEach((element) => {
+        element.style.opacity = 0;
+        element.style.pointerEvents = "none";
+      });
+
       if (borders) {
         if (!headerBorders) header.style.border = "none";
         if (!footerBorders) footer.style.border = "none";
@@ -822,7 +836,6 @@ const util = {
     }
 
     if (modalType == "info") {
-      // modal.find(".modal-footer").hide();
       modal.find("modal-dialog").removeClass("modal-dialog-centered");
     }
     const options = {
@@ -1687,21 +1700,28 @@ const util = {
         }
         const args = util.mergeArgs(...classNames);
         // Ensure the arguments are not mixed up
-        const strArgs = args.every((x) => typeof x === "string");
-        const objArgs = args.every((x) => typeof x === "object");
+        const strArgs = args.filter((x) => typeof x === "string");
+        const objArgs = args.filter((x) => typeof x === "object");
         if (!(strArgs || objArgs)) {
-          throw new Error("subscribe() invoked with invalid input");
+          // throw new Error("subscribe() invoked with invalid input");
         }
-        let nodes = [];
-        if (strArgs) {
-          args.forEach((className) => {
-            nodes = [].slice.call(document.getElementsByClassName(className));
+        const nodes = [];
+        if (strArgs.length > 0) {
+          strArgs.forEach((className) => {
+            const tem = [].slice.call(document.getElementsByClassName(className));
+            if (tem.length == 0) {
+              throw new Error("element with class " + className + " does not exist!");
+            }
+            nodes.push(...tem);
           });
         }
-        if (objArgs) {
-          nodes = args.filter((i) => {
-            return (i && i.nodeType == 1) || (i == window) || (i.nodeType == 9);
+        if (objArgs.length > 0) {
+          objArgs.forEach((i) => {
+            if (!(i instanceof EventTarget)) {
+              throw new Error("subscribe() invoked with invalid target");
+            }
           });
+          nodes.push(...objArgs);
         }
         this.root.subscribers.nodes.push(...nodes); // all subscribing nodes to the instance are put together
         if (!this.root.subscribers.name) { // under the same name for ease of use

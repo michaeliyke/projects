@@ -17,9 +17,12 @@ jQuery(function ($) {
     { type: "input", subscriber: $("#item, #amount"), handler: util.calculate }
   ]);
  
-  // util.subscription("click", "escape").override().subscribe("modal").handle(vars.resetModalHTML);
-  util.subscription("click").override().subscribe(
-    "modal-footer", "modal", grab(".modal-header button.close")
+  /*util.subscription("click", ).override().subscribe(
+    "modal"
+    ).handle(vars.resetModalHTML);
+ */
+  util.subscription("click", "escape").override().subscribe(
+    "modal-footer", "modal", "modal-header"
     ).handle(util.modalDialogResponse);
 
   util.defaults([
