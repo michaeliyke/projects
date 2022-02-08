@@ -87,8 +87,9 @@ const util = {
       
       util.modalRole = "create-listing";
       let d = String(new Date()).split(" ").slice(0, 5);
-      let t = d.pop().replace(/:\d+$/, "");
-      let s = "listing-" + d.join("-").toLowerCase() + "-" + t;
+      let t = d.pop().replace(/:/g, "-");
+      var s = "listing-" + d.join("-").toLowerCase() + "-" + t;
+      // let s = "listing-" + d.join("-").toLowerCase();
       const html = `
         <div class="row col-12">
           <input id="modal-item" class="create-listing item col-12 pt-1" value="${s}" />
