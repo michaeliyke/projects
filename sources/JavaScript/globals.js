@@ -1,12 +1,17 @@
+
+
 const grab = document.querySelector.bind(document); // Picks first match
+
 
 const grabAll = function grabAll(selector) {
   return [].slice.call(document.querySelectorAll.call(this, selector));
 }.bind(document);
 
+
 const byClass = function getElementsByClassName(className) {
   return [].slice.call(document.getElementsByClassName.call(this, className));
 }.bind(document);
+
 
 function find(selector, target = this) {
   if (typeof selector !== "string" || !(target instanceof HTMLElement)) {
@@ -15,12 +20,14 @@ function find(selector, target = this) {
   return target.querySelector(selector);
 }
 
+
 function findAll(selector, target = this) {
   if (typeof selector !== "string" || !(target instanceof HTMLElement)) {
     throw new Error("Invalid argument to find()");
   }
   return [].slice.call(target.querySelectorAll(selector));
 }
+
 
 const EventProfiler = function addEventListener(type, listener, options) {
   // console.log(this.nodeName, ":-", type, "; ", listener.name, options);
@@ -35,8 +42,11 @@ const EventProfiler = function addEventListener(type, listener, options) {
  * @returns {boolean} True if the target contains className
  */
 function hasClass(className, target = this) {
-  if (typeof className !== "string" || !(target instanceof HTMLElement)) {
-    throw new Error("Invalid argument to has()");
+  if (typeof className !== "string") {
+    throw new Error("className must be a string");
+  }
+  if (!(target instanceof HTMLElement)) {
+    throw new Error("Invalid target argument in has()");
   }
   return target.classList.contains(className);
 }
@@ -51,6 +61,16 @@ const util = {
   grabAll,
   byClass,
   collections: {
+    async postListingData(data) {
+      // TODO: if data is null, 
+      // TODO: show modal info - No data found
+      // TODO: show spinner 
+      const url = ""
+      const result = await util.POST(url, data);
+      // TODO: dismiss spinner
+      return result;
+    },
+
     fillRecent() {
       const recent = grab(".recent-listings");
       let str = ``;
@@ -62,16 +82,25 @@ const util = {
     },
 
     performCreateListing(event) {
-      console.log("here there!");
       const {target: t} = event;
       const footer = t.parentNode;
       const body = util.getPreviousSibling(footer, "div");
       const input = find.call(body, "input");
-      if (!input.value.trim()) return;
-      util.vars.store.push({
+      if (!input.value.trim()) return null && info("Listing name required");
+      
+      const content = util.getTableData();
+      if (content.length == 0) return null && util.info("No data to be process");
+
+      const data = {
+        content,
         name: input.value.trim()
+      };
+      util.vars.store.push(data);
+      util.collections.postListingData(data).then((result) => {
+        console.log("Response has returned.\n");
+        console.log(result);
+        util.collections.fillRecent();
       });
-      util.collections.fillRecent();
     },
 
     triggerSelection(event) {
@@ -258,6 +287,52 @@ const util = {
       inputs[0].focus();
     }
   },
+
+  remoteErrorReport(errorMessage, remoteAction) {
+    const action = "While performing " + remoteAction + "action";
+    const consoleMessage = `\n\n\t${action}\n\t${errorMessage}\n\n`
+    console.error(consoleMessage);
+  },
+
+  async POST(url, data, cb) {
+    const fn = typeof cb === "function" ? cb : function cb() {};
+    
+    const options = {
+      method: "POST",
+      mode: "cors",
+      cache: "no-cache",
+      credentials: "same-origin",
+      redirect: "follow",
+      referrerPolicy: "no-referrer",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
+
+    const responseData = await fetch(url, options).catch((error) => {
+      return util.remoteErrorReport(error, "POST");
+    }).then((response) => {
+      return response.json();
+    }); // Note: await will execute the last part of 'then chaining'
+
+    fn(responseData);
+    return responseData;
+  },
+
+  async GET(url, cb, options) {
+    const fn = typeof cb === "function" ? cb : function cb() {};
+   
+    const responseData = await fetch(url).catch((error) => {
+      return util.remoteErrorReport(error, "GET");
+    }).then((response) => {
+      return response.json();
+    }); // Note: await will execute the last part of 'then chaining'
+
+    fn(responseData);
+    return responseData;
+  },
+
 
   /**
    * Create Table data from disc uploads - application/json, text/plain
@@ -509,7 +584,10 @@ const util = {
    */
   getRowData(row) {
     const [item, value] = row.getElementsByTagName("td");
-    return { item: item.textContent, value: value.textContent };
+    return { 
+      item: item.textContent, 
+      value: value.firstChild.textContent.trim() // 'firstChild' is the Text Node
+    };
   },
 
   /**
@@ -518,7 +596,9 @@ const util = {
    * @returns {string} A JSON string containing data
    */
   getTableData(table) {
-    const data = [].map.call(grabAll.call(table, "tr"), (row) => util.getRowData(row));
+    const data = [].map.call(grabAll.call(table, "tr[data-pos]"), (row) => {
+      return util.getRowData(row);
+    });
     return JSON.stringify(data);
   },
 
@@ -629,18 +709,23 @@ const util = {
   modalDialogResponse(event) {
     const has = hasClass.bind(event.target);
     let resolved = false;
+    
     if (has("modal-no")) {
       util.modalDialogReject(event);
       resolved = true;
     }
+
     if (has("modal-yes")) {
       util.modalDialogAccept(event);
       resolved = true;
     }
+
+    if(has("close") || has("modal")) {
+      vars.resetModalHTML();
+    }
+
     if (resolved && event.defaultPrevented === false) {
       util.modalHide();
-    } else {
-      console.log("Default prevented");
     }
   },
 
@@ -720,12 +805,16 @@ const util = {
 
     if (typeof cb === "function") {
       const {
-        hideCloser, borders, unfocus, footerBorders, headerBorders
+        hideCloser, borders, unfocus, footerBorders, headerBorders, hideCancel,
+        hideAccept, hideFooter
       } = cb.call(modal, body, footer, header);
       // Fall-through required in switch statement
       /* jshint -W086 */
       if (unfocus instanceof HTMLButtonElement) unfocus.classList.add("unfocus");
       if (hideCloser) header.close.style.display = "none";
+      if (hideCancel) footer.buttons[0].style.opacity = 0;
+      if (hideAccept) footer.buttons[1].style.opacity = 0;
+      if (hideFooter) footer.style.opacity = 0;
       if (borders) {
         if (!headerBorders) header.style.border = "none";
         if (!footerBorders) footer.style.border = "none";
@@ -751,6 +840,20 @@ const util = {
 
   infoModal(message, cb) {
     util.modal("info", message, cb);
+  },
+
+  info(message) {
+    util.modal("info", message, (body) => {
+      const h2 = find.call(body, "h2");
+      if (h2) {
+        h2.style.textAlign = "center";
+        h2.style.width = "100%";
+      }
+      return {
+        borders: true,
+        hideFooter: true
+      };
+    });
   },
 
   confirmModal(message, cb) {
@@ -798,7 +901,7 @@ const util = {
       const [cancel, accept] = footer.buttons;
       accept.textContent = "DELETE";
       accept.style.color = "#ea4f4f";
-      return {
+      return { // (body, footer, header) 
         hideCloser: true,
         borders: true,
         unfocus: accept

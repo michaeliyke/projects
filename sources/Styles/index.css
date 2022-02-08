@@ -810,7 +810,7 @@ footer a:hover {
 
 .modal-body > h2 {
   font-size: 1.6rem;
-}
+/* background: #abc; *//* width: 100%; *//* text-align: center; */}
 
 .modal-body input {
   border: 0.1rem outset rgba(122, 172, 218, 0.8);

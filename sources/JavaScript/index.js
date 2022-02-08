@@ -18,7 +18,9 @@ jQuery(function ($) {
   ]);
  
   // util.subscription("click", "escape").override().subscribe("modal").handle(vars.resetModalHTML);
-  util.subscription("click").override().subscribe("modal-footer").handle(util.modalDialogResponse);
+  util.subscription("click").override().subscribe(
+    "modal-footer", "modal", grab(".modal-header button.close")
+    ).handle(util.modalDialogResponse);
 
   util.defaults([
     { type: "keyup", handler: util.HandleEnter },
