@@ -51,8 +51,27 @@ const util = {
   grabAll,
   byClass,
   collections: {
+    fillRecent() {
+      const recent = grab(".recent-listings");
+      let str = ``;
+      util.vars.store.reverse().slice(0, 5).forEach((item) => {
+        if (!(item && typeof item.name === "string")) return;
+        str = `<p> ${item.name} </p>` + str;
+      });
+      recent.innerHTML = str;
+    },
+
     performCreateListing(event) {
       console.log("here there!");
+      const {target: t} = event;
+      const footer = t.parentNode;
+      const body = util.getPreviousSibling(footer, "div");
+      const input = find.call(body, "input");
+      if (!input.value.trim()) return;
+      util.vars.store.push({
+        name: input.value.trim()
+      });
+      util.collections.fillRecent();
     },
 
     triggerSelection(event) {
@@ -62,6 +81,10 @@ const util = {
     },
 
     launchCreateListing(event) {
+
+      util.closeModal("button[data-target='#listings'");
+      util.closeModal("button[data-target='#mgt-options'");
+      
       util.modalRole = "create-listing";
       let d = String(new Date()).split(" ").slice(0, 5);
       let t = d.pop().replace(/:\d+$/, "");
@@ -83,11 +106,12 @@ const util = {
     }
   },
   vars: {
-    Total: 0,
-    activeRow: null,
     fileOpenActive: false,
-    tableData: [],
+    Total: 0,
     pos: 0,
+    activeRow: null,
+    tableData: [],
+    store: [],
     /**
      * Preserves the orginal HTML of main modal
      * This facilitates restore commands
@@ -718,6 +742,10 @@ const util = {
       show: true
     };
     $("#mainModal").modal(options);
+  },
+
+  closeModal(toggler) {
+    $(toggler).click();
   },
 
   infoModal(message, cb) {
