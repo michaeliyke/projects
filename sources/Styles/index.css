@@ -756,9 +756,10 @@ footer a:hover {
 }
 
 .modal-title {
-  font-size: 2rem;
-  text-align: center;
+  font-size: 1.8rem;
   flex-basis: 100%;
+  margin-left: 1rem;
+  color: rgb(116 81 15);
 }
 
 .modal-header .close {
@@ -768,7 +769,7 @@ footer a:hover {
 }
 
 .modal-body {
-  /* padding: 1.6rem; */
+  padding: 0;
 }
 
 .modal-body p {
@@ -795,14 +796,20 @@ footer a:hover {
 }
 
 .modal-footer .btn {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   border-radius: 0.4rem;
   padding: 0.6rem 1.2rem;
   color: #667b97;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .modal-footer .btn.unfocus {
   color: #a4b1c1;
+}
+
+.modal-body > h2 {
+  font-size: 1.6rem;
 }
 
 .modal-body input {
@@ -812,6 +819,7 @@ footer a:hover {
   font-family: unset;
   font-weight: normal;
 }
+
 #modal-item.create-listing {
   border-radius: 5px;
   padding-right: .5rem;
@@ -819,4 +827,24 @@ footer a:hover {
   font-size: 1.4rem;
   padding-bottom: 0.5rem;
   border: 0.1rem outset rgba(122, 172, 218, 0.2);
+}
+
+.modify-row {
+  justify-content: space-between;
+  /* padding: 0; */
+}
+
+.modify-row input {
+  border: 0.1rem outset rgba(122, 172, 218, 0.2);
+  border-radius: 5px;
+  font-size: 1.4rem;
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
+  padding-right: .5rem;
+  padding-left: 0.5rem;
+}
+
+.delete-warning {
+  line-height: 1;
+  margin-bottom: 0 !important;
 }

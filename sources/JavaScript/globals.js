@@ -36,45 +36,50 @@ const EventProfiler = function addEventListener(type, listener, options) {
  */
 function hasClass(className, target = this) {
   if (typeof className !== "string" || !(target instanceof HTMLElement)) {
-      throw new Error("Invalid argument to has()");
-    }
-    return target.classList.contains(className);
+    throw new Error("Invalid argument to has()");
+  }
+  return target.classList.contains(className);
 }
 
 
 /**
  * The util object
- * @type  util
+ * @type  {object}
  */
 const util = {
   grab,
   grabAll,
   byClass,
   collections: {
-
-    createListing(event) {
-    util.infoModal("", util.collections.launchEditCB);
+    performCreateListing(event) {
+      console.log("here there!");
     },
 
-    launchEditCB(body, footer, header) {
+    triggerSelection(event) {
+      const { target: t } = event;
+      if (!(t.tagName == "INPUT" && hasClass("create-listing", t))) return;
+      t.select();
+    },
+
+    launchCreateListing(event) {
+      util.modalRole = "create-listing";
       let d = String(new Date()).split(" ").slice(0, 5);
       let t = d.pop().replace(/:\d+$/, "");
       let s = "listing-" + d.join("-").toLowerCase() + "-" + t;
       const html = `
-        <div class="row col-11  mx-auto">
+        <div class="row col-12">
           <input id="modal-item" class="create-listing item col-12 pt-1" value="${s}" />
         </div>
       `;
-      const [close, save] = footer.buttons;
-      header.modalTitle.textContent = "Edit row";
-      body.innerHTML = html;
-      body.getElementsByTagName("input")[0].addEventListener("focus", (event) => {
-        event.target.select();
+      util.infoModal("", (body, footer, header) => {
+        const [close, save] = footer.buttons;
+        header.modalTitle.textContent = "Create listing from table";
+        body.innerHTML = html;
+        save.textContent = "Create";
+        return {
+          hideCloser: !0, borders: !0
+        };
       });
-      save.textContent = "Update";
-      return {
-        hideCloser: !0, borders: !0
-      };
     }
   },
   vars: {
@@ -88,32 +93,49 @@ const util = {
      * This facilitates restore commands
      */
     saveModalHTML() {
-      
+
     },
 
     /**
      * Restores the orginal HTML contents of the modal dialog
      */
     resetModalHTML() {
-      const m = grab("#mainModal");
+      const modal = grab("#mainModal");
       $("tr[data-role='editing'], tr[data-role='deleting']").each((_, node) => {
         return node && node.removeAttribute("data-role");
       });
-      m.dataset.role = "info";
-      m.removeAttribute("style");
-      const f = find.bind(m);
-      f(".modal-header").removeAttribute("style");
-      f(".modal-body").innerHTML = f(".modal-header h5").textContent = "";
-      const footer = f(".modal-footer");
-      footer.removeAttribute("style");
-      [cancel, accept] = findAll.call(footer, "button");
-      cancel.textContent = "Cancel";
-      cancel.classList.remove("unfocus");
-      accept.textContent = "Continue";
-      accept.classList.remove("unfocus");
+      modal.dataset.role = "info";
+      modal.className = "modal fade";
+
+      const dialog = find.call(modal, "div");
+      dialog.className = "modal-dialog modal-dialog-centered";
+
+      const content = find.call(dialog, "div");
+      content.className = "modal-content row col-8 mx-auto px-0";
+
+      const header = find.call(content, ".modal-header");
+      header.className = "modal-header col-12 row";
+      const title = find.call(header, "h5");
+      title.className = "modal-title";
+      title.textContent = "";
+
+      const body = find.call(content, ".modal-body");
+      body.className = "modal-body col-12 row mx-0 px-0 py-0";
+      body.innerHTML = "";
+
+      const footer = find.call(content, ".modal-footer");
+      footer.className = "modal-footer col-12 row";
+      const [btnNo, btnYes] = findAll.call(footer, ".btn");
+      btnNo.className = "btn btn-link modal-no";
+      btnNo.textContent = "CANCEL";
+      btnYes.className = "btn btn-link modal-yes";
+      btnYes.textContent = "CONTINUE";
+
+      [
+      modal, dialog, content, header, title, body, footer, btnNo, btnYes
+      ].forEach((node) => node.removeAttribute("style"));
     },
 
-    // 08106500826
     // Miles Munro Kingdom Principles, 
     /**
      * updates the value of budget calculator total
@@ -124,7 +146,7 @@ const util = {
         throw new Error(`update() expects a table row but got ${row}`);
       }
       const value = parseFloat(row.dataset.amount);
-      switch(row.dataset.operation) {
+      switch (row.dataset.operation) {
         case "update":
           const update = util.extractNumbers(row.dataset.update);
           row.dataset.amount = update;
@@ -132,15 +154,15 @@ const util = {
           vars.Total += update;
           break;
         case "subtraction": vars.Total -= value;
-        break;
+          break;
         case "addition": vars.Total += value;
-        break;
-        }
-         if(vars.Total < 0) {
-           vars.Total = 0;
-         }
+          break;
+      }
+      if (vars.Total < 0) {
+        vars.Total = 0;
+      }
       row.removeAttribute("data-update");
-      row.removeAttribute("data-operation");      
+      row.removeAttribute("data-operation");
       vars.unsetActive().updateCount();
     },
 
@@ -206,10 +228,10 @@ const util = {
      * Shift focus to iteminput box
      */
     resetInputs() {
-    const inputs = grabAll("#item, #amount");
-    inputs.forEach((input) => input.value = "");
-    inputs[0].focus();
-  }
+      const inputs = grabAll("#item, #amount");
+      inputs.forEach((input) => input.value = "");
+      inputs[0].focus();
+    }
   },
 
   /**
@@ -607,6 +629,8 @@ const util = {
         break;
       case "delete": util.performRowDelete(event);
         break;
+      case "create-listing": util.collections.performCreateListing(event);
+        break;
     }
     // DO nothing for other modal roles like info 
   },
@@ -616,7 +640,7 @@ const util = {
    * @param {object} event Event
    */
   modalDialogReject(event) {
-    
+
   },
 
   /**
@@ -674,14 +698,13 @@ const util = {
         hideCloser, borders, unfocus, footerBorders, headerBorders
       } = cb.call(modal, body, footer, header);
       // Fall-through required in switch statement
-      /* jshint -W086 */ 
-        if (unfocus instanceof HTMLButtonElement) unfocus.classList.add("unfocus");
-        if (hideCloser) header.close.style.display = "none";
-        if (borders) {
-          console.log("here")
-          if(!headerBorders) header.style.border = "none";
-          if (!footerBorders) footer.style.border = "none";
-        }
+      /* jshint -W086 */
+      if (unfocus instanceof HTMLButtonElement) unfocus.classList.add("unfocus");
+      if (hideCloser) header.close.style.display = "none";
+      if (borders) {
+        if (!headerBorders) header.style.border = "none";
+        if (!footerBorders) footer.style.border = "none";
+      }
     }
 
     if (modalType == "info") {
@@ -703,7 +726,7 @@ const util = {
 
   confirmModal(message, cb) {
     util.modal("info", message, cb);
-    return 
+    return
   },
 
   actionModal(content, cb) {
@@ -739,10 +762,13 @@ const util = {
     row.dataset.role = "deleting";
     row.dataset.operation = "subtraction";
     util.modalRole = "delete"; // will be removed by the aftermath reset
-    const warning = "Do you want to delete this row?";
+    let warning = `<p class="col delete-warning"> Delete selected row?</p>`;
     util.infoModal(warning, launchDeleteRowCB);
     function launchDeleteRowCB(body, footer, header) {
+      header.modalTitle.textContent = "Dangerous operation";
       const [cancel, accept] = footer.buttons;
+      accept.textContent = "DELETE";
+      accept.style.color = "#ea4f4f";
       return {
         hideCloser: true,
         borders: true,
@@ -778,16 +804,16 @@ const util = {
     const row = util.getNextAncestor(t, "tr");
     const { item, value } = util.getRowData(row);
     const html = `
-        <div>
-          <input id="modal-item" class="item" value="${item.trim()}" />
-          <input id="modal-amount" class="amount" value="${value.trim()}" />
+        <div class="row col-12 modify-row">
+          <input id="modal-item" class="col-7 mx-0 px-0 item" value="${item.trim()}" />
+          <input id="modal-amount" class="col-4 mx-0 px-0 amount" value="${value.trim()}" />
         </div>
               `;
     row.dataset.role = "editing";
     util.infoModal("", launchRowEditCB);
     function launchRowEditCB(body, footer, header) {
       const [close, save] = footer.buttons;
-      header.modalTitle.textContent = "Edit row";
+      header.modalTitle.textContent = "Modify row information";
       body.innerHTML = html;
       save.textContent = "Update";
       return {
@@ -822,8 +848,8 @@ const util = {
    * @returns {object}
    */
   getNextAncestor(child, tagName, predicate) {
-    const fn = typeof predicate === "function" ? predicate : function fn() {return false;};
-    const yes = fn(child.parentNode,  tagName);
+    const fn = typeof predicate === "function" ? predicate : function fn() { return false; };
+    const yes = fn(child.parentNode, tagName);
     if (!tagName && predicate) {
       tagName = "";
     }
@@ -1034,13 +1060,13 @@ const util = {
    */
   group() {
     util.mergeArgs(...arguments).forEach((s) => {
-      const sHold = Array.isArray(s.subscribers) && s.subscriber ? s.subscribers.concat(s.subscriber) : 
+      const sHold = Array.isArray(s.subscribers) && s.subscriber ? s.subscribers.concat(s.subscriber) :
         s.subscriber ? [s.subscriber] : Array.isArray(s.subscribers) ? s.subscribers : [];
       const fnHold = Array.isArray(s.handlers) && s.handler ? s.handlers.concat(s.handler) :
         s.handler ? [s.handler] : Array.isArray(s.handlers) ? s.handlers : [];
       const tHold = Array.isArray(s.types) && s.type ? s.types.concat(s.type) :
         s.type ? [s.type] : Array.isArray(s.types) ? s.types : [];
-     
+
       if ((s && s.types) && !Array.isArray(s.types)) {
         throw new Error("Inavid input provided as types array");
       }
@@ -1051,7 +1077,11 @@ const util = {
         throw new Error("Inavid input provided as handlers array");
       }
       if (sHold.length < 1 || fnHold.length < 1 || tHold.length < 1) {
-        return
+        let msg;
+        if (sHold.length < 1) msg = "util.group() - invalid 'subscriber' in subscription";
+        if (fnHold.length < 1) msg = "util.group() - invalid 'handler' in subscription";
+        if (tHold.length < 1) msg = "util.group() - invalid 'type' in subscription";
+        throw new Error("\n\n\t\t" + msg + "\n\t\tExecution terminates.. \n\n");
       }
       const subscribers = [];
       sHold.forEach((x) => {
@@ -1087,42 +1117,33 @@ const util = {
       return o && typeof o.type === "string" && (Array.isArray(o.handlers) || typeof o.handler === "function");
     });
 
-    
+
     if (options.length == 0) {
       return this;
     }
 
     if (optArgs) {
       options = options.map((o) => {
-        switch(true) {
-          case o.handlers && !Array.isArray(o.handlers): 
-            throw new Error("Inavid input provided as handlers array");
-          case o.handler && o.handlers: o.handlers.push(o.handler); break;
-          case o.handler && !o.handlers: o.handlers = [o.handler]; break;
-        }
-        switch (true) {
-          case o.types && !Array.isArray(o.types): throw new Error("Inavid input provided as types array");
-          case o.type && o.types: o.types.push(o.type); break;
-          case o.type && !o.types: o.types = [o.type]; break;
-        }
+        if (o.handlers && !Array.isArray(o.handlers))
+          throw new Error("Inavid input provided as handlers array");
+        if (o.handler && o.handlers) o.handlers.push(o.handler);
+        if (o.handler && !o.handlers) o.handlers = [o.handler];
+        if (o.types && !Array.isArray(o.types)) throw new Error("Inavid input provided as types array");
+        if (o.type && o.types) o.types.push(o.type);
+        if (o.type && !o.types) o.types = [o.type];
         return o;
       });
     }
 
-    switch (true) {
-      case strArgs: options = [{ types: options, handlers: [] }];
-        break;
-      case fnArgs:
-        if (!(Object.getPrototypeOf(this) == util && this.events && this.events.length > 0)) {
-          throw new Error("util.defaults(): event type not set");
-        }
-        options = [{ types: this.events, handlers: options }];
-        break;
-      default:
-        if (!optArgs) {
-          throw new Error("invalid input in call to defaults()");
-        }
+    if (strArgs) options = [{ types: options, handlers: [] }];
+    if (fnArgs) {
+      if (!(Object.getPrototypeOf(this) == util && this.events && this.events.length > 0)) {
+        throw new Error("util.defaults(): event type not set");
+      }
+      options = [{ types: this.events, handlers: options }];
     }
+    if (!(optArgs || fnArgs || strArgs)) throw new Error("invalid input in call to defaults()");
+
     return this.handleDefault(options, optArgs);
   },
 
@@ -1134,14 +1155,14 @@ const util = {
    * @returns {object} this
    */
   handleDefault(options, isOptions) {
-    if (!isOptions) { // handle() will completes the flow
-      const [{types, handlers}] = options;
-      const s = util.subscription(types).subscribe(document).override(!1);
+    if (!isOptions) { // handle() will complete the flow
+      const [{ types, handlers }] = options;
+      const s = util.subscription(types).subscribe(document).override(false);
       return Array.isArray(handlers) && handlers.length > 0 ? s.handle(handlers) : s;
     }
     options.forEach((option) => {
       const { types, handlers } = option;
-      return this.subscription(types).subscribe(document).override(!1).handle(handlers);
+      return this.subscription(types).subscribe(document).override(false).handle(handlers);
     });
     return this;
   },
@@ -1211,7 +1232,7 @@ const util = {
 
       // Add a handler for event identified by className
       addHandlers(handlers) {
-        this.types.forEach(({type}) => {
+        this.types.forEach(({ type }) => {
           const fns = Array.isArray(this.handlers[type]) ? this.handlers[type] : [];
           fns.push.apply(fns, handlers.filter((fn) => !(fns.includes(fn))));
           this.handlers[type] = fns;
@@ -1223,7 +1244,7 @@ const util = {
       // returns true if not queued, and puts the subscriber in queue.
       attachx(subscriber, handlers) {
         let response = false;
-        const types = this.types.map(({type}) => type);
+        const types = this.types.map(({ type }) => type);
         subscriber.matchset.forEach((node) => {
           handlers.forEach((h) => {
             types.forEach((eventType) => {
@@ -1263,7 +1284,7 @@ const util = {
 
       // default generic handler handles all non-delegated events
       defaultHandler() {
-        const types = this.types.map(({type}) => type);
+        const types = this.types.map(({ type }) => type);
         this.subscribers.nodes.forEach((node) => {
           types.forEach((type) => {
             this.attach(node, type, this.execute((this.handlers[type] || [])));
@@ -1284,7 +1305,7 @@ const util = {
           }
           return this.defaultHandler(...arguments);
         }
-        const types = this.types.map(({type}) => type);
+        const types = this.types.map(({ type }) => type);
         types.forEach((type) => {
           this.attach(document, type, util.delegationBridge);
         });
@@ -1294,7 +1315,7 @@ const util = {
       },
 
       extrasHandler() {
-        this.types.forEach(({type}) => {
+        this.types.forEach(({ type }) => {
           const info = util.extras.getInfo(type);
           if (info.token == "key") { // If it's a keyboard event
             this.attach(document, "keyup", (event) => {
@@ -1426,8 +1447,8 @@ const util = {
        */
       setContextualTypes(types) {
         if (types) {
-          types.every = typeof types.every === "function" ? types.every : [].every.bind(types); 
-          let allQualified = types.every(({handler, type}) => {
+          types.every = typeof types.every === "function" ? types.every : [].every.bind(types);
+          let allQualified = types.every(({ handler, type }) => {
             return typeof handler === "string" && typeof type === "string";
           });
           if (!(Array.isArray(types) && allQualified)) {
@@ -1664,16 +1685,16 @@ const util = {
     util.addCustomEvents(customEvent);
     const event = new Event('build');
 
-/* 
-    Three Steps
-    0. save customEvent in dedicated util list for diligence
-    1. setup a normal event with baseEvent and baseTarget
-    2. create a dispatch method and set as handler; it will
-       trigger or invoke the custom event
-    3. develope customEventsHandler() to handle custom events
- */
+    /* 
+        Three Steps
+        0. save customEvent in dedicated util list for diligence
+        1. setup a normal event with baseEvent and baseTarget
+        2. create a dispatch method and set as handler; it will
+           trigger or invoke the custom event
+        3. develope customEventsHandler() to handle custom events
+     */
     // Listen for the event.
-    function fn(e) {baseEvent.dispatchEvent()}
+    function fn(e) { baseEvent.dispatchEvent() }
     baseTarget.addEventListener(baseEvent, fn, false);
 
     // Dispatch the event.
@@ -1731,11 +1752,11 @@ const util = {
       // returns status {isMixed, isDelegatable}
       detect(types) {
         let delegated = [], extras = [], defaultTypes = [], detectedTypes = [],
-            customTypes = [];
+          customTypes = [];
         types.forEach((type) => {
           this.checkSupported(type);
-          const typeInfo = { type, handler: null, defaultEnabled: false};
-          switch(true){
+          const typeInfo = { type, handler: null, defaultEnabled: false };
+          switch (true) {
             case (this.isDelegatable(type)): // delegated
               typeInfo.handler = "delegationHandler";
               typeInfo.defaultEnabled = true;
@@ -1747,14 +1768,14 @@ const util = {
               typeInfo.handler = "customEventsHandler";
               customTypes.push(typeInfo); break;
             default: // default
-            typeInfo.handler = "defaultHandler";
-            defaultTypes.push(typeInfo);
+              typeInfo.handler = "defaultHandler";
+              defaultTypes.push(typeInfo);
           }
           detectedTypes.push(typeInfo);
         });
         const unDelegated = [].concat(defaultTypes, customTypes, extras);
         const isDelegatable = Boolean(unDelegated.length == 0);
-        const isMixed = !detectedTypes.every((current, index, detectedTypes) =>{
+        const isMixed = !detectedTypes.every((current, index, detectedTypes) => {
           const next = detectedTypes[index + 1];
           return next ? current.handler == next.handler : true;
         });
