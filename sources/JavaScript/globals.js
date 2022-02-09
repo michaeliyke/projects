@@ -62,8 +62,7 @@ const util = {
   byClass,
   collections: {
     async postListingData(data) {
-      // TODO: if data is null, 
-      // TODO: show modal info - No data found
+      if (!data) return util.info("No data found");
       // TODO: show spinner 
       const url = ""
       const result = await util.POST(url, data);
@@ -86,10 +85,10 @@ const util = {
       const footer = t.parentNode;
       const body = util.getPreviousSibling(footer, "div");
       const input = find.call(body, "input");
-      if (!input.value.trim()) return null && info("Listing name required");
+      if (!input.value.trim()) return util.delay((x) => util.info("Listing name required"));
       
       const content = util.getTableData();
-      if (content.length == 0) return null && util.info("No data to be process");
+      if (content.length == 0) return util.delay(() => util.info("No data to be process"));
 
       const data = {
         content,
@@ -294,8 +293,23 @@ const util = {
     }
   },
 
+  /**
+   * Put an execution on the queue
+   * 
+   * Or
+   * 
+   * Simply put it on hold for a while
+   * @param {function} cb callback function
+   * @param {number} duration duration in milliseconds
+   */
+  delay(cb, duration = 400) {
+    new Promise((resolve) => {
+      setTimeout(resolve, duration);
+    }).then(cb).catch(util.remoteErrorReport);
+  } ,
+
   remoteErrorReport(errorMessage, remoteAction) {
-    const action = "While performing " + remoteAction + "action";
+    const action = "While performing '" + remoteAction + "' action";
     const consoleMessage = `\n\n\t${action}\n\t${errorMessage}\n\n`
     console.error(consoleMessage);
   },
@@ -316,14 +330,13 @@ const util = {
       }
     };
 
-    const responseData = await fetch(url, options).catch((error) => {
+    return fetch(url, options).then((response) => {
+        return response.text();
+    }).then((data) => {
+      fn(data);
+    }).catch((error) => {
       return util.remoteErrorReport(error, "POST");
-    }).then((response) => {
-      return response.json();
-    }); // Note: await will execute the last part of 'then chaining'
-
-    fn(responseData);
-    return responseData;
+    });
   },
 
   async GET(url, cb, options) {
@@ -602,10 +615,9 @@ const util = {
    * @returns {string} A JSON string containing data
    */
   getTableData(table) {
-    const data = [].map.call(grabAll.call(table, "tr[data-pos]"), (row) => {
+    return [].map.call(grabAll.call(table, "tr[data-pos]"), (row) => {
       return util.getRowData(row);
     });
-    return JSON.stringify(data);
   },
 
   /**
@@ -716,15 +728,9 @@ const util = {
     const has = hasClass.bind(event.target);
     let resolved = false;
     
-    if (has("modal-no")) {
-      util.modalDialogReject(event);
-      resolved = true;
-    }
+    if (has("modal-no")) resolved = util.modalDialogReject(event) || true;
 
-    if (has("modal-yes")) {
-      util.modalDialogAccept(event);
-      resolved = true;
-    }
+    if (has("modal-yes")) resolved = util.modalDialogAccept(event) || true;
 
     if(has("close-btn") || has("close") || has("modal")) {
       vars.resetModalHTML();
@@ -740,15 +746,13 @@ const util = {
    * @param {object} event The event objct
    */
   modalDialogAccept(event) {
-    switch (util.modalRole) {
-      case "edit": util.performRowEdit(event);
-        break;
-      case "delete": util.performRowDelete(event);
-        break;
-      case "create-listing": util.collections.performCreateListing(event);
-        break;
-    }
-    // DO nothing for other modal roles like info 
+
+    if (util.modalRole == "edit") util.performRowEdit(event);
+
+    if (util.modalRole == "delete") util.performRowDelete(event);
+
+    if (util.modalRole == "create-listing")
+      util.collections.performCreateListing(event);
   },
 
   /**
