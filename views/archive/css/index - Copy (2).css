@@ -1,0 +1,161 @@
+body, html, *{
+    font-size: 16px;
+    line-height: 1.2;
+    box-sizing: border-box;
+    font-family: Verdana,Arial,sans-serif;
+}
+#manage{
+    text-align: left;
+    margin: 7px;
+}
+.managed{
+    display: inline;
+    font-size: 12px;
+    background-color: #a49499;
+    color: #fff;
+    border-radius: 5px;
+    padding: 5px;
+    position: relative;
+}
+.managed:hover{
+    background: #d7aa99;
+    /* Make the mouse pointer to be hand */
+}
+#managed_right{
+    left: 70%;
+}
+#managed_center{
+    left: 40%;
+}
+#managed_left{
+    left: 10%
+}
+#inputs { /*Input container*/
+    background-color: #f5deb3;
+    margin: 0 auto;
+    padding: 2%;
+    text-align: center;
+    width: 80%;
+    box-sizing: content-box;
+}
+
+#intro{
+    width: 20em;
+    position: relative;
+    left: 10em;
+    margin: 2em;
+}
+
+.trigger {
+    color: #444444;
+    display: inline;
+    font-size: 100%;
+    padding: 3px 8px;
+    position: relative;
+    background-color: #ebebeb;
+}
+.cell, #total, #submit, #reset {
+    font-size-adjust: 1;
+    font-size: 100%;
+    font-weight: 600;
+    text-align: right;
+    border-radius: 5px;
+    color: #789;
+}
+#reset, #total, #submit{
+    font-size: 80%;
+}
+#total, #current{
+    background: none;
+}
+
+#reset{
+    left: -30%;
+}
+#submit{
+    right: -30%;
+}
+
+body {
+    background-color: #ebebeb;
+    width: 100%;
+}
+#resultsPane > table {
+    margin: 0 auto;
+}
+header {
+    background-color: #ffffdf;
+    font-size: 120%;
+    padding: 0.5em;
+    text-align: center;
+    width: 100%;
+}
+header {
+    margin: 0 auto;
+    background-color: #ffffdf;
+    font-size: 120%;
+    padding: 2em;
+    text-align: center;
+    width: 80%;
+    box-sizing: content-box;
+}
+
+nav {
+    background-color: #e8e8e8;
+    border-bottom: 1px solid #000000;
+    font-family: Arial;
+    margin: 0 auto;
+    padding: 1em;
+    text-align: center;
+    width: 80%;
+}
+nav ul li {
+    display: inline;
+    font-style: oblique;
+}
+nav ul li a {
+    border: medium none;
+    border-radius: 50%;
+    color: #0000ff;
+    padding: 0.5em 1em;
+    text-decoration: none;
+}
+nav ul li a:visited {
+    color: #b30000;
+    text-decoration: overline dotted #ffff00;
+}
+nav ul li a:hover {
+    /*background-color: #ffffa4;*/
+    color: #228080;
+    text-decoration: overline dotted #0000ff;
+}
+
+nav ul li a:link {
+    color: #808000;
+}
+#resultsPane {
+    width: 101%;
+}
+#row {
+    width: 70%;
+}
+#trigger{
+    margin: 1em;
+}
+
+#input{
+    margin: 2em;
+}
+
+
+.input {
+    font-family: Verdana,Arial,sans-serif;
+    font-stretch: extra-expanded;
+}
+
+#cell0 {
+    text-align: left;
+}
+.RASTERS {
+    width: 85%;
+}

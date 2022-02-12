@@ -2,13 +2,16 @@ package main
 
 import (
 	"net/http"
+	"projects/server/api"
+	. "projects/server/middleware"
+	. "projects/server/util"
 )
 
 func main() {
 	var mux *http.ServeMux = http.NewServeMux()
-	files := http.FileServer(http.Dir(config.Static))
+	files := http.FileServer(http.Dir(Config.Static))
 	mux.Handle("/sources/", http.StripPrefix("/sources/", files))
-	mux.Handle("/favicon.ico", http.StripPrefix("/sources/", files))
+	mux.Handle("/favicon.ico", http.StripPrefix("/", files))
 
 	//Aliases (GET)
 	mux.HandleFunc("/signup/", RouteTo("/account/signup/"))
@@ -32,18 +35,21 @@ func main() {
 	mux.HandleFunc("/app/manage/", ManageRecords)
 	mux.HandleFunc("/t/", T)
 
-	if port == "" || port == "5000" {
+	// API manager
+	mux.HandleFunc("/api/", api.API)
+
+	if Port == "" || Port == "5000" {
 		Log("$PORT var not set. ..")
 		Log("Deafulting to :80")
 		Log("-----------------------")
-		port = "80"
+		Port = "80"
 	} else {
-		Log("$PORT value: " + port)
+		Log("$PORT value: " + Port)
 	}
 
 	server := &http.Server{
 		Handler:        mux,
-		Addr:           "0.0.0.0:" + port,
+		Addr:           "0.0.0.0:" + Port,
 		MaxHeaderBytes: 1 << 20, //2^20 --> 1048576
 	}
 	Println("server running..")

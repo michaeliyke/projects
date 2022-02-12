@@ -1,1 +1,1 @@
-web: bin\projects
+web: gin run main.go -a 80 -b bin/projects.exe --notifications

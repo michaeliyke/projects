@@ -2,6 +2,6 @@
     "Address": "0.0.0.0:80",
     "ReadTimeout": 10,
     "WriteTimeout": 600,
-    "Static": "sources",
+    "Static": "views",
     "AuthCookieName": "auth_tok"
 }
