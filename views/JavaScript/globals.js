@@ -64,7 +64,7 @@ const util = {
     async postListingData(data) {
       if (!data) return util.info("No data found");
       // TODO: show spinner 
-      const url = ""
+      const url = "/api/collection/listing";
       const result = await util.POST(url, data);
       // TODO: dismiss spinner
       return result;

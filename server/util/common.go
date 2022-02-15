@@ -56,16 +56,6 @@ func AddLastChar(s, ch string) string {
 	return s + ch
 }
 
-// FirstChar returns the first character of a string
-//
-// Returns is a single character string
-func FirstChar(s string) string {
-	if len(s) < 1 {
-		return s
-	}
-	return string(s[0])
-}
-
 // RemoveFirstChar removes the first character in a string
 func RemoveFirstChar(s string) string {
 	if len(s) < 1 {
@@ -81,12 +71,52 @@ func AddFirstChar(s, ch string) string {
 	return ch + s
 }
 
+// FirstChar returns the first character of a string
+//
+// Returns is a single character string
+func FirstChar(s string) string {
+	if len(s) < 1 {
+		return s
+	}
+	return string(s[0])
+}
+
+// Checks if a string starts with a given prefix
+func StartsWith(str, prefix string) bool {
+	return strings.HasPrefix(str, prefix)
+}
+
+// Checks if a string starts with a given prefix
+func HasPrefix(str, prefix string) bool {
+	return strings.HasPrefix(str, prefix)
+}
+
+// Checks if a string end with a given suffix
+func EndsWith(str, suffix string) bool {
+	return strings.HasSuffix(str, suffix)
+}
+
+// HasSuffix if a string end with a given suffix
+func HasSuffix(str, suffix string) bool {
+	return EndsWith(str, suffix)
+}
+
+// HasSubstring checks if a given substring is present in s
+func HasSubstring(s, substring string) bool {
+	return ContainsSub(s, substring)
+}
+
 // Replaces every occurence of char found in s with repl
-func StrReplaceAny(s string, chars string, repl string) string {
+func StrReplaceAny(s, chars, repl string) string {
 	for _, ch := range strings.Split(chars, "") {
 		s = strings.ReplaceAll(s, ch, repl)
 	}
 	return s
+}
+
+// Replaces every occurence of char found in s with repl
+func StrReplace(s, old, new string) string {
+	return strings.Replace(s, old, new, -1)
 }
 
 // Strips out all occurence of individual chars or group thereof from a string
@@ -107,6 +137,23 @@ func StripChar(s, ch string) string {
 	}, s)
 }
 
+// StrParts splits throught a string by a given characte and return the parts
+func StrParts(str string, ch string) []string {
+	return strings.FieldsFunc(strings.TrimSpace(str), func(c rune) bool {
+		return string(c) == ch
+	})
+}
+
+// Strplit splits throught a string by a given character and returns the parts
+func StrSplit(str, ch string) []string {
+	return StrParts(str, ch)
+}
+
+// StrJoin joins a string slice together separated by separator
+func StrJoin(s []string, separator string) string {
+	return strings.Join(s, separator)
+}
+
 // StripChars removes each of the runes chars from s and returns what is left
 func StripChars(s string, chars ...string) string {
 	for _, ch := range chars {
@@ -115,7 +162,7 @@ func StripChars(s string, chars ...string) string {
 	return s
 }
 
-// ContainsSub checks if any of substrings is present in s.
+// ContainsSub checks if any of a given set of substrings is present in s.
 // ContainsSub(s, "f", "foo", "bar", "baz", ...)
 func ContainsSub(s string, chars ...string) (b bool) {
 	for _, ch := range chars {

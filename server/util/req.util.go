@@ -62,15 +62,37 @@ func FromContext(ctx context.Context) (net.IP, bool) {
 	return userIP, ok
 }
 
-// PopSlash removes the trailing slash on a path and ensures the leading one
-func PopSlash(path string) string {
-	if LastChar(path) == "/" {
-		path = RemoveLastChar(path)
+// PathRoot get the root of a URL path
+func PathRoot(path string) string {
+	for FirstChar(path) == "/" {
+		path = RemoveFirstChar(path)
 	}
-	if FirstChar(path) != "/" {
-		path = AddFirstChar(path, "/")
-	}
-	return path
+	return "/" + StrParts(path, "/")[0] + "/"
+}
+
+// GetPathRoot get the root of a URL path
+func GetPathRoot(path string) string {
+	return PathRoot(path)
+}
+
+// PopSlashes removes all trailing slashe on a path and ensures only one leading slash
+func PopSlashes(path string) string {
+	return RemoveLastChar(CorrectPathSlashes(path))
+}
+
+// AppendSlash adds a trailing slash on a path and ensures only one leading slash
+func AppendSlash(path string) string {
+	return CorrectPathSlashes(path)
+}
+
+// AddTrailingSlash adds a trailing slash on a path and ensures only one leading slash
+func AddTrailingSlash(path string) string {
+	return AppendSlash(path)
+}
+
+// RemoveTrailingSlash removes the trailing slash on a path and ensures the leading one
+func RemoveTrailingSlashes(path string) string {
+	return PopSlashes((path))
 }
 
 // compares the request path with the manually provided path
@@ -146,16 +168,18 @@ func Referred(r *http.Request) (referred bool, ref string) {
 	return
 }
 
-// CorrectPathSlashes ensures a path starts and ends with slash
+// CorrectPathSlashes ensures a path starts and ends with a slash
 //
-// /users => /users/
+// It also replace backslashes and removes excess forward slashes
 func CorrectPathSlashes(path string) string {
-	if FirstChar(path) != "/" {
-		path = "/" + path
+	path = StrReplace(path, "\\", "/")
+	for FirstChar(path) == "/" {
+		path = RemoveFirstChar(path)
 	}
-	if LastChar(path) != "/" {
-		path += "/"
+	for LastChar(path) == "/" {
+		path = RemoveLastChar(path)
 	}
+	path = AddLastChar(AddFirstChar(StrJoin(StrParts(path, "/"), "/"), "/"), "/")
 	return path
 }
 
