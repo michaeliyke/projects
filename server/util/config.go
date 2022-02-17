@@ -1,11 +1,13 @@
 package util
 
 import (
+	"encoding/json"
 	"log"
 	"os"
-
-	log_ "github.com/michaeliyke/Golang/log"
 )
+
+var Config Configurations
+var Port string
 
 type Configurations struct {
 	Address        string
@@ -14,14 +16,6 @@ type Configurations struct {
 	Static         string
 	AuthCookieName string
 }
-
-var Config Configurations
-var Logger *log.Logger
-var Port string
-var Log = log_.Log
-var Fatal = log_.Fatal
-var Sprintf = log_.Sprintf
-var Println = log_.Println
 
 func init() {
 	LoadConfigs()
@@ -38,4 +32,18 @@ func init() {
 		"INFO",
 		log.Ldate|log.Ltime|log.Lshortfile,
 	)
+}
+
+func LoadConfigs() {
+	Port = os.Getenv("PORT")
+	file, err := os.Open("config.json")
+	if err != nil {
+		Fatal("cannot open config file", err)
+	}
+	decoder := json.NewDecoder(file)
+	Config = Configurations{}
+	err = decoder.Decode(&Config)
+	if err != nil {
+		Fatal("cannot get configuration from file", err)
+	}
 }

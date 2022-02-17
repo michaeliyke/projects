@@ -17,7 +17,7 @@ func Api(w http.ResponseWriter, r *http.Request) {
 	case endpoint == "/listings/":
 		handler = listingsHandler
 	default:
-		handler = helpers.NotImplemented
+		handler = notImplemented
 	}
 
 	handler(w, r)

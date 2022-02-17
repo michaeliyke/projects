@@ -2,7 +2,6 @@ package util
 
 import (
 	"encoding/json"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -19,7 +18,27 @@ func Int_2_String(num int) (s string) {
 	return strconv.Itoa(num)
 }
 
-func Marshal(arguments ...interface{}) (marshalled []string) {
+func Unmarshal(data []byte, structure interface{}) error {
+	return json.Unmarshal(data, structure)
+}
+
+func MarshalKeep(x interface{}) ([]byte, error) {
+	return json.Marshal(x)
+}
+
+func Marshal(x interface{}) (s string, err error) {
+	b, err := json.Marshal(x)
+	s = string(b)
+	return
+}
+
+func MarshalIndent(x interface{}, prefix string, indent string) (s string, err error) {
+	b, err := json.MarshalIndent(x, prefix, indent)
+	s = string(b)
+	return
+}
+
+func MarshalDebug(arguments ...interface{}) (marshalled []string) {
 	for _, datum := range arguments {
 		json_, err := json.MarshalIndent(datum, "", "  ")
 		if err != nil {
@@ -201,33 +220,4 @@ func Contains(array []string, s string) (present bool) {
 		}
 	}
 	return
-}
-
-func LoadConfigs() {
-	Port = os.Getenv("PORT")
-	file, err := os.Open("config.json")
-	if err != nil {
-		Fatal("cannot open config file", err)
-	}
-	decoder := json.NewDecoder(file)
-	Config = Configurations{}
-	err = decoder.Decode(&Config)
-	if err != nil {
-		Fatal("cannot get configuration from file", err)
-	}
-}
-
-func Warning(args ...interface{}) {
-	Logger.SetPrefix("WARNING ")
-	Logger.Println(args...)
-}
-
-func Danger(args ...interface{}) {
-	Logger.SetPrefix("ERROR ")
-	Logger.Println(args...)
-}
-
-func Info(args ...interface{}) {
-	Logger.SetPrefix("INFO ")
-	Logger.Println(args...)
 }

@@ -1,0 +1,52 @@
+INFO2022/02/16 12:14:30 util.reporting.go:63: pq: relation "listings" does not exist
+INFO2022/02/16 12:17:47 util.reporting.go:63: pq: relation "listings" does not exist
+INFO2022/02/16 12:27:41 util.reporting.go:63: pq: relation "listings" does not exist
+INFO2022/02/16 12:29:44 util.reporting.go:63: pq: relation "listings" does not exist
+INFO2022/02/16 12:29:44 util.reporting.go:63: cannot create listing
+INFO2022/02/16 12:34:00 util.reporting.go:63: pq: relation "listings" does not exist
+INFO2022/02/16 12:34:00 util.reporting.go:63: cannot create listing
+INFO2022/02/16 12:37:54 util.reporting.go:63: pq: relation "listings" does not exist
+INFO2022/02/16 12:37:54 util.reporting.go:63: cannot create listing
+INFO2022/02/16 12:39:01 util.reporting.go:63: pq: relation "listings" does not exist
+INFO2022/02/16 12:39:01 util.reporting.go:63: cannot create listing
+INFO2022/02/16 12:41:20 util.reporting.go:63: pq: relation "listings" does not exist
+INFO2022/02/16 12:41:20 util.reporting.go:63: cannot create listing
+INFO2022/02/16 12:42:12 util.reporting.go:63: pq: relation "listings" does not exist
+INFO2022/02/16 12:42:12 util.reporting.go:63: cannot create listing
+LOGS 2022/02/16 13:22:03 util.reporting.go:84: $PORT value: 3001
+ERROR 2022/02/16 13:22:03 util.reporting.go:58: pq: relation "listings" does not exist
+INFO 2022/02/16 13:22:03 util.reporting.go:70: cannot create listing
+ERROR 2022/02/16 13:25:43 util.reporting.go:58: pq: column "user_uuid" of relation "listings" does not exist
+INFO 2022/02/16 13:25:43 util.reporting.go:70: cannot create listing
+LOGS 2022/02/16 13:26:40 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/16 13:26:41 util.reporting.go:84: Post Prepare case
+LOGS 2022/02/16 13:26:41 util.reporting.go:84: Post QueryRow case
+ERROR 2022/02/16 13:26:41 util.reporting.go:58: sql: converting argument $2 type: unsupported type []collection.row, a slice of struct
+INFO 2022/02/16 13:26:41 util.reporting.go:70: cannot create listing
+LOGS 2022/02/16 13:49:38 util.reporting.go:84: $PORT value: 3001
+ERROR 2022/02/16 13:49:39 util.reporting.go:58: sql: converting argument $2 type: pq: Unable to convert *[]collection.row to array
+INFO 2022/02/16 13:49:39 util.reporting.go:70: cannot create listing
+LOGS 2022/02/16 13:50:25 util.reporting.go:84: $PORT value: 3001
+ERROR 2022/02/16 13:50:25 util.reporting.go:58: sql: converting argument $2 type: unsupported type collection.row, a struct
+INFO 2022/02/16 13:50:25 util.reporting.go:70: cannot create listing
+LOGS 2022/02/16 13:52:34 util.reporting.go:84: $PORT value: 3001
+ERROR 2022/02/16 13:52:34 util.reporting.go:58: pq: syntax error at or near "any"
+INFO 2022/02/16 13:52:34 util.reporting.go:70: cannot create listing
+LOGS 2022/02/16 13:54:54 util.reporting.go:84: $PORT value: 3001
+ERROR 2022/02/16 13:54:54 util.reporting.go:58: pq: syntax error at or near "ANY"
+INFO 2022/02/16 13:54:54 util.reporting.go:70: cannot create listing
+LOGS 2022/02/16 14:05:27 util.reporting.go:84: $PORT value: 3001
+ERROR 2022/02/16 14:05:27 util.reporting.go:58: pq: syntax error at or near "ANY"
+INFO 2022/02/16 14:05:27 util.reporting.go:70: cannot create listing
+LOGS 2022/02/16 14:07:14 util.reporting.go:84: $PORT value: 3001
+ERROR 2022/02/16 14:07:14 util.reporting.go:58: sql: converting argument $2 type: pq: Unable to convert *[]collection.row to array
+INFO 2022/02/16 14:07:14 util.reporting.go:70: cannot create listing
+LOGS 2022/02/16 14:09:50 util.reporting.go:84: $PORT value: 3001
+ERROR 2022/02/16 14:09:50 util.reporting.go:58: pq: syntax error at or near "$2"
+INFO 2022/02/16 14:09:50 util.reporting.go:70: cannot create listing
+LOGS 2022/02/16 14:10:49 util.reporting.go:84: $PORT value: 3001
+ERROR 2022/02/16 14:10:49 util.reporting.go:58: sql: converting argument $2 type: pq: Unable to convert *[]collection.row to array
+INFO 2022/02/16 14:10:49 util.reporting.go:70: cannot create listing
+LOGS 2022/02/16 14:13:03 util.reporting.go:84: $PORT value: 3001
+ERROR 2022/02/16 14:13:03 util.reporting.go:58: sql: converting argument $2 type: unsupported type []collection.row, a slice of struct
+INFO 2022/02/16 14:13:03 util.reporting.go:70: cannot create listing

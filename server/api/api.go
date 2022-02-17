@@ -18,7 +18,7 @@ func API(w http.ResponseWriter, r *http.Request) {
 
 	switch path := StrReplace(r.URL.Path, "/api", ""); PathRoot(path) {
 	case "/":
-		Api = helpers.ServerOK
+		Api = ok
 	case "/chat/":
 		Api = chat.Api
 	case "/collection/":
@@ -28,7 +28,7 @@ func API(w http.ResponseWriter, r *http.Request) {
 	case "/user/":
 		Api = user.Api
 	default:
-		Api = helpers.NotImplemented
+		Api = notImplemented
 	}
 
 	if Api == nil {
@@ -39,4 +39,12 @@ func API(w http.ResponseWriter, r *http.Request) {
 
 	Api(w, r)
 
+}
+
+func ok(w http.ResponseWriter, r *http.Request) {
+	helpers.ServerOK(w, r)
+}
+
+func notImplemented(w http.ResponseWriter, r *http.Request) {
+	helpers.ServerNotImplemented(w, r)
 }

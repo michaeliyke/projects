@@ -7,6 +7,11 @@ jQuery(function ($) {
 // abulegba
 // signup
 
+/*
+  TODO;
+    implement quantity and unit price, and individual total
+*/
+
   util.queue([
     { type: "click", subscriber: "create-listing", handler: util.collections.launchCreateListing },
     { type: "click", subscriber: "to-pdf", handler: util.ConvertToPDF },
@@ -31,6 +36,10 @@ jQuery(function ($) {
   ]);
 
 });
+
+function l() {
+  grab(".create-listing").click()
+}
 
 
 function fn(event) {

@@ -91,7 +91,7 @@ const util = {
       if (content.length == 0) return util.delay(() => util.info("No data to be process"));
 
       const data = {
-        content,
+        rows: content,
         name: input.value.trim()
       };
       util.vars.store.push(data);
@@ -546,8 +546,8 @@ const util = {
     //reset all fields here
     const item = grab("#item"), amount = grab("#amount"), total = grab("#total");
     item.value = amount.value = "";
-    item.placeholder = "New item";
-    amount.placeholder = "New vlaue";
+    item.placeholder = "Description";
+    amount.placeholder = "value";
     item.focus();
     total.textContent = "Total: 0";
     $("table tbody").empty();

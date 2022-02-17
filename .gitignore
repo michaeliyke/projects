@@ -1,3 +1,5 @@
 bin/*.exe
+bin/logs
+*.exe
 temp*
 !temp.js

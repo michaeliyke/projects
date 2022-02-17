@@ -5,6 +5,10 @@ import (
 	"projects/server/api/helpers"
 )
 
+func notImplemented(w http.ResponseWriter, r *http.Request) {
+	helpers.ServerNotImplemented(w, r)
+}
+
 func root(w http.ResponseWriter, r *http.Request) {
 	helpers.ServerOK(w, r)
 }
