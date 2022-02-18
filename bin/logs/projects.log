@@ -50,3 +50,52 @@ INFO 2022/02/16 14:10:49 util.reporting.go:70: cannot create listing
 LOGS 2022/02/16 14:13:03 util.reporting.go:84: $PORT value: 3001
 ERROR 2022/02/16 14:13:03 util.reporting.go:58: sql: converting argument $2 type: unsupported type []collection.row, a slice of struct
 INFO 2022/02/16 14:13:03 util.reporting.go:70: cannot create listing
+LOGS 2022/02/17 16:39:43 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/17 16:39:57 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/17 16:43:09 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/17 16:43:21 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/17 17:07:08 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/17 17:07:14 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/17 17:29:41 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/17 17:29:44 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/18 00:35:28 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/18 00:35:28 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/18 00:36:51 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/18 00:36:52 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/18 00:37:51 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/18 00:37:51 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/18 00:38:40 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/18 00:38:40 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/18 00:39:05 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/18 00:40:57 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/18 00:40:57 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/18 00:42:41 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/18 00:42:42 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/18 00:44:01 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/18 00:44:02 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/18 00:47:16 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/18 00:47:17 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/18 01:02:42 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/18 01:02:43 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/18 01:04:39 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/18 01:04:39 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/18 01:05:25 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/18 01:05:25 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/18 01:07:06 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/18 01:07:06 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/18 01:07:47 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/18 01:07:47 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/18 01:09:47 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/18 01:09:47 util.reporting.go:84: Email validation failed ------- : invalid email
+LOGS 2022/02/18 01:10:28 util.reporting.go:84: $PORT value: 3001
+ERROR 2022/02/18 01:10:28 util.reporting.go:58: Multiplex(): 404/app/manage/
+LOGS 2022/02/18 01:10:29 util.reporting.go:84: Email validation failed ------- : invalid email
+ERROR 2022/02/18 01:10:29 util.reporting.go:58: Multiplex(): 404/account/login/
+LOGS 2022/02/18 01:11:47 util.reporting.go:84: $PORT value: 3001
+ERROR 2022/02/18 01:11:47 util.reporting.go:58: Multiplex(): 404/app/manage/
+LOGS 2022/02/18 01:11:47 util.reporting.go:84: Email validation failed ------- : invalid email
+ERROR 2022/02/18 01:11:47 util.reporting.go:58: Multiplex(): 404/account/login/
+ERROR 2022/02/18 01:11:47 util.reporting.go:58: Multiplex(): 404/notfound/
+LOGS 2022/02/18 01:15:45 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/18 01:17:17 util.reporting.go:84: $PORT value: 3001
+LOGS 2022/02/18 01:28:32 util.reporting.go:84: $PORT value: 3001

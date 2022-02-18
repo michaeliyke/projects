@@ -2,9 +2,7 @@ package middleware
 
 import (
 	"net/http"
-	. "projects/server/auth"
 	. "projects/server/util"
-	"strings"
 )
 
 type UserMiddleware struct{}
@@ -27,25 +25,21 @@ type M map[string]func(w http.ResponseWriter, r *http.Request)
 // All requests on a route are disallowed by default except its a GET.
 // If it's a GET and no handler is found, it's directed to 404.
 // For others, if handler is not found, disallowed header is issued
-func Multiplex(routes M, route string, w http.ResponseWriter, r *http.Request) {
-	CheckRoute(w, r, route)
-	var routed bool
-	for method, handler := range routes {
-		if strings.ToUpper(method) == r.Method {
-			handler(w, r)
-			routed = true
-		}
+func Multiplex(routes M, route string, w http.ResponseWriter, r *http.Request) (t Reporter) {
+	if !(CheckRoute(w, r, route)) {
+		return
 	}
-	if routed == false {
-		// Prepare for Not Implemented response Ssituation
+	for _, handler := range routes {
 		if r.Method == "GET" {
-			// Route to not found page
-			RedirectTo("/notfound/", w, r)
+			handler(w, r)
 			return
 		}
-		Note(r)
-		http.Error(w, "DISALLOWED", http.StatusMethodNotAllowed)
 	}
+	if r.Method == "GET" {
+		return RedirectTo("/notfound/", w, r)
+	}
+	http.Error(w, "DISALLOWED", http.StatusMethodNotAllowed)
+	return ReportError("Multiplex(): 404" + r.URL.String())
 }
 
 // RouteTo reroutes a path to another
@@ -65,6 +59,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 // 404 router - "/notfound/"
 func NotFound(w http.ResponseWriter, r *http.Request) {
+	// Check if it was a redirect by dumping the enter request object
 	mult := M{"GET": Serve404}
 	Multiplex(mult, "/notfound/", w, r)
 }

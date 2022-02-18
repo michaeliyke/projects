@@ -9,6 +9,9 @@ import (
 // Serves the 404 page
 func Serve404(w http.ResponseWriter, r *http.Request) {
 	// Serve404 Serves the 404 page
+
+	txt, _ := MarshalIndent(r, "", " ")
+	Println("\n\n", txt, "\n\n")
 	s := "head, general.header, silent.nav, main.nav, footer, errpg.layout"
 	files := ListTemplates(s)
 	var load *Payload = InitPayload(&Payload{

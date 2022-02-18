@@ -1,6 +1,11 @@
 package user
 
 // "/user/comments/"
+// "/account/login/"
+// "/account/signup/"
+// "/account/update/"
+// "/user/feedback/"
+// "/user/comments/"
 
 /*
 	/user/collections - get all collections for a user

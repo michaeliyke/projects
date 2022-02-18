@@ -21,26 +21,28 @@ func main() {
 	mux.HandleFunc("/comments/", RouteTo("/user/comments/"))
 
 	// POST, PUT, GET, PATCH, OPTIONS, HEAD, DELETE, RENAME
-	mux.HandleFunc("/notfound/", NotFound)     // 001 404
-	mux.HandleFunc("/account/logout/", LogOut) // 03
-	mux.HandleFunc("/errpg/", ErrPG)           // 001 Error page
-	mux.HandleFunc("/user/comments/", Comments)
-	mux.HandleFunc("/", Index)                 // 01
-	mux.HandleFunc("/account/signup/", SignUp) // 02
+	mux.HandleFunc("/notfound/", NotFound)
+	mux.HandleFunc("/account/logout/", LogOut)
+	mux.HandleFunc("/errpg/", ErrPG)
+	mux.HandleFunc("/", Index)
 	mux.HandleFunc("/help/", Help)
 	mux.HandleFunc("/client/chat/", Chat)
-	mux.HandleFunc("/account/login/", LogIn) // 03
-	mux.HandleFunc("/user/feedback/", Feedback)
-	mux.HandleFunc("/account/update/", AccountUpdate)
 	mux.HandleFunc("/app/manage/", ManageRecords)
 	mux.HandleFunc("/t/", T)
+	mux.HandleFunc("/account/login/", LogIn)
+	mux.HandleFunc("/account/signup/", SignUp)
+	mux.HandleFunc("/account/update/", AccountUpdate)
+	mux.HandleFunc("/user/feedback/", Feedback)
+	mux.HandleFunc("/user/comments/", Comments)
+
+	http.NotFoundHandler()
 
 	// API manager
 	mux.HandleFunc("/api/", api.API)
 
 	if Port == "" || Port == "5000" {
 		Log("$PORT var not set. ..")
-		Log("Deafulting to :80")
+		Log("Defaulting to :80")
 		Log("-----------------------")
 		Port = "80"
 	} else {

@@ -97,10 +97,10 @@ func RemoveTrailingSlashes(path string) string {
 
 // compares the request path with the manually provided path
 // If compare proves false Redirect to /notfound/
-func CheckRoute(w http.ResponseWriter, r *http.Request, path string) {
+func CheckRoute(w http.ResponseWriter, r *http.Request, path string) bool {
 	if ContainsSub(r.URL.Path, ".js", ".css", ".jpg", ".png", ".ico") {
 		http.Error(w, "Whoops: NOT FOUND", http.StatusNotFound)
-		return
+		return false
 	}
 	path1 := path // path1 is the path variable with leading '/'
 	path2 := ""   // path2 is the path variable without leading '/'
@@ -116,8 +116,9 @@ func CheckRoute(w http.ResponseWriter, r *http.Request, path string) {
 	// Log("ROUTES: ", "path1: ", path1, "path2: ", path2)
 	if path1 != r.URL.Path && path2 != r.URL.Path {
 		http.Redirect(w, r, "/notfound/", http.StatusFound)
+		return false
 	}
-	return
+	return true
 }
 
 // RedirectTo pushes a traffic on a path to another at run time.
@@ -125,29 +126,33 @@ func CheckRoute(w http.ResponseWriter, r *http.Request, path string) {
 // It saves the orginal path in the query string as ref.
 //
 // Route is expected to be a simple path string for now.
-func RedirectTo(route string, w http.ResponseWriter, r *http.Request) {
+func RedirectTo(route string, w http.ResponseWriter, r *http.Request) (t Reporter) {
 	http.Redirect(w, r, route, http.StatusFound)
+	return
 }
 
 // RedirectWithReferer forwards a request with referer to another path.
 // The orginal referer is saved in the query string
-func RedirectWithReferer(route string, w http.ResponseWriter, r *http.Request) {
-	query := AddQuery("ref", r.URL.Path, Queries(r))
-	u := Sprintf("%v?%v", route, query.Encode())
+func RedirectWithReferer(route string, w http.ResponseWriter, r *http.Request) (t Reporter) {
+	// query := AddQuery("ref", r.URL.Path, Queries(r))
+	// u := Sprintf("%v?%v", route, query.Encode())
+	u := route
 	http.Redirect(w, r, u, http.StatusFound)
+	return
 }
 
 // RedirectToReferer continues with a a route previously droped for
 // authentication or simply goes to home page if there isn't one
 //
 // It exracts and decodes the ref route from ref query param
-func RedirectToReferer(w http.ResponseWriter, r *http.Request) {
+func RedirectToReferer(w http.ResponseWriter, r *http.Request) (t Reporter) {
 	referred, referer := Referred(r)
 	if referred {
 		http.Redirect(w, r, referer, http.StatusFound)
 		return
 	}
 	http.Redirect(w, r, "/", http.StatusFound)
+	return
 }
 
 func GetReferer(r *http.Request) (ref string) {

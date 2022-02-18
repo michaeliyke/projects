@@ -10,7 +10,6 @@ import (
 	. "projects/server/util"
 )
 
-// Record management router - /app/manage/
 func API(w http.ResponseWriter, r *http.Request) {
 	// TODO:
 	// Perform login checks here and have a session user
@@ -25,7 +24,7 @@ func API(w http.ResponseWriter, r *http.Request) {
 		Api = collection.Api
 	case "/comment/":
 		Api = comment.Api
-	case "/user/":
+	case "/user/", "/account/":
 		Api = user.Api
 	default:
 		Api = notImplemented

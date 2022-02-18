@@ -6,17 +6,24 @@ import (
 	"strings"
 )
 
+/*  */
+
 func ServerNotImplemented(w http.ResponseWriter, r *http.Request) (t Reporter) {
 	http.Error(w, "NOT IMPLEMENTED", http.StatusNotImplemented)
 	return
 }
 
-func NotFound(w http.ResponseWriter, r *http.Request) (t Reporter) {
-	http.Error(w, "NOT FOUND", http.StatusNotFound)
-	return
+func ServeNotFound(w http.ResponseWriter, r *http.Request) (t Reporter) {
+	RedirectTo("/notfound/", w, r)
+	return ReportWarning(r)
 }
 
-func NotAllowed(w http.ResponseWriter, r *http.Request) (t Reporter) {
+func ServerNotFound(w http.ResponseWriter, r *http.Request) (t Reporter) {
+	http.Error(w, "NOT FOUND", http.StatusNotFound)
+	return ReportWarning(r)
+}
+
+func ServerNotAllowed(w http.ResponseWriter, r *http.Request) (t Reporter) {
 	http.Error(w, "NOT ALLOWED", http.StatusMethodNotAllowed)
 	return
 }
@@ -84,6 +91,6 @@ func Multiplex(routes M, route string, w http.ResponseWriter, r *http.Request) {
 	}
 	if routed == false {
 		// Prepare for Not Implemented response situations
-		NotAllowed(w, r)
+		ServerNotAllowed(w, r)
 	}
 }
