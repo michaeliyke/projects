@@ -61,6 +61,8 @@ func LastChar(s string) string {
 }
 
 // RemoveLastChar removes the last character on a string
+//
+// Returns the orignal string with the last char removed
 func RemoveLastChar(s string) string {
 	if len(s) < 1 {
 		return s

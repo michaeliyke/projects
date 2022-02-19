@@ -9,6 +9,12 @@ import (
 	"net/url"
 )
 
+// Aliase of http.Handler
+type Handler http.Handler
+
+// Alias of http.HandlerFunc
+type HandlerFunc http.HandlerFunc
+
 func ErrorMessage(w http.ResponseWriter, r *http.Request, message string) {
 	query := Queries(r)
 	query.Add("m", message)
@@ -102,19 +108,17 @@ func CheckRoute(w http.ResponseWriter, r *http.Request, path string) bool {
 		http.Error(w, "Whoops: NOT FOUND", http.StatusNotFound)
 		return false
 	}
-	path1 := path // path1 is the path variable with leading '/'
-	path2 := ""   // path2 is the path variable without leading '/'
-	if len(path) > 1 {
-		lastChar := string(path[len(path)-1])
-		if lastChar == "/" { //if there's a leading '/' in path
-			path2 = path[:len(path)-1] // create path2 short of it
-		} else { // if there isn't
-			path2 = path1 // assign path2 to it, and
-			path1 += "/"  // assign path1 to it with a leading '/'
+	var path1, path2 string
+	if len(path) > 0 {
+		path1 = path + "/" // path1 is the path variable with leading '/'
+		path2 = path       // path2 is the path variable without leading '/'
+		if LastChar(path) == "/" {
+			path1 = RemoveLastChar(path1)
+			path2 = RemoveLastChar(path)
 		}
 	}
 	// Log("ROUTES: ", "path1: ", path1, "path2: ", path2)
-	if path1 != r.URL.Path && path2 != r.URL.Path {
+	if r.URL.Path != path1 && r.URL.Path != path2 {
 		http.Redirect(w, r, "/notfound/", http.StatusFound)
 		return false
 	}
@@ -129,6 +133,11 @@ func CheckRoute(w http.ResponseWriter, r *http.Request, path string) bool {
 func RedirectTo(route string, w http.ResponseWriter, r *http.Request) (t Reporter) {
 	http.Redirect(w, r, route, http.StatusFound)
 	return
+}
+
+func RedirectToNotFound(w http.ResponseWriter, r *http.Request) {
+	RedirectTo("/notfound/", w, r)
+	ReportWarning(r)
 }
 
 // RedirectWithReferer forwards a request with referer to another path.

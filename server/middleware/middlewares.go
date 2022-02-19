@@ -2,44 +2,45 @@ package middleware
 
 import (
 	"net/http"
+	"projects/server/api/helpers"
 	. "projects/server/util"
 )
 
-type UserMiddleware struct{}
-
-func (user *UserMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	//
+func NewServeMux() *ServeMux {
+	mux := http.NewServeMux()
+	s := &ServeMux{mux}
+	return s
 }
 
-// The M type specifies request methods and their handlers for an endpoint.
-//
-// It's a map of request methods to their respecive handlers on an endpoint,
-// one for each.
-//
-// Only specified entries are considerd to be allowed.
-// Request whose entries are not present are treated as error
-type M map[string]func(w http.ResponseWriter, r *http.Request)
+type ServeMux struct {
+	*http.ServeMux
+}
 
-// Routes all requests: POST, GET, PATCH, PUT, DELETE, HEAD, OPTIONS, etc
-// to matching handlers.
-// All requests on a route are disallowed by default except its a GET.
-// If it's a GET and no handler is found, it's directed to 404.
-// For others, if handler is not found, disallowed header is issued
-func Multiplex(routes M, route string, w http.ResponseWriter, r *http.Request) (t Reporter) {
-	if !(CheckRoute(w, r, route)) {
-		return
-	}
-	for _, handler := range routes {
-		if r.Method == "GET" {
-			handler(w, r)
+func (s *ServeMux) RouteTo(pattern string) {}
+
+type ServeMuxFunc func(w http.ResponseWriter, r *http.Request) HandlerFunc
+
+// Run the function to determine the status of operation
+// Function returns a serveHandler or nil
+// serveHandler is returned if static page is served, and nil if not
+// If it returns nil, then execution redirects to api handlers
+func (s *ServeMux) Delegate(pattern string, cb ServeMuxFunc, serveStatic bool) {
+	var server HandlerFunc
+	server = func(w http.ResponseWriter, r *http.Request) {
+		var serveHandler HandlerFunc
+		if serveStatic { // Should a static page be served
+			serveHandler = cb(w, r)
+			if serveHandler != nil && r.Method == "GET" {
+				serveHandler(w, r)
+				return
+			}
+			// Either the method is not GET or path  faile to match
+			RedirectToNotFound(w, r)
 			return
 		}
+		RedirectTo("/api/"+pattern, w, r)
 	}
-	if r.Method == "GET" {
-		return RedirectTo("/notfound/", w, r)
-	}
-	http.Error(w, "DISALLOWED", http.StatusMethodNotAllowed)
-	return ReportError("Multiplex(): 404" + r.URL.String())
+	s.HandleFunc(pattern, server)
 }
 
 // RouteTo reroutes a path to another
@@ -51,81 +52,55 @@ func RouteTo(route string) http.HandlerFunc {
 	}
 }
 
-// Index router - "/"
-func Index(w http.ResponseWriter, r *http.Request) {
-	mult := M{"GET": ServeIndex}
-	Multiplex(mult, "/", w, r)
-}
-
-// 404 router - "/notfound/"
-func NotFound(w http.ResponseWriter, r *http.Request) {
-	// Check if it was a redirect by dumping the enter request object
-	mult := M{"GET": Serve404}
-	Multiplex(mult, "/notfound/", w, r)
-}
-
-// Logout router - /account/logout/
-func LogOut(w http.ResponseWriter, r *http.Request) {
-	mult := M{"GET": ServeLogout}
-	Multiplex(mult, "/account/logout/", w, r)
-}
-
-// Error page router - /errpg/
-func ErrPG(w http.ResponseWriter, r *http.Request) {
-	mult := M{"GET": ServeErrPg}
-	Multiplex(mult, "/errpg/", w, r)
-}
-
-// Help router - /help/
-func Help(w http.ResponseWriter, r *http.Request) {
-	mult := M{"GET": ServeHelp, "POST": ProcessHelp}
-	Multiplex(mult, "/help/", w, r)
+func AccountServeMux(w http.ResponseWriter, r *http.Request) (sh HandlerFunc) {
+	// sh means serveHandler
+	switch path := StrReplace(r.URL.Path, "/account", ""); PathRoot(path) {
+	case "/":
+		sh = RedirectToNotFound
+	case "/signup/":
+		sh = ServeSignUp
+	case "/login/":
+		sh = ServeLogin
+	case "/logout/":
+		sh = ServeLogout
+	case "/update/":
+		sh = ServeUpdateProfile
+	case "/user/":
+		switch path := StrReplace(r.URL.Path, "/user", ""); PathRoot(path) {
+		case "/comments/":
+			sh = ServeComments
+		case "/feedback/":
+			sh = ServeFeedback
+		case "/chat/":
+			sh = ServeChat
+		}
+	default:
+		sh = helpers.HTTPNotImplemented
+	}
+	return
 }
 
 // Signup router - /account/signup/
-func SignUp(w http.ResponseWriter, r *http.Request) {
-	mult := M{"GET": ServeSignUp, "POST": ProcessSignUp}
-	Multiplex(mult, "/account/signup/", w, r)
-}
-
-// Login router - /account/login/
-func LogIn(w http.ResponseWriter, r *http.Request) {
-	mult := M{"GET": ServeLogin, "POST": ProcessUserAuth}
-	Multiplex(mult, "/account/login/", w, r)
-}
-
-// Account update router - /account/update/
-func AccountUpdate(w http.ResponseWriter, r *http.Request) {
-	mult := M{"GET": ServeUpdateProfile, "POST": ProcessAccountUpdate}
-	Multiplex(mult, "/account/update/", w, r)
-}
-
-// Feed back router - /user/feedback/
-func Feedback(w http.ResponseWriter, r *http.Request) {
-	mult := M{"GET": ServeFeedback, "POST": ProcessFeedback}
-	Multiplex(mult, "/user/feedback/", w, r)
-}
-
-// Comments router - /comments/
-func Comments(w http.ResponseWriter, r *http.Request) {
-	mult := M{"GET": ServeComments, "POST": ProcessComments}
-	Multiplex(mult, "/user/comments/", w, r)
-}
-
-// Chat router - /client/chat/
-func Chat(w http.ResponseWriter, r *http.Request) {
-	mult := M{"GET": ServeChat, "POST": ProcessChat}
-	Multiplex(mult, "/client/chat/", w, r)
-}
-
-// Record management router - /app/manage/
-func ManageRecords(w http.ResponseWriter, r *http.Request) {
-	mult := M{"GET": ServeManageRecords}
-	Multiplex(mult, "/app/manage/", w, r)
-}
-
-// Record management router - /app/manage/
-func T(w http.ResponseWriter, r *http.Request) {
-	mult := M{"GET": ServeT}
-	Multiplex(mult, "/t/", w, r)
+func GeneralServeMux(w http.ResponseWriter, r *http.Request) (sh HandlerFunc) {
+	// sh means serveHandler
+	switch PathRoot(r.URL.Path) {
+	case "/":
+		sh = ServeIndex
+	case "/notfound/":
+		sh = Serve404
+	case "/errpg/":
+		sh = ServeErrPg
+	case "/help/":
+		sh = ServeHelp
+	case "/t/":
+		sh = ServeT
+	case "/collections/":
+		switch path := StrReplace(r.URL.Path, "/collections", ""); PathRoot(path) {
+		case "/manage/":
+			sh = ServeManageRecords
+		}
+	default:
+		sh = RedirectToNotFound
+	}
+	return
 }

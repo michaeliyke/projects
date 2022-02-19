@@ -8,10 +8,20 @@ import (
 )
 
 func main() {
-	var mux *http.ServeMux = http.NewServeMux()
+	var mux *ServeMux = NewServeMux()
 	files := http.FileServer(http.Dir(Config.Static))
 	mux.Handle("/sources/", http.StripPrefix("/sources/", files))
 	mux.Handle("/favicon.ico", http.StripPrefix("/", files))
+
+	// POST, PUT, GET, PATCH, OPTIONS, HEAD, DELETE, RENAME
+	mux.Delegate("/notfound/", GeneralServeMux, true)
+	mux.Delegate("/errpg/", GeneralServeMux, true)
+	mux.Delegate("/", GeneralServeMux, true)
+	mux.Delegate("/help/", GeneralServeMux, true)
+	mux.Delegate("/collections/manage/", GeneralServeMux, true)
+	mux.Delegate("/t/", GeneralServeMux, true)
+	mux.Delegate("/account/", AccountServeMux, true)
+	mux.Delegate("/user/", AccountServeMux, true)
 
 	//Aliases (GET)
 	mux.HandleFunc("/signup/", RouteTo("/account/signup/"))
@@ -19,23 +29,6 @@ func main() {
 	mux.HandleFunc("/logout/", RouteTo("/account/logout/"))
 	mux.HandleFunc("/account/", RouteTo("/account/login/"))
 	mux.HandleFunc("/comments/", RouteTo("/user/comments/"))
-
-	// POST, PUT, GET, PATCH, OPTIONS, HEAD, DELETE, RENAME
-	mux.HandleFunc("/notfound/", NotFound)
-	mux.HandleFunc("/account/logout/", LogOut)
-	mux.HandleFunc("/errpg/", ErrPG)
-	mux.HandleFunc("/", Index)
-	mux.HandleFunc("/help/", Help)
-	mux.HandleFunc("/client/chat/", Chat)
-	mux.HandleFunc("/app/manage/", ManageRecords)
-	mux.HandleFunc("/t/", T)
-	mux.HandleFunc("/account/login/", LogIn)
-	mux.HandleFunc("/account/signup/", SignUp)
-	mux.HandleFunc("/account/update/", AccountUpdate)
-	mux.HandleFunc("/user/feedback/", Feedback)
-	mux.HandleFunc("/user/comments/", Comments)
-
-	http.NotFoundHandler()
 
 	// API manager
 	mux.HandleFunc("/api/", api.API)

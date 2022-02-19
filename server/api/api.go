@@ -13,7 +13,7 @@ import (
 func API(w http.ResponseWriter, r *http.Request) {
 	// TODO:
 	// Perform login checks here and have a session user
-	var Api helpers.ApiFunc
+	var Api helpers.ApiHandler
 
 	switch path := StrReplace(r.URL.Path, "/api", ""); PathRoot(path) {
 	case "/":

@@ -13,9 +13,13 @@ func ServerNotImplemented(w http.ResponseWriter, r *http.Request) (t Reporter) {
 	return
 }
 
+func HTTPNotImplemented(w http.ResponseWriter, r *http.Request) {
+	http.Error(w, "NOT IMPLEMENTED", http.StatusNotImplemented)
+}
+
 func ServeNotFound(w http.ResponseWriter, r *http.Request) (t Reporter) {
 	RedirectTo("/notfound/", w, r)
-	return ReportWarning(r)
+	return ReportWarning("NOT FOUND " + r.URL.Path)
 }
 
 func ServerNotFound(w http.ResponseWriter, r *http.Request) (t Reporter) {
@@ -48,6 +52,10 @@ func ServerOK(w http.ResponseWriter, r *http.Request) (t Reporter) {
 	return
 }
 
+func HTTPOk(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+}
+
 func ServerTextResponse(w http.ResponseWriter, r *http.Request, text string) (t Reporter) {
 	w.Header().Set("Content-Type", "text/plain")
 	w.Write([]byte(text))
@@ -60,7 +68,8 @@ func ServerJsonResponse(w http.ResponseWriter, r *http.Request, json string) (t 
 	return
 }
 
-type ApiFunc func(http.ResponseWriter, *http.Request)
+type ApiHandler func(w http.ResponseWriter, r *http.Request)
+type Handler func(w http.ResponseWriter, r *http.Request)
 
 type CollectionHandler func(http.ResponseWriter, *http.Request)
 
