@@ -2,15 +2,19 @@ package user
 
 import (
 	"net/http"
+	"projects/server/api/helpers"
 	. "projects/server/util"
 )
+
+// /api/user/*
+// /api/account/*
 
 func Api(w http.ResponseWriter, r *http.Request) {
 	var handler HandlerFunc
 	path := StrReplace(r.URL.Path, "/api/collection", "")
 	switch endpoint := AddTrailingSlash(path); {
 	case endpoint == "/":
-		handler = root
+		handler = helpers.HTTPNotAllowed
 	case endpoint == "/login/":
 		handler = login
 	case endpoint == "/signup/":
@@ -24,7 +28,5 @@ func Api(w http.ResponseWriter, r *http.Request) {
 	default:
 		handler = notImplemented
 	}
-
 	handler(w, r)
-
 }
