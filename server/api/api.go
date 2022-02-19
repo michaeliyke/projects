@@ -13,11 +13,11 @@ import (
 func API(w http.ResponseWriter, r *http.Request) {
 	// TODO:
 	// Perform login checks here and have a session user
-	var Api helpers.ApiHandler
+	var Api HandlerFunc
 
 	switch path := StrReplace(r.URL.Path, "/api", ""); PathRoot(path) {
 	case "/":
-		Api = ok
+		Api = helpers.HTTPNotAllowed
 	case "/chat/":
 		Api = chat.Api
 	case "/collection/":
@@ -27,23 +27,15 @@ func API(w http.ResponseWriter, r *http.Request) {
 	case "/user/", "/account/":
 		Api = user.Api
 	default:
-		Api = notImplemented
+		Api = helpers.HTTPNotImplemented
 	}
 
 	if Api == nil {
-		NewError("Invalid path")
+		ReportError("Invalid path")
 		http.Error(w, "Invalid path", http.StatusBadRequest)
 		return
 	}
 
 	Api(w, r)
 
-}
-
-func ok(w http.ResponseWriter, r *http.Request) {
-	helpers.ServerOK(w, r)
-}
-
-func notImplemented(w http.ResponseWriter, r *http.Request) {
-	helpers.ServerNotImplemented(w, r)
 }

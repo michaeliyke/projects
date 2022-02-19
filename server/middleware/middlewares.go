@@ -6,23 +6,24 @@ import (
 	. "projects/server/util"
 )
 
+type ServeMuxFunc func(w http.ResponseWriter, r *http.Request) HandlerFunc
+
+type ServeMux struct {
+	*http.ServeMux
+}
+
 func NewServeMux() *ServeMux {
 	mux := http.NewServeMux()
 	s := &ServeMux{mux}
 	return s
 }
 
-type ServeMux struct {
-	*http.ServeMux
-}
-
 func (s *ServeMux) RouteTo(pattern string) {}
 
-type ServeMuxFunc func(w http.ResponseWriter, r *http.Request) HandlerFunc
-
-// Run the function to determine the status of operation
-// Function returns a serveHandler or nil
-// serveHandler is returned if static page is served, and nil if not
+// Run the function to determine the status of operation.
+//
+// A handler is returned if static page is served, and nil if not.
+//
 // If it returns nil, then execution redirects to api handlers
 func (s *ServeMux) Delegate(pattern string, cb ServeMuxFunc, serveStatic bool) {
 	var server HandlerFunc

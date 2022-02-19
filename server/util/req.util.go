@@ -68,6 +68,16 @@ func FromContext(ctx context.Context) (net.IP, bool) {
 	return userIP, ok
 }
 
+// Return the full path string
+func Path(r *http.Request) string {
+	return r.URL.Path
+}
+
+// Return the full url string
+func Url(r *http.Request) string {
+	return r.URL.String()
+}
+
 // PathRoot get the root of a URL path
 func PathRoot(path string) string {
 	for FirstChar(path) == "/" {

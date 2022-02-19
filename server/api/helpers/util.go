@@ -6,72 +6,57 @@ import (
 	"strings"
 )
 
-/*  */
-
-func ServerNotImplemented(w http.ResponseWriter, r *http.Request) (t Reporter) {
-	http.Error(w, "NOT IMPLEMENTED", http.StatusNotImplemented)
-	return
-}
-
 func HTTPNotImplemented(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "NOT IMPLEMENTED", http.StatusNotImplemented)
+	ReportWarning("NOT IMPLEMENTED " + Url(r))
 }
 
-func ServeNotFound(w http.ResponseWriter, r *http.Request) (t Reporter) {
-	RedirectTo("/notfound/", w, r)
-	return ReportWarning("NOT FOUND " + r.URL.Path)
+func HTTPNotFound(w http.ResponseWriter, r *http.Request) {
+	http.Error(w, "404 NOT FOUND", http.StatusNotFound)
+	ReportWarning("404 NOT FOUND " + Url(r))
 }
 
-func ServerNotFound(w http.ResponseWriter, r *http.Request) (t Reporter) {
-	http.Error(w, "NOT FOUND", http.StatusNotFound)
-	return ReportWarning(r)
-}
-
-func ServerNotAllowed(w http.ResponseWriter, r *http.Request) (t Reporter) {
+func HTTPNotAllowed(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "NOT ALLOWED", http.StatusMethodNotAllowed)
-	return
+	ReportError("NOT ALLOWED " + Url(r))
 }
 
-func ServerUnauthorized(w http.ResponseWriter, r *http.Request) (t Reporter) {
+func HTTPUnauthorized(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "NOT AUTHORIZED", http.StatusUnauthorized)
-	return
+	ReportError("NOT AUTHORIZED " + Url(r))
 }
 
-func SeverError(w http.ResponseWriter, r *http.Request) (t Reporter) {
+func HTTPError(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "INTERNAL SERVER ERROR", http.StatusInternalServerError)
-	return
+	ReportError("INTERNAL SERVER ERROR" + Url(r))
 }
 
-func ServerUnknown(w http.ResponseWriter, r *http.Request) (t Reporter) {
+func HTTPUnknown(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "UNKNOWN REQUEST", http.StatusNotFound)
-	return
-}
-
-func ServerOK(w http.ResponseWriter, r *http.Request) (t Reporter) {
-	w.WriteHeader(http.StatusOK)
-	return
+	ReportWarning("UNKNOWN REQUEST " + Url(r))
 }
 
 func HTTPOk(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
+	ReportInfo("SUCCESS " + Url(r))
 }
 
-func ServerTextResponse(w http.ResponseWriter, r *http.Request, text string) (t Reporter) {
+func HTTPTextResponse(w http.ResponseWriter, r *http.Request, text string) {
 	w.Header().Set("Content-Type", "text/plain")
 	w.Write([]byte(text))
-	return
+	ReportInfo("SUCCESS " + Url(r))
 }
 
-func ServerJsonResponse(w http.ResponseWriter, r *http.Request, json string) (t Reporter) {
+func HTTPJsonResponse(w http.ResponseWriter, r *http.Request, json string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(json))
-	return
+	ReportInfo("SUCCESS " + Url(r))
 }
 
-type ApiHandler func(w http.ResponseWriter, r *http.Request)
-type Handler func(w http.ResponseWriter, r *http.Request)
-
-type CollectionHandler func(http.ResponseWriter, *http.Request)
+func ServeNotFound(w http.ResponseWriter, r *http.Request) {
+	RedirectTo("/notfound/", w, r)
+	ReportWarning("NOT FOUND " + r.URL.Path)
+}
 
 // The M type specifies request methods and their handlers for an endpoint.
 //
@@ -80,7 +65,7 @@ type CollectionHandler func(http.ResponseWriter, *http.Request)
 //
 // Only specified entries are considerd to be allowed.
 // Request whose entries are not present are treated as error
-type M map[string]func(w http.ResponseWriter, r *http.Request) Reporter
+type M map[string]func(w http.ResponseWriter, r *http.Request)
 
 // Routes all /api/ requests: POST, GET, PATCH, PUT, DELETE, HEAD, OPTIONS, etc
 // to matching handlers.
@@ -100,6 +85,6 @@ func Multiplex(routes M, route string, w http.ResponseWriter, r *http.Request) {
 	}
 	if routed == false {
 		// Prepare for Not Implemented response situations
-		ServerNotAllowed(w, r)
+		HTTPNotAllowed(w, r)
 	}
 }

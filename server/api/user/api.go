@@ -2,12 +2,11 @@ package user
 
 import (
 	"net/http"
-	"projects/server/api/helpers"
 	. "projects/server/util"
 )
 
 func Api(w http.ResponseWriter, r *http.Request) {
-	var handler helpers.CollectionHandler
+	var handler HandlerFunc
 	path := StrReplace(r.URL.Path, "/api/collection", "")
 	switch endpoint := AddTrailingSlash(path); {
 	case endpoint == "/":

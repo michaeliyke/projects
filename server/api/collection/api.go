@@ -2,22 +2,21 @@ package collection
 
 import (
 	"net/http"
-	"projects/server/api/helpers"
 	. "projects/server/util"
 )
 
 func Api(w http.ResponseWriter, r *http.Request) {
-	var handler helpers.CollectionHandler
+	var handler HandlerFunc
 	path := StrReplace(r.URL.Path, "/api/collection", "")
 	switch endpoint := AddTrailingSlash(path); {
 	case endpoint == "/":
-		handler = root
+		// handler = root
 	case endpoint == "/listing/":
 		handler = listingHandler
 	case endpoint == "/listings/":
-		handler = listingsHandler
+		// handler = listingsHandler
 	default:
-		handler = notImplemented
+		// handler = notImplemented
 	}
 
 	handler(w, r)
