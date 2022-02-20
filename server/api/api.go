@@ -32,7 +32,7 @@ func API(w http.ResponseWriter, r *http.Request) {
 
 	if Api == nil {
 		ReportError("Invalid path")
-		http.Error(w, "Invalid path", http.StatusBadRequest)
+		helpers.HTTPNotFound(w, r)
 		return
 	}
 

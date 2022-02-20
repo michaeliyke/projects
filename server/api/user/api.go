@@ -11,7 +11,7 @@ import (
 
 func Api(w http.ResponseWriter, r *http.Request) {
 	var handler HandlerFunc
-	path := StrReplace(r.URL.Path, "/api/collection", "")
+	path := StrReplace(r.URL.Path, "/api/account", "")
 	switch endpoint := AddTrailingSlash(path); {
 	case endpoint == "/":
 		handler = helpers.HTTPNotAllowed

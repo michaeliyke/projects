@@ -13,14 +13,12 @@ func ProcessUserAuth(w http.ResponseWriter, r *http.Request) {
 	email := strings.TrimSpace(r.PostFormValue("email"))
 	err := ValidateEmail(email)
 	if err != nil {
-		Log("Email validation failed ------- :", err)
-		ErrorMessage(w, r, err.Error())
+		ReportError(err.Error())
 		return
 	}
 	err = ValidatePassword(r.PostFormValue("password"))
 	if err != nil {
-		Log("password validation failed-------- : ", err)
-		ErrorMessage(w, r, "invalid password")
+		ReportError(err.Error())
 		return
 	}
 	keepLogged := r.PostFormValue("keep-login") == "on"
@@ -30,8 +28,7 @@ func ProcessUserAuth(w http.ResponseWriter, r *http.Request) {
 	}
 	err = user.Authenticate(w, r)
 	if err != nil {
-		Log("User Auth failed ------------ : ", err)
-		ErrorMessage(w, r, err.Error())
+		ReportError(err.Error())
 		return
 	}
 	RedirectToReferer(w, r)

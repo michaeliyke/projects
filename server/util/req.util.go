@@ -127,9 +127,8 @@ func CheckRoute(w http.ResponseWriter, r *http.Request, path string) bool {
 			path2 = RemoveLastChar(path)
 		}
 	}
-	// Log("ROUTES: ", "path1: ", path1, "path2: ", path2)
-	if r.URL.Path != path1 && r.URL.Path != path2 {
-		http.Redirect(w, r, "/notfound/", http.StatusFound)
+
+	if Path(r) != path1 && Path(r) != path2 {
 		return false
 	}
 	return true
