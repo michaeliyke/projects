@@ -14,15 +14,12 @@ func main() {
 	mux.Handle("/favicon.ico", http.StripPrefix("/", files))
 
 	// POST, PUT, GET, PATCH, OPTIONS, HEAD, DELETE, RENAME
-	Mt.ForEach(func(s string, m M) {
-		mux.Delegate(s, GeneralServeMux, true)
+	Routes.ForEach(func(route string, handle HandlerFunc) {
+		mux.HandleFunc(route, handle)
 	})
 
-	//Aliases (GET)
-	Mt2.ForEach(func(s string, m M) {
-		var fn HandlerFunc = m[s]
-		mux.HandleFunc(s, fn)
-	})
+	//RRouter for route aliases
+	RRoutes.Reroute(mux)
 
 	// API manager
 	mux.HandleFunc("/api/", api.API)
