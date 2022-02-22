@@ -8,6 +8,18 @@ import (
 	"unicode"
 )
 
+func StrToUpperCase(s string) string {
+	return strings.ToUpper(s)
+}
+
+func StrToLowerCase(s string) string {
+	return strings.ToLower(s)
+}
+
+func StrToTitleCase(s string) string {
+	return strings.ToTitle(s)
+}
+
 // String_2_Int converts a string to a number (base 10)
 func String_2_Int(s string) (num int, err error) {
 	return strconv.Atoi(s)

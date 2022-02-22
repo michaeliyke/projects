@@ -3,7 +3,6 @@ package main
 import (
 	"net/http"
 	"projects/server/api"
-	"projects/server/api/helpers"
 	. "projects/server/middleware"
 	. "projects/server/util"
 )
@@ -15,13 +14,13 @@ func main() {
 	mux.Handle("/favicon.ico", http.StripPrefix("/", files))
 
 	// POST, PUT, GET, PATCH, OPTIONS, HEAD, DELETE, RENAME
-	Mt.ForEach(func(s string, m helpers.M) {
+	Mt.ForEach(func(s string, m M) {
 		mux.Delegate(s, GeneralServeMux, true)
 	})
 
 	//Aliases (GET)
-	Mt2.ForEach(func(s string, m helpers.M) {
-		var fn HandlerFunc = m["GET"]
+	Mt2.ForEach(func(s string, m M) {
+		var fn HandlerFunc = m[s]
 		mux.HandleFunc(s, fn)
 	})
 

@@ -1,21 +1,12 @@
 package util
 
 import (
-	"encoding/json"
 	"log"
 	"os"
 )
 
 var Config Configurations
 var Port string
-
-type Configurations struct {
-	Address        string
-	ReadTimeout    int64
-	WriteTimeout   int64
-	Static         string
-	AuthCookieName string
-}
 
 func init() {
 	LoadConfigs()
@@ -32,18 +23,5 @@ func init() {
 		"INFO",
 		log.Ldate|log.Ltime|log.Lshortfile,
 	)
-}
 
-func LoadConfigs() {
-	Port = os.Getenv("PORT")
-	file, err := os.Open("config.json")
-	if err != nil {
-		Fatal("cannot open config file", err)
-	}
-	decoder := json.NewDecoder(file)
-	Config = Configurations{}
-	err = decoder.Decode(&Config)
-	if err != nil {
-		Fatal("cannot get configuration from file", err)
-	}
 }
