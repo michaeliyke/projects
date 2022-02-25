@@ -7,23 +7,24 @@ var RRoutes RRouter
 
 func init() {
 	Routes = NewRoutes(Router{
-		"/account/login/": Login,
-		// "/account/":            RedirectToNotFound,
-		// "/account/signup/":     ServeSignUp,
-		// "/account/logout/":     ServeLogout,
-		// "/account/update/":     ServeUpdateProfile,
-		// "/user/comments/":      ServeComments,
-		// "/user/feedback/":      ServeFeedback,
-		// "/user/chat/":          ServeChat,
-		// "/":                    ServeIndex,
-		// "/notfound/":           Serve404,
-		// "/errpg/":              ServeErrPg,
-		// "/help/":               ServeHelp,
-		// "/t/":                  ServeT,
-		// "/collections/manage/": ServeManageRecords,
+		"/":                    serveIndex,
+		"/account/login/":      login,
+		"/account/signup/":     signup,
+		"/account/logout/":     logout,
+		"/notfound/":           serve404,
+		"/errpg/":              serveErrPg,
+		"/t/":                  serveT,
+		"/user/comments/":      comments,
+		"/account/update/":     update,
+		"/user/feedback/":      feedback,
+		"/user/chat/":          chat_,
+		"/help/":               help,
+		"/account/profile":     profile,
+		"/collections/manage/": manageCollections,
 	})
 
 	RRoutes = NewRRoutes(RRouter{
+		"/account/":  "account/profile",
 		"/signup/":   "/account/signup/",
 		"/login/":    "/account/login/",
 		"/logout/":   "/account/logout/",

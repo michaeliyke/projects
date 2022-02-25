@@ -13,12 +13,10 @@ func main() {
 	mux.Handle("/sources/", http.StripPrefix("/sources/", files))
 	mux.Handle("/favicon.ico", http.StripPrefix("/", files))
 
-	// POST, PUT, GET, PATCH, OPTIONS, HEAD, DELETE, RENAME
-	Routes.ForEach(func(route string, handle HandlerFunc) {
-		mux.HandleFunc(route, handle)
-	})
+	// Set up routing using Router
+	Routes.Route(mux)
 
-	//RRouter for route aliases
+	//set up route aliases using RRouter
 	RRoutes.Reroute(mux)
 
 	// API manager

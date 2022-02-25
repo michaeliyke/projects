@@ -2,7 +2,6 @@ package user
 
 import (
 	"net/http"
-	"projects/server/api/helpers"
 	. "projects/server/util"
 )
 
@@ -14,19 +13,21 @@ func Api(w http.ResponseWriter, r *http.Request) {
 	path := StrReplace(r.URL.Path, "/api/account", "")
 	switch endpoint := AddTrailingSlash(path); {
 	case endpoint == "/":
-		handler = helpers.HTTPNotAllowed
+		handler = HTTPNotAllowed
 	case endpoint == "/login/":
-		handler = login
+		handler = authWrapper
 	case endpoint == "/signup/":
-		handler = signup
+		handler = signupWrapper
 	case endpoint == "/update/":
-		handler = signup
+		handler = updateWrapper
 	case endpoint == "/feedback/":
-		handler = signup
+		handler = HTTPNotImplemented
 	case endpoint == "/comments/":
-		handler = signup
+		handler = HTTPNotImplemented
 	default:
-		handler = notImplemented
+		handler = HTTPNotImplemented
 	}
 	handler(w, r)
 }
+
+func CommentApi(w http.ResponseWriter, r *http.Request) {}

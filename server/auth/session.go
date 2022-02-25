@@ -18,14 +18,13 @@ type Session_ struct {
 	User       User      `json:"user"`
 }
 
-func GetCookie(r *http.Request, x string) (cookie *http.Cookie, err error) {
-	cookie, err = r.Cookie(x)
+func GetCookie(r *http.Request, name string) (cookie *http.Cookie, err error) {
+	cookie, err = r.Cookie(name)
 	if err == http.ErrNoCookie {
-		err = NewError(Sprintf("cookie '%v' coud not be found.", x))
+		err = NewError(Sprintf("cookie '%v' could not be found.", name))
 		return
 	}
 	if err != nil {
-		// Log("cookie not found: ", err)
 		err = NewError("cookie not found")
 		return
 	}

@@ -2,31 +2,32 @@ package chat
 
 import (
 	"net/http"
-	"projects/server/api/helpers"
+	. "projects/server/util"
 )
 
 func notImplemented(w http.ResponseWriter, r *http.Request) {
-	helpers.HTTPNotImplemented(w, r)
+	HTTPNotImplemented(w, r)
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
-	helpers.HTTPOk(w, r)
+	HTTPOk(w, r)
 }
 
 func listingHandler(w http.ResponseWriter, r *http.Request) {
-	mult := helpers.M{
+	/*mult := M{
 		"GET":    processGetListing,
 		"POST":   processPostListing,
 		"PUT":    processUpdateListing,
 		"DELETE": processDeleteListing,
 	}
-	helpers.Multiplex(mult, "/api/collection/listing/", w, r)
+	Multiplex(mult, "/api/collection/listing/", w, r)
+	*/
 }
 
 func listingsHandler(w http.ResponseWriter, r *http.Request) {
-	helpers.HTTPOk(w, r)
+	HTTPOk(w, r)
 }
 
 func tempHandler(w http.ResponseWriter, r *http.Request) {
-	helpers.HTTPOk(w, r)
+	HTTPOk(w, r)
 }

@@ -45,17 +45,16 @@ func (user *User) Authenticate(w http.ResponseWriter, r *http.Request) (err erro
 
 // Performs user logout chores
 func (user *User) Logout(w http.ResponseWriter, r *http.Request) (err error) {
-	return UserLogout(w, r)
+	return AcctLogout(w, r)
 }
 
 // Effects user logout
-func UserLogout(w http.ResponseWriter, r *http.Request) (err error) {
+func AcctLogout(w http.ResponseWriter, r *http.Request) (err error) {
 	cookie, err := GetCookie(r, Config.AuthCookieName)
 	if err == nil {
 		session := Session_{Uuid: cookie.Value}
 		session.DeleteByUUID()
 		UnsetCookie(w, Config.AuthCookieName)
-
 	}
 	return
 }

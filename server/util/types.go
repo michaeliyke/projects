@@ -8,6 +8,8 @@ import (
 	"net/http/httputil"
 )
 
+// APIRS "projects/server/util/more"
+
 type IPayload interface {
 	init()
 	SetAuthorizations()
@@ -142,6 +144,14 @@ func (rr RRouter) ForEach(fn func(_path_, _path_)) RRouter {
 	return rr
 }
 
+// POST, PUT, GET, PATCH, OPTIONS, HEAD, DELETE, RENAME
+func (r Router) Route(mux *ServeMux) Router {
+	r.ForEach(func(route _path_, handle HandlerFunc) {
+		mux.HandleFunc(route, handle)
+	})
+	return r
+}
+
 func (r Router) Has(path _path_) (exists bool) {
 	_, exists = r[path]
 	return
@@ -200,4 +210,67 @@ func Multiplex(routes Router, route _path_, w http.ResponseWriter, r *http.Reque
 			}
 		}
 	}
+}
+
+type ExecRoutes map[string]HandlerFunc
+
+var sample = ExecRoutes{
+	"GET":    nil,
+	"POST":   nil,
+	"PUT":    nil,
+	"DELETE": nil,
+}
+
+func (routes ExecRoutes) Execute(w http.ResponseWriter, r *http.Request) {
+	// TODO:
+	// create same for ExecuteAPI - returns json and error for use
+	// Execute should take a third param to route to upon success
+	// It should route to errpg upon failure
+	for method, handle := range routes {
+		if method == r.Method {
+			if handle != nil {
+				handle(w, r)
+				return
+			}
+		}
+	}
+	HTTPNotFound(w, r)
+}
+
+type APIResponse struct {
+	Ok         bool   // Boolean indicating whether execution is successful
+	Error      error  // error object set when execution fails
+	Response   []byte // Success reponse in bytes
+	String     string // General response text
+	FailReason string // One word - reason for fail
+	FailCode   int    // Code for the fail
+}
+
+// ReportError is the primary method to respond with error.
+//
+// It sets up:- Error, String, FailReason, and optionally FailCode
+//
+// Each of the properties can be set individually
+func (res APIResponse) ReportError(err error, reason string, options ...interface{}) APIResponse {
+	failCode, err2 := options[0].(int)
+	if err2 == false {
+		panic("options[0] - failCode must be of type int")
+	}
+	res.FailCode = failCode
+	res.Error = err
+	res.String = err.Error()
+	res.FailReason = reason
+	return res
+}
+
+// ResponseOk - called at last when everything goes well to return response
+//
+// Calling ResponeOk after setting any error information causes a panic
+func (res APIResponse) ResponseOk(response []byte) APIResponse {
+	if res.Error != nil || res.FailCode > 0 || res.FailReason != "" {
+		panic("res.ResponseOk() called with res.Error set.")
+	}
+	res.Ok = true
+	res.Response = response
+	return res
 }

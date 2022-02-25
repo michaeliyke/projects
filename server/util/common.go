@@ -177,6 +177,10 @@ func StrParts(str string, ch string) []string {
 	})
 }
 
+func Trim(s string) string {
+	return strings.TrimSpace(s)
+}
+
 // Strplit splits throught a string by a given character and returns the parts
 func StrSplit(str, ch string) []string {
 	return StrParts(str, ch)
