@@ -1,6 +1,4 @@
-bin/*.exe
-bin/logs
-/*.exe
-gin-bin.exe
+bin/logs/
+*.exe
 temp*
-!temp.js
+offenders.bashrc 
