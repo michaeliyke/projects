@@ -8,37 +8,6 @@ import (
 	"net/http/httputil"
 )
 
-// APIRS "projects/server/util/more"
-
-type IPayload interface {
-	init()
-	SetAuthorizations()
-	GetAuthorization() string
-	GetAuthorizations() []string
-	GetPrivileges() []string
-	GetPrivilege() string
-}
-
-type IUser interface {
-	Create() (err error)
-	Fetch(id int) error
-	Update() (err error)
-	Delete() (err error)
-	Authenticate(w http.ResponseWriter, r *http.Request) error
-	CreateAcount(w http.ResponseWriter, r *http.Request) error
-	UpdateAccount(w http.ResponseWriter, r *http.Request) error
-}
-
-type IEmpty interface{}
-
-type Configurations struct {
-	Address        string
-	ReadTimeout    int64
-	WriteTimeout   int64
-	Static         string
-	AuthCookieName string
-}
-
 type ServeMux struct {
 	*http.ServeMux
 }

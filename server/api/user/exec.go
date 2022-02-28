@@ -2,10 +2,15 @@ package user
 
 import (
 	"net/http"
-	. "projects/server/auth"
 	. "projects/server/util"
 	"projects/server/util/reason"
-	"strings"
+	"projects/server/util/responses/comment"
+	"projects/server/util/responses/help"
+
+	"projects/server/util/responses/feedback"
+	"projects/server/util/session"
+	. "projects/server/util/session"
+	. "projects/server/util/validation"
 
 	"time"
 )
@@ -92,19 +97,15 @@ func Comments(w http.ResponseWriter, r *http.Request) (res APIResponse) {
 	body := form.POST("body")
 	err := ValidateMessage(body)
 	if err != nil {
-		return res.ReportError(err, reason.InvalidMessage)
+		return res.ReportError(err, reason.InvalidField)
 	}
-	session, err := Session(w, r)
+	comment := comment.New(body)
+	session, err := session.Session(w, r)
 	if err != nil {
-		return res.ReportError(err, reason.SessionCheckFail)
+		return res.ReportError(err, reason.SessionRetrieveFail)
 	}
-	comment := &CommentStruct{
-		UserUuid:  session.UserUuid,
-		Uuid:      CreateUuid(),
-		Body:      body,
-		CreatedAt: time.Now(),
-	}
-	err = SendComment(comment)
+	comment.UserUuid = session.UserUuid
+	err = comment.Post()
 	if err != nil {
 		return res.ReportError(err, reason.CommentCreateFail)
 	}
@@ -119,29 +120,29 @@ func Help(w http.ResponseWriter, r *http.Request) (res APIResponse) {
 	if err != nil {
 		return res.ReportError(err, reason.InvalidEmail)
 	}
-	fullName := strings.TrimSpace(r.PostFormValue("fullname"))
+	fullName := form.POST("fullname", true)
 	err = ValidateFullName(fullName)
 	if err != nil {
 		return res.ReportError(err, reason.InvalidName)
 	}
+
 	body := form.POST("body", true)
 	err = ValidateMessage(body)
 	if err != nil {
 		return res.ReportError(err, reason.InvalidField)
 	}
 
-	session, _ := Session(w, r)
-
-	help := &HELPStruct{
-		Name:      fullName,
-		Email:     email,
-		UserUuid:  session.UserUuid,
-		Uuid:      CreateUuid(),
-		Body:      EscapeHtml(body),
-		CreatedAt: time.Now(),
+	h := help.New(body)
+	session, err := Session(w, r)
+	if err != nil {
+		return res.ReportError(err, reason.SessionRetrieveFail)
 	}
 
-	err = SendHelp(help)
+	h.Name = fullName
+	h.Email = email
+	h.UserUuid = session.UserUuid
+	err = h.Post()
+
 	if err != nil {
 		return res.ReportError(err, reason.HelpCreateFail)
 	}
@@ -176,19 +177,18 @@ func Feedback(w http.ResponseWriter, r *http.Request) (res APIResponse) {
 	}
 	session, err := Session(w, r)
 	if err != nil {
-		return res.ReportError(err, reason.SessionCheckFail)
+		return res.ReportError(err, reason.SessionRetrieveFail)
 	}
-	feedback := &FeedbackStruct{
-		UserUuid:  session.UserUuid,
-		Uuid:      CreateUuid(),
-		Rating:    rating,
-		Body:      body,
-		CreatedAt: time.Now(),
-	}
-	err = SendFeedback(feedback)
+
+	feedback := feedback.New(body)
+	feedback.UserUuid = session.UserUuid
+	feedback.Rating = rating
+
+	err = feedback.Post()
 	if err != nil {
 		return res.ReportError(err, reason.FeedbackCreateFail)
 	}
+
 	return res.ResponseOk([]byte(nil))
 }
 

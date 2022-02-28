@@ -2,8 +2,10 @@ package middleware
 
 import (
 	"net/http"
-	. "projects/server/auth"
 	. "projects/server/util"
+	. "projects/server/util/payload"
+	"projects/server/util/responses/comment"
+	. "projects/server/util/session"
 )
 
 func serveLogin(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +39,7 @@ func serveComments(w http.ResponseWriter, r *http.Request) {
 	}
 	s := "head, general.header, silent.nav, main.nav, footer, comments.layout"
 	files := ListTemplates(s)
-	comments, err := GetComments()
+	comments, err := comment.FetchAll()
 	payload := Payload{
 		Session:  session,
 		Comments: comments,

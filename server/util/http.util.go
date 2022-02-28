@@ -2,7 +2,6 @@ package util
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -10,7 +9,6 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"os"
 )
 
 type RequestFields struct {
@@ -308,20 +306,6 @@ func DecodeString(s string) (string, error) {
 func RouteTo(route string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, IncludeURIParts(route, r), http.StatusFound)
-	}
-}
-
-func LoadConfigs() {
-	Port = os.Getenv("PORT")
-	file, err := os.Open("config.json")
-	if err != nil {
-		Fatal("cannot open config file", err)
-	}
-	decoder := json.NewDecoder(file)
-	Config = Configurations{}
-	err = decoder.Decode(&Config)
-	if err != nil {
-		Fatal("cannot get configuration from file", err)
 	}
 }
 
