@@ -1,7 +1,9 @@
 package payload
 
 import (
+	"net/http"
 	"projects/server/util/reporting"
+	"projects/server/util/request"
 	"projects/server/util/responses/comment"
 	"projects/server/util/session"
 )
@@ -30,6 +32,7 @@ type Payload struct {
 	authorizations []string
 	Session        session.U_session
 	Comments       []comment.U_comment
+	Request        *http.Request
 }
 
 func (load *Payload) HasAccess(level string) (allow bool) {
@@ -98,10 +101,11 @@ func (load *Payload) GetPrivilege() (privilege string) {
 
 // set payload related log in params
 func (load *Payload) setLogginParams() {
+	ip := request.GetIpAddress(load.Request)
+	session := " (user) "
 	if len(load.privilege) > 0 {
-		reporting.ReportInfo("payload: '" + load.Session.UserUuid + "'")
 		load.IsLogged = true
-		return
+		session = " (" + load.Session.Uuid + ") "
 	}
-	reporting.ReportInfo("package payload: 'visitor'")
+	reporting.ReportInfo("payload:" + session + ip)
 }

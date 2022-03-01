@@ -1,6 +1,9 @@
-LOGS 2022/02/28 16:35:23 reporting.go:84: $PORT value: 3001
-WARNING 2022/02/28 16:35:23 reporting.go:64: package payload: 'user is not logged in'
-WARNING 2022/02/28 16:36:30 reporting.go:64: package payload: 'user is not logged in'
-WARNING 2022/02/28 16:37:41 reporting.go:64: package payload: 'user is not logged in'
-WARNING 2022/02/28 16:37:57 reporting.go:64: package payload: 'user is not logged in'
-WARNING 2022/02/28 16:38:02 reporting.go:64: package payload: 'user is not logged in'
+INFO 2022/03/01 15:40:58 reporting.go:91: $PORT value: 3001
+INFO 2022/03/01 15:40:58 reporting.go:77: payload: (user) 127.0.0.1
+INFO 2022/03/01 15:42:17 reporting.go:77: payload: (user) 127.0.0.1
+INFO 2022/03/01 15:54:57 reporting.go:77: payload: (user) 127.0.0.1
+INFO 2022/03/01 15:58:28 reporting.go:77: payload: (user) 127.0.0.1
+INFO 2022/03/01 15:59:23 reporting.go:77: payload: (user) 127.0.0.1
+INFO 2022/03/01 16:08:27 reporting.go:77: payload: (user) 127.0.0.1
+INFO 2022/03/01 16:16:40 reporting.go:77: payload: (user) 127.0.0.1
+INFO 2022/03/01 16:17:31 reporting.go:77: payload: (user) 127.0.0.1

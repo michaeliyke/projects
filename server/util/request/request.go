@@ -1,14 +1,14 @@
-package util
+package request
 
 import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"net/http"
-	"net/http/cookiejar"
 	"net/url"
+	. "projects/server/util/common"
+	. "projects/server/util/reporting"
 )
 
 type RequestFields struct {
@@ -307,77 +307,4 @@ func RouteTo(route string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, IncludeURIParts(route, r), http.StatusFound)
 	}
-}
-
-type CstmClient struct {
-	*http.Client
-	response *http.Response
-	request  *http.Request
-}
-
-func (c *CstmClient) CheckRedirect(req *http.Request, via *http.Request) error {
-	err := Report("Here we go")
-	return err
-}
-
-func (c *CstmClient) Get(url string) (res *http.Response, err error) {
-	res, err = c.Get(url)
-	c.response = res
-	defer res.Body.Close()
-	return
-}
-
-func (c *CstmClient) Body() (string, error) {
-	body, err := ioutil.ReadAll(c.response.Body)
-	return string(body), err
-}
-
-func (c *CstmClient) Bytes() ([]byte, error) {
-	return ioutil.ReadAll(c.response.Body)
-}
-
-func Client(r *http.Request) (client *CstmClient, err error) {
-	client = &CstmClient{}
-	jar, err := cookiejar.New(nil)
-	client.Jar = jar
-
-	return
-}
-
-// Manage all things login here
-/*
-	client := &http.Client{
-		CheckRedirect: redirectPolicyFunc,
-	}
-	resp, err := client.Get("http://example.com")
-	defer resp.Body.Close()
-	resp, err := http.Get("http://webcode.me")
-	fmt.Println(resp.Status)
-	fmt.Println(resp.StatusCode)
-	resp, err := http.Get("http://webcode.me")
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body)
-*/
-
-/*
-	resp, err := http.PostForm("https://httpbin.org/post",
-	url.Values{"name": {"John Doe"}, "message": {"Hey!"}})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(string(body))
-*/
-
-func (c *CstmClient) Post(uri, jsonData string) (res *http.Response, err error) {
-	res, err = c.PostForm(uri, url.Values{})
-	c.response = res
-	defer res.Body.Close()
-	return
 }

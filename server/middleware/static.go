@@ -15,6 +15,7 @@ func serveLogin(w http.ResponseWriter, r *http.Request) {
 		Session: session,
 		Query:   query.Encode(),
 		Referer: query.Get("ref"),
+		Request: r,
 	})
 	if payload.IsLogged {
 		RedirectToReferer(w, r)
@@ -32,7 +33,7 @@ func serveComments(w http.ResponseWriter, r *http.Request) {
 		RedirectWithReferer("/login/", w, r)
 		return
 	}
-	load := InitPayload(&Payload{Session: session})
+	load := InitPayload(&Payload{Session: session, Request: r})
 	if load.IsLogged != true {
 		RedirectWithReferer("/login/", w, r)
 		return
@@ -43,6 +44,7 @@ func serveComments(w http.ResponseWriter, r *http.Request) {
 	payload := Payload{
 		Session:  session,
 		Comments: comments,
+		Request: r,
 	}
 	GenerateHTML(w, InitPayload(&payload), files...)
 	return
@@ -56,7 +58,7 @@ func serveFeedback(w http.ResponseWriter, r *http.Request) {
 		RedirectWithReferer("/login/", w, r)
 		return
 	}
-	load := InitPayload(&Payload{Session: session})
+	load := InitPayload(&Payload{Session: session, Request: r})
 	if load.IsLogged != true {
 		RedirectWithReferer("/login/", w, r)
 		return
@@ -73,7 +75,7 @@ func serveHelp(w http.ResponseWriter, r *http.Request) {
 	files := ListTemplates(s)
 	session, _ := Session(w, r)
 	// check if user has a sesion set, retrieve if so
-	load := InitPayload(&Payload{Session: session})
+	load := InitPayload(&Payload{Session: session, Request: r})
 	GenerateHTML(w, load, files...)
 	return
 }
@@ -88,7 +90,7 @@ func serveChat(w http.ResponseWriter, r *http.Request) {
 		RedirectWithReferer("/login/", w, r)
 		return
 	}
-	load := InitPayload(&Payload{Session: session})
+	load := InitPayload(&Payload{Session: session, Request: r})
 	if load.IsLogged != true {
 		RedirectWithReferer("/login/", w, r)
 		return
@@ -107,7 +109,7 @@ func serveManageRecords(w http.ResponseWriter, r *http.Request) {
 		RedirectWithReferer("/login/", w, r)
 		return
 	}
-	load := InitPayload(&Payload{Session: session})
+	load := InitPayload(&Payload{Session: session, Request: r})
 	if load.IsLogged != true {
 		RedirectWithReferer("/login/", w, r)
 		return
@@ -128,7 +130,7 @@ func serveUpdateProfile(w http.ResponseWriter, r *http.Request) {
 		RedirectWithReferer("/login/", w, r)
 		return
 	}
-	load := InitPayload(&Payload{Session: session})
+	load := InitPayload(&Payload{Session: session, Request: r})
 	if load.IsLogged != true {
 		RedirectWithReferer("/login/", w, r)
 		return
@@ -146,7 +148,7 @@ func serveIndex(w http.ResponseWriter, r *http.Request) {
 	files := ListTemplates(s)
 	session, err := Session(w, r)
 	// check for and retrieve user session
-	load := InitPayload(&Payload{Session: session})
+	load := InitPayload(&Payload{Session: session, Request: r})
 	if err != nil {
 		GenerateHTML(w, load, files...)
 		return
@@ -162,6 +164,7 @@ func serve404(w http.ResponseWriter, r *http.Request) {
 	files := ListTemplates(s)
 	var load *Payload = InitPayload(&Payload{
 		ErrorMessage: r.URL.Query().Get("m"),
+		Request: r,
 	})
 	GenerateHTML(w, load, files...)
 	return
@@ -179,6 +182,7 @@ func serveErrPg(w http.ResponseWriter, r *http.Request) {
 	// Log(files)
 	var load *Payload = InitPayload(&Payload{
 		ErrorMessage: m,
+		Request: r,
 	})
 	GenerateHTML(w, load, files...)
 	return
@@ -190,6 +194,7 @@ func serveT(w http.ResponseWriter, r *http.Request) {
 	m := "This is some error message"
 	var load *Payload = InitPayload(&Payload{
 		ErrorMessage: m,
+		Request: r,
 	})
 	GenerateHTML(w, load, files...)
 	return
@@ -203,6 +208,7 @@ func serveSignUp(w http.ResponseWriter, r *http.Request) {
 		Session: session,
 		Query:   query.Encode(),
 		Referer: query.Get("ref"),
+		Request: r,
 	})
 	if load.IsLogged {
 		RedirectTo("/", w, r)
@@ -220,6 +226,7 @@ func serveProfile(w http.ResponseWriter, r *http.Request) {
 		Session: session,
 		Query:   query.Encode(),
 		Referer: query.Get("ref"),
+		Request: r,
 	})
 	files := ListTemplates("head, silent.nav, main.nav, footer, signup.layout")
 	GenerateHTML(w, load, files...)

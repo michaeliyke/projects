@@ -6,9 +6,16 @@ import (
 	"github.com/michaeliyke/Golang/log"
 )
 
-var Sprintf = log.Sprintf
-var Println = log.Println
-var Logger = logger.Logger
+var (
+	trace   string = "TRACE "
+	info    string = "INFO "
+	warning string = "WARNING "
+	erro_r  string = "ERROR "
+
+	Sprintf = log.Sprintf
+	Println = log.Println
+	Logger  = logger.Logger
+)
 
 type plain interface{}
 
@@ -54,19 +61,19 @@ func ReportFatal(err plain) (r Reporter) {
 }
 
 func Danger(message plain) (r Reporter) {
-	Logger.SetPrefix("ERROR ")
+	Logger.SetPrefix(erro_r)
 	Logger.Println(message)
 	return
 }
 
 func Warning(message plain) (r Reporter) {
-	Logger.SetPrefix("WARNING ")
+	Logger.SetPrefix(warning)
 	Logger.Println(message)
 	return
 }
 
 func Info(message plain) (r Reporter) {
-	Logger.SetPrefix("INFO ")
+	Logger.SetPrefix(info)
 	Logger.Println(message)
 	return
 }
@@ -80,7 +87,7 @@ func Error(message string) error {
 }
 
 func Log(args ...interface{}) (r Reporter) {
-	Logger.SetPrefix("LOGS ")
+	Logger.SetPrefix(info)
 	Logger.Println(args...)
 	log.Println(args...)
 	return

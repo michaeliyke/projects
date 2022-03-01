@@ -3,19 +3,23 @@ textarea {
 }
 
 .form-wrapper {
-  padding-top: 2em;
+  padding-top: 1.3em;
 }
 
 .form.account {
   border: 1px solid #dfe2e6;
   margin: 0 auto;
-  padding: 1em 2em 10em;
+  padding: 1em 2em 5em; /* top-em x-em bottom-em */
   width: 45%;
   overflow: hidden;
 }
 
 .signup.form.account {
   padding-bottom: 5em;
+}
+
+.signup.form.account.help {
+  padding-bottom: 2em;
 }
 
 .signup .form-control.break-up {
@@ -42,8 +46,25 @@ textarea {
   border: none;
 }
 
+.form-control.name {
+  margin-top: 0.5em;
+}
+
+.form-control label {
+  margin-bottom: 0;
+}
+
 .signup .form-control {
   flex-flow: column nowrap;
+  height: unset;
+}
+
+.signup.form.account.help .submit-control{
+  margin-top: 1.3em;
+}
+
+input, textarea {
+  font-size: unset;
 }
 
 .form-control .control {
@@ -55,6 +76,16 @@ textarea {
 
 .signup .form-control .control {
   width: 100%;
+}
+
+.help-s-title {
+  text-align: center;
+  padding-top: 1.5em;
+  color: #959aa1;
+}
+
+.signup .submit-control {
+  margin-top: 1em;
 }
 
 .signup .form-control .form-control {
@@ -88,7 +119,7 @@ textarea {
   border: medium none;
   color: #ffffff;
   font-size: 1em;
-  padding: 0.5em 1.2em;
+  padding: 0.4em 1.2em 0.5em; /* top x bottom;*/
   width: unset;
 }
 
@@ -104,8 +135,8 @@ textarea {
 }
 
 .signup .form-control input {
-  margin-top: 0.6em;
-}
+  margin-top: 0.6rem;
+height: calc(1.5em + .75rem + 6px);}
 
 .rating {
   font-size: 1.7rem;
